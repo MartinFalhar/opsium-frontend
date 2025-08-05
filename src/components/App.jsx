@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import Login from "./Login/Login.jsx";
-import Footer from "./footer/footer.jsx";
+import { Routes, Route } from "react-router-dom";
+
+import Login from "./login/Login.jsx";
+import Footer from "./footer/Footer.jsx";
 import Note from "./note/Note.jsx";
 import CreateArea from "./CreateArea";
-import { Routes, Route } from "react-router-dom";
 import Hello from "./Hello";
 import Layout from "../layout/LayoutMain";
+
 import "../styles.css"; // global CSS file for styling
 
 function App() {
