@@ -1,4 +1,5 @@
 import React from "react";
+import "./Note.css"; // Assuming you have a CSS file for styling
 
 function Note(props) {
   return (

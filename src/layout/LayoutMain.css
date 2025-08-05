@@ -1,0 +1,64 @@
+/* layout.css */
+.layout-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 95vh;
+}
+.layout-header {
+  height: 10%;
+  display: flex;
+  flex-direction: row;
+  /* justify-content: left; */
+  /* align-items: center; */
+  background: var(--color-bg-b1);
+  margin: 0;
+  padding: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.layout-header h1 {
+  text-align: center;
+  color: #fff;
+  font-weight: 600;
+  padding-left: 115px;
+}
+
+.layout-section {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  background-color: #f8f9fa;
+}
+.layout-nav {
+  flex: 15vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: top;
+  width: 15%;
+  align-items: top;
+  padding: 25px;
+  font-size: 1rem;
+  background: var(--color-grd-g13);
+}
+.layout-content {
+  flex: 85vh;
+  /* width: 85%; */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  background-color: #ffffff;
+}
+.layout-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  padding: 1rem;
+  text-align: center;
+  height: 5%;
+}

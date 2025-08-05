@@ -1,6 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import "./Footer.css"; // Assuming you have a CSS file for styling
 
 function Footer() {
   const year = new Date().getFullYear();

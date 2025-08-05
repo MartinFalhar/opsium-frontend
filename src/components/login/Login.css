@@ -1,0 +1,136 @@
+:root {
+  --card-height: 350px;
+  --card-width: calc(var(--card-height) / 1.5);
+}
+
+.card {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 250px;
+  height: 350px;
+  padding: 3px;
+  position: relative;
+  border-radius: 30px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+  display: flex;
+  font-size: 1.5em;
+  color: rgb(#789ac1);
+  box-shadow: 4px 4px 30px rgba(0, 0, 0, 0.3);
+  opacity: 1;
+}
+
+/* .card:hover {
+  color: rgb(88 199 250 / 100%);
+  transition: color 1s;
+}
+.card:hover:before,
+.card:hover:after {
+  animation: none;
+  opacity: 0;
+} */
+
+.card::before {
+  content: "";
+  width: 104%;
+  height: 102%;
+  border-radius: 30px;
+  background-image: linear-gradient(
+    var(--rotate),
+    #e0e7f0,
+    #d2d5da 43%,
+    #789ac1
+  );
+  position: absolute;
+  z-index: -1;
+  top: -1%;
+  left: -2%;
+  animation: spin 13s linear infinite;
+}
+
+.card::after {
+  position: absolute;
+  content: "";
+  top: 20px;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+  transform: scale(0.8);
+  filter: blur(calc(var(--card-height) / 6));
+  background-image: linear-gradient(
+    var(--rotate),
+    #e0e7f0,
+    #d2d5da 43%,
+    #789ac1
+  );
+  opacity: 1;
+  transition: opacity 0.5s;
+  animation: spin 20s linear infinite;
+}
+@property --rotate {
+  syntax: "<angle>";
+  initial-value: 132deg;
+  inherits: false;
+}
+
+@keyframes spin {
+  0% {
+    --rotate: 0deg;
+  }
+  100% {
+    --rotate: 360deg;
+  }
+}
+
+.user {
+  color: white;
+  font-size: 24px;
+  font-family: "Roboto";
+}
+
+.userNotFound {
+  margin: 0;
+  padding: 0;
+  color: red;
+  font-size: 0.8rem;
+}
+
+form {
+  position: relative;
+  width: 100vh;
+  margin: 30px 30px 30px 30px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 7px;
+  box-shadow: 0 1px 5px rgb(138, 137, 137);
+}
+form input,
+form textarea {
+  width: 100%;
+  border: none;
+  padding: 4px;
+  outline: none;
+  font-size: 1.2em;
+  font-family: inherit;
+  resize: none;
+}
+form button {
+  position: absolute;
+  right: 18px;
+  bottom: -18px;
+  background: #f5ba13;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 136px;
+  height: 36px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  outline: none;
+}
