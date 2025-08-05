@@ -2,14 +2,16 @@
 .layout-main {
   display: flex;
   flex-direction: column;
-  min-height: 95vh;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f0f2f5;
+  padding: 0;
+  margin: 0;
 }
 .layout-header {
-  height: 10%;
+  flex: 0 0 10%;
   display: flex;
   flex-direction: row;
-  /* justify-content: left; */
-  /* align-items: center; */
   background: var(--color-bg-b1);
   margin: 0;
   padding: 10px;
@@ -24,14 +26,14 @@
 }
 
 .layout-section {
-  flex: 1;
+  flex: 0 0 87%;
   display: flex;
   flex-direction: row;
   padding: 0;
   background-color: #f8f9fa;
 }
 .layout-nav {
-  flex: 15vh;
+  flex: 5;
   display: flex;
   flex-direction: column;
   justify-content: top;
@@ -42,8 +44,7 @@
   background: var(--color-grd-g13);
 }
 .layout-content {
-  flex: 85vh;
-  /* width: 85%; */
+  flex: 5;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -53,12 +54,11 @@
   background-color: #ffffff;
 }
 .layout-footer {
+  flex: 0 0 3%;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   background-color: #f8f9fa;
-  padding: 1rem;
   text-align: center;
-  height: 5%;
 }
