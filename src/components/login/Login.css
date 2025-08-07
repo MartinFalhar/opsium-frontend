@@ -1,14 +1,34 @@
 :root {
-  --card-height: 350px;
+  --card-height: 65vh;
   --card-width: calc(var(--card-height) / 1.5);
+  --rotate: 0deg;
+}
+
+@property --rotate {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes spin {
+  0% {
+    --rotate: 0deg;
+  }
+  100% {
+    --rotate: 360deg;
+  }
+}
+
+body {
+  background-color: aliceblue;
 }
 
 .card {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  width: 250px;
-  height: 350px;
+  width: var(--card-width);
+  height: var(--card-height);
   padding: 3px;
   position: relative;
   border-radius: 30px;
@@ -18,7 +38,8 @@
   flex-direction: column;
   display: flex;
   font-size: 1.5em;
-  color: rgb(#789ac1);
+  color: #789ac1;
+  /* color: #fff; */
   box-shadow: 4px 4px 30px rgba(0, 0, 0, 0.3);
   opacity: 1;
 }
@@ -35,8 +56,8 @@
 
 .card::before {
   content: "";
-  width: 104%;
-  height: 102%;
+  width: 100%;
+  height: 100%;
   border-radius: 30px;
   background-image: linear-gradient(
     var(--rotate),
@@ -46,20 +67,20 @@
   );
   position: absolute;
   z-index: -1;
-  top: -1%;
-  left: -2%;
+  top: -0%;
+  left: -0%;
   animation: spin 13s linear infinite;
 }
 
 .card::after {
   position: absolute;
   content: "";
-  top: 20px;
+  top: calc(var(--card-height) / 6);
   left: 0;
   right: 0;
   z-index: -1;
-  height: 100%;
-  width: 100%;
+  height: 101%;
+  width: 101%;
   margin: 0 auto;
   transform: scale(0.8);
   filter: blur(calc(var(--card-height) / 6));
@@ -73,64 +94,28 @@
   transition: opacity 0.5s;
   animation: spin 20s linear infinite;
 }
-@property --rotate {
-  syntax: "<angle>";
-  initial-value: 132deg;
-  inherits: false;
-}
 
-@keyframes spin {
-  0% {
-    --rotate: 0deg;
-  }
-  100% {
-    --rotate: 360deg;
-  }
-}
-
-.user {
-  color: white;
-  font-size: 24px;
-  font-family: "Roboto";
-}
-
-.userNotFound {
-  margin: 0;
-  padding: 0;
-  color: red;
-  font-size: 0.8rem;
-}
-
-form {
-  position: relative;
-  width: 100vh;
-  margin: 30px 30px 30px 30px;
-  background: #fff;
-  padding: 15px;
-  border-radius: 7px;
-  box-shadow: 0 1px 5px rgb(138, 137, 137);
-}
-form input,
-form textarea {
-  width: 100%;
-  border: none;
-  padding: 4px;
-  outline: none;
-  font-size: 1.2em;
-  font-family: inherit;
-  resize: none;
-}
-form button {
+button {
   position: absolute;
   right: 18px;
   bottom: -18px;
   background: #f5ba13;
-  color: #fff;
+  color: black;
   border: none;
-  border-radius: 50%;
+  border-radius: 25px;
   width: 136px;
   height: 36px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   outline: none;
+}
+
+input {
+  width: 80%;
+  height: 40px;
+  border-radius: 20px;
+  border: 1px solid #e0e7f0;
+  padding: 0 20px;
+  margin: 10px 0;
+  font-size: 0.7em;
 }

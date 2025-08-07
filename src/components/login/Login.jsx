@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
-import logo from "./opsium-logo-blk.png"; // Import the logo image
+import logo from "./opsium-logo-blk.png";
 
 const API_URL = import.meta.env.VITE_API_URL;
 console.log("API URL:", API_URL);
@@ -32,8 +32,8 @@ function Login() {
   };
 
   return (
-    <div>
-      <form className="card" onSubmit={handleSubmit}>
+    <div className="card">
+      <form onSubmit={handleSubmit}>
         <img src={logo} style={{ width: "150px", objectFit: "contain" }} />
         <input
           type="email"

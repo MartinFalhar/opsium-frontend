@@ -7,8 +7,8 @@ function Footer(props) {
   return (
     <footer className="layout-footer">
       <p>
-        `© {new Date().getFullYear()} Opsium. All rights reserved.
-        {props.footerText}`
+        © {new Date().getFullYear()} Opsium,{" " + props.footerText}. All rights
+        reserved.
       </p>
     </footer>
   );

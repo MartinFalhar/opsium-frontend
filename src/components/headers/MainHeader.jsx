@@ -9,7 +9,7 @@ function MainHeader() {
         src={OpsiumLogo}
         style={{ width: "150px", objectFit: "contain" }}
       ></img>
-      <h1>WELCOME, dear sheapard!</h1>
+      <h1>WELCOME, dear shepherd!</h1>
     </header>
   );
 }
