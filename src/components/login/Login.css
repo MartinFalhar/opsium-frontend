@@ -95,11 +95,12 @@ body {
   animation: spin 20s linear infinite;
 }
 
-button {
+.button-login {
   position: absolute;
   right: 18px;
   bottom: -18px;
-  background: #f5ba13;
+  background: var(--color-grd-g2);
+  /* background: red; */
   color: black;
   border: none;
   border-radius: 25px;

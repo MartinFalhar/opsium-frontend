@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
+import "../../styles/styles.css";
 import logo from "./opsium-logo-blk.png";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -47,7 +48,7 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Heslo"
         />
-        <button type="submit">Přihlásit se</button>
+        <button className="button-login" type="submit">Přihlásit se</button>
         {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
     </div>

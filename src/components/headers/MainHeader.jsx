@@ -1,5 +1,5 @@
 import React from "react";
-import OpsiumLogo from "../../styles/images/opsium-logo-wht.png"; // Adjust the path as necessary
+import OpsiumLogo from "../../styles/images/opsium-logo-gray.png"; // Adjust the path as necessary
 
 function MainHeader() {
   return (
@@ -7,9 +7,11 @@ function MainHeader() {
       <img
         alt="Opsium logo"
         src={OpsiumLogo}
-        style={{ width: "150px", objectFit: "contain" }}
+        style={{ width: "130px", objectFit: "contain", paddingLeft: "20px" }}
       ></img>
-      <h1>WELCOME, dear shepherd!</h1>
+      <h1 style={{ fontSize: "30px" }}>
+        .: OPSIUM :: An optometry software :.
+      </h1>
     </header>
   );
 }

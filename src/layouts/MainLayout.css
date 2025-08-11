@@ -33,16 +33,16 @@
   height: 100%;
 }
 .layout-nav {
-  width: 150px;
+  width: 200px;
   flex-shrink: 0;
   display: flex;
   height: 100%;
   flex-direction: column;
   justify-content: top;
   align-items: top;
-  padding: 25px;
+  padding: 15px;
   font-size: 1rem;
-  background: var(--color-grd-g13);
+  background: var(--color-bg-b3);
 }
 .layout-content {
   flex: 1;
@@ -55,11 +55,11 @@
   margin: 0;
 }
 .layout-footer {
-  flex: 0 0 3%;
+  flex: 0 0 4%;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  background-color: #f8f9fa;
+  background-color: #faf8f8;
   text-align: center;
 }
