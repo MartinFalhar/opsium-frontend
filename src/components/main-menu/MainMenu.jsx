@@ -21,13 +21,13 @@ const buttons = [
 
 function MainMenu(prosps) {
   const [activeButton, setActiveButton] = useState(null);
+  const navigate = useNavigate();
 
   const handleClick = (button) => {
     setActiveButton(button.id); // změna stylu
     navigate(button.path); // přechod na stránku
   };
 
-  const navigate = useNavigate();
   return (
     <div>
       <h1>Menu</h1>

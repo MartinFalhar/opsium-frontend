@@ -29,6 +29,13 @@
   --icon-size: 20px;
 }
 
+@font-face {
+  font-family: "SLOAN";
+  src: url("./sloan.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 * {
   padding: 0;
   margin: 0;
@@ -90,4 +97,21 @@ h1 {
   transition: filter 0.12s ease, transform 0.12s ease,
     background-image 0.12s ease;
   padding: 0 1px 0 15px;
+}
+
+.button-big {
+  width: 166px;
+  height: 82px;
+  background: var(--color-grd-g2);
+  color: var(--color-bg-b12);
+  font-weight: bold;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 13px rgba(0, 0, 0, 0.3);
+  font-size: var(--font-size-main-menu);
+  margin-top: 20px;
+  text-align: center;
+  color: var(--color-bg-b1);
+  font-size: 1.2rem;
 }
