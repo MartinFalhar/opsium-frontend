@@ -14,7 +14,7 @@ const buttons = [
     id: "visual-training",
     label: "Zrakový trénink",
     rights: 0,
-    path: "/",
+    path: "/visual-training",
   },
   { id: "clients", label: "Klienti", rights: 1, path: "/" },
 ];

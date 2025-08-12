@@ -7,6 +7,25 @@
   justify-content: center;
   margin: 0;
   background-color: rgb(255, 255, 255);
+}
+
+.optotyp-testing-container p {
+  
   font-family: "SLOAN", Arial, sans-serif;
   font-size: 3rem;
+  letter-spacing: 3rem ;
+  -webkit-user-select: none; /* pro Safari */
+  -moz-user-select: none; /* pro Firefox */
+  -ms-user-select: none; /* pro Internet Explorer/Edge */
+  user-select: none; /* standardní syntaxe */
+
+}
+
+.optotyp-testing-container .info {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  color: rgba(0, 0, 0, 0.4);
+  font-size: 2rem;
+  letter-spacing: 10px;
 }

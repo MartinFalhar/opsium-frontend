@@ -1,0 +1,23 @@
+.layout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #f8f9fa; /* Light background for contrast */
+}
+
+.header-title {
+  flex: 1;
+  color: var(--color-bg-b10);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  margin-left: 20px;
+  color: azure;
+}
+ .layout-header img.header-logo {
+  cursor: pointer;
+  
+}
