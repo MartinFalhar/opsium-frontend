@@ -40,7 +40,7 @@ function Vistraining() {
             })}
           </div>
         ) : (
-          <div>No data</div>
+          <div>:-)</div>
         )}
 
         <button className="button-big" onClick={handleClick}>

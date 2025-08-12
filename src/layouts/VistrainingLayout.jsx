@@ -4,6 +4,8 @@ import "./VistrainingLayout.css";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import magentaImg from "../styles/images/magenta.png";
+import cyanImg from "../styles/images/cyan.png";
 // import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 
 
@@ -61,15 +63,14 @@ function VistrainingLayout() {
 
   return (
     <div className="visual-training-container">
-      <img className="cyan" src="../../src/styles/images/cyan.png" style={{
+      <img className="cyan" src={magentaImg} style={{
         height:"250px", 
         transform: `translateX(${-imgDistance}px)`,
         }}/>
-      <img className="magenta" src="../../src/styles/images/magenta.png" style={{
+      <img className="magenta" src={cyanImg} style={{
         height:"250px",
          transform: `translateX(${+imgDistance}px)`,
          }}/>
-
 
 
 
