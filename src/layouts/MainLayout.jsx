@@ -11,7 +11,7 @@ const MainLayout = () => {
       <MainHeader className="layout-header" />
       <section className="layout-section">
         <nav className="layout-nav">
-          <MainMenu rights={1} />
+          <MainMenu rights={0} />
         </nav>
         <div className="layout-content">
           <Outlet />

@@ -2,9 +2,11 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import "./Optotyp.css";
+import { useUser } from "../../context/UserContext";
 
 function Optotyp() {
   const navigate = useNavigate();
+  const { user } = useUser();
 
   const handleClick = (button) => {
     console.log("Optotyp clicked");
@@ -15,6 +17,14 @@ function Optotyp() {
     <div className="optotyp-container">
       <div className="optotyp-settings">
         <h2>Optotyp Settings</h2>
+        <p>FRNT User set: {JSON.stringify(user)}</p>
+        {user ? (
+          <p>
+            Přihlášen: {user.name} ({user.rights})
+          </p>
+        ) : (
+          <p>Nepřihlášený uživatel</p>
+        )}
         <button className="button-big" onClick={() => handleClick()}>
           Start Test
         </button>

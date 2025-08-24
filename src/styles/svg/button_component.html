@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Custom Button — HTML + CSS</title>
+  <style>
+    /* --- Variables --- */
+    :root{
+      --btn-height: 44px;
+      --btn-padding-x: 16px;
+      --btn-gap: 10px; /* space between icon and label */
+      --btn-radius: 10px;
+
+      --color-bg: #f3f6fb;
+      --color-border: #d1dbe8;
+      --color-text: #0f1724;
+      --color-hover-bg: #e8f0ff;
+      --color-selected-bg: #0b66ff;
+      --color-selected-text: #ffffff;
+
+      --icon-size: 20px;
+    }
+
+    /* --- Base reset for demo --- */
+    body{font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; padding:24px; background: #ffffff; color:var(--color-text)}
+
+    /* --- Button component --- */
+    .btn{
+      --height: var(--btn-height);
+      --padding-x: var(--btn-padding-x);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--btn-gap);
+      height: var(--height);
+      padding: 0 var(--padding-x);
+      border-radius: var(--btn-radius);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+      transition: background .18s ease, box-shadow .12s ease, transform .06s ease, color .12s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* make it keyboard accessible look */
+    .btn:focus{
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(11,102,255,0.12);
+    }
+
+    .btn:hover{
+      background: var(--color-hover-bg);
+      transform: translateY(-1px);
+    }
+
+    /* selected / active state: either class or aria-pressed="true" */
+    .btn.is-selected,
+    .btn[aria-pressed="true"]{
+      background: var(--color-selected-bg);
+      color: var(--color-selected-text);
+      border-color: transparent;
+    }
+
+    .btn.is-selected:hover,
+    .btn[aria-pressed="true"]:hover{
+      filter: brightness(.98);
+      transform: translateY(-1px);
+    }
+
+    /* disabled look */
+    .btn:disabled{
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* --- Icon via ::before using an inline SVG data URI --- */
+    /* You can replace the SVG (star icon) with any other SVG — keep it URL encoded. */
+    .btn::before{
+      content: "";
+      display: inline-block;
+      width: var(--icon-size);
+      height: var(--icon-size);
+      flex: 0 0 auto;
+      background-repeat: no-repeat;
+      background-size: contain;
+      /* simple star svg, url-encoded */
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><path d='M12 2l2.6 6.9L21 10.1l-5 3.9L17.2 21 12 17.8 6.8 21 8 14l-5-3.9 6.4-1.2L12 2z' fill='%230b66ff'/></svg>");
+      transition: filter .12s ease, transform .12s ease, background-image .12s ease;
+    }
+
+    /* When button is selected, we want the icon color to adapt. We swap the background-image to a white SVG */
+    .btn.is-selected::before,
+    .btn[aria-pressed="true"]::before{
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><path d='M12 2l2.6 6.9L21 10.1l-5 3.9L17.2 21 12 17.8 6.8 21 8 14l-5-3.9 6.4-1.2L12 2z' fill='%23ffffff'/></svg>");
+    }
+
+    /* Slight visual tweak on hover for the icon */
+    .btn:hover::before{ transform: translateY(-1px); }
+
+    /* --- Label inside button --- */
+    .btn__label{ display: inline-block; }
+
+    /* --- Compact variant: only show icon --- */
+    .btn--compact{
+      width: var(--height); /* make it square */
+      padding-inline: 8px; /* smaller padding */
+      justify-content: center;
+      gap: 0;
+    }
+    .btn--compact .btn__label{ display:none; }
+    .btn--compact::before{ margin: 0; }
+
+    /* Provide an accessible hidden label alternative if you need to show a tooltip or for screen readers */
+    .sr-only{
+      border: 0 !important; clip: rect(1px, 1px, 1px, 1px) !important; clip-path: inset(50%) !important; height: 1px !important; margin: -1px !important; overflow: hidden !important; padding: 0 !important; position: absolute !important; width: 1px !important; white-space: nowrap !important;
+    }
+
+    /* small helpers for demo layout */
+    .row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap }
+    h1{font-size:16px}
+  </style>
+</head>
+<body>
+  <h1>Button component demo</h1>
+
+  <div class="row" style="margin-bottom:12px;">
+    <!-- Normal button -->
+    <button class="btn" type="button" aria-pressed="false">
+      <span class="btn__label">Uložit</span>
+    </button>
+
+    <!-- Selected button (using class) -->
+    <button class="btn is-selected" type="button" aria-pressed="true">
+      <span class="btn__label">Zvolen</span>
+    </button>
+
+    <!-- Compact button (icon only) -->
+    <button class="btn btn--compact" type="button" aria-label="Uložit" title="Uložit">
+      <span class="btn__label">Uložit</span>
+    </button>
+
+    <!-- Disabled example -->
+    <button class="btn" type="button" disabled>
+      <span class="btn__label">Nevyplněno</span>
+    </button>
+  </div>
+
+  <p>Tip: pokud chcete změnit ikonu, vyměňte obsah <code>background-image</code> v <code>.btn::before</code> za jiný SVG data-URI. Pokud byste raději používali externí SVG symboly, lze místo data-URI umístit element <code>&lt;svg&gt;</code> přímo do tlačítka a skrýt ho v compact módu.</p>
+
+</body>
+</html>

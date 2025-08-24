@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../../context/UserContext";
 
 const buttons = [
   {
@@ -22,17 +23,27 @@ const buttons = [
 function MainMenu(prosps) {
   const [activeButton, setActiveButton] = useState(null);
   const navigate = useNavigate();
+  const { user } = useUser();
 
   const handleClick = (button) => {
     setActiveButton(button.id); // změna stylu
     navigate(button.path); // přechod na stránku
   };
 
+  console.log("FRNT MainMenu user:", user);
+
   return (
     <div>
       <h1>Menu</h1>
       {buttons.map((button) => {
-        if (prosps.rights >= button.rights) {
+        // Kontrola práv uživatele
+        // user.rights = user.rights || 0; // Zajištění, že rights existují a jsou číslo
+        // user.rights = 1; // Zajištění, že rights existují a jsou číslo
+
+        // Pokud není uživatel přihlášen, zobrazíme jen tlačítka s právy 0
+        // if (Number(JSON.stringify(user.rights)) >= button.rights)
+        console.log("FRNT MainMenu user rights:", user?.rights);
+        if (user?.rights >= button.rights) {
           return (
             <button
               key={button.id}
@@ -46,6 +57,7 @@ function MainMenu(prosps) {
             </button>
           );
         }
+        return null; // Pokud uživatel nemá práva, tlačítko se nezobrazí
       })}
     </div>
   );

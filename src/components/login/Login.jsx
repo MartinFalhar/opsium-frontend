@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import "../../styles/styles.css";
 import logo from "./opsium-logo-blk.png";
+import { useUser } from "../../context/UserContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 console.log("API URL:", API_URL);
@@ -13,6 +14,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,10 +25,19 @@ function Login() {
     });
 
     const data = await res.json();
-    console.log("Response data:", data);
     if (res.ok) {
-      localStorage.setItem("token", data.token); // nebo cookie, podle implementace
-      navigate("/footer");
+      // localStorage.setItem("token", data.token);
+      // nebo cookie, podle implementace
+      setUser(data);
+      console.log("FRNT Response data:", data);
+
+      // Zkontrolujeme, jestli se uložil do localStorage
+      console.log(
+        "Co je v localStorage po uložení usera:",
+        JSON.parse(localStorage.getItem("user"))
+      );
+
+      navigate("/"); // přesměrování na domovskou stránku s právy
     } else {
       setError(data.message);
     }
@@ -48,7 +59,9 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Heslo"
         />
-        <button className="button-login" type="submit">Přihlásit se</button>
+        <button className="button-login" type="submit">
+          Přihlásit se
+        </button>
         {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
     </div>
