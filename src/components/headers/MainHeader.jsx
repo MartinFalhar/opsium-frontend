@@ -15,13 +15,12 @@ function MainHeader() {
         src={OpsiumLogo}
         style={{ width: "130px", objectFit: "contain", paddingLeft: "20px" }}
         onClick={handleLogoClick}
-        className="header-logo" 
+        className="header-logo"
       ></img>
       <div className="header-title">
-        <h1 style={{ fontSize: "30px" }}>
-          .: OPSIUM :: OPtical Smart Instrument for User Mastery :.
-        </h1>
-        <p>Your recipe for clear insights and happy clients</p>
+        <p style={{ fontSize: "20px" }}>
+          OPSIUM : optical smart instrument for user mastery
+        </p>
       </div>
     </header>
   );

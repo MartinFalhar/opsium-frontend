@@ -17,7 +17,6 @@ function Optotyp() {
     <div className="optotyp-container">
       <div className="optotyp-settings">
         <h2>Optotyp Settings</h2>
-        <p>FRNT User set: {JSON.stringify(user)}</p>
         {user ? (
           <p>
             Přihlášen: {user.name} ({user.rights})

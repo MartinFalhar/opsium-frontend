@@ -33,32 +33,45 @@ function MainMenu(prosps) {
   console.log("FRNT MainMenu user:", user);
 
   return (
-    <div>
-      <h1>Menu</h1>
-      {buttons.map((button) => {
-        // Kontrola práv uživatele
-        // user.rights = user.rights || 0; // Zajištění, že rights existují a jsou číslo
-        // user.rights = 1; // Zajištění, že rights existují a jsou číslo
+    <div className="main-menu-container">
+      <div className="main-menu">
+        <h1>Menu</h1>
+        {buttons.map((button) => {
+          // Kontrola práv uživatele
+          // user.rights = user.rights || 0; // Zajištění, že rights existují a jsou číslo
+          // user.rights = 1; // Zajištění, že rights existují a jsou číslo
 
-        // Pokud není uživatel přihlášen, zobrazíme jen tlačítka s právy 0
-        // if (Number(JSON.stringify(user.rights)) >= button.rights)
-        console.log("FRNT MainMenu user rights:", user?.rights);
-        if (user?.rights >= button.rights) {
-          return (
-            <button
-              key={button.id}
-              id={button.id}
-              className={`button-main-menu ${
-                activeButton === button.id ? "active" : ""
-              }`}
-              onClick={() => handleClick(button)}
-            >
-              {button.label}
-            </button>
-          );
-        }
-        return null; // Pokud uživatel nemá práva, tlačítko se nezobrazí
-      })}
+          // Pokud není uživatel přihlášen, zobrazíme jen tlačítka s právy 0
+          // if (Number(JSON.stringify(user.rights)) >= button.rights)
+          console.log("FRNT MainMenu user rights:", user?.rights);
+          if (user?.rights >= button.rights) {
+            return (
+              <button
+                key={button.id}
+                id={button.id}
+                className={`button-main-menu ${
+                  activeButton === button.id ? "active" : ""
+                }`}
+                onClick={() => handleClick(button)}
+              >
+                {button.label}
+              </button>
+            );
+          }
+          return null; // Pokud uživatel nemá práva, tlačítko se nezobrazí
+        })}
+      </div>
+      <div className="main-menu-footer">
+        <div className="main-menu-avatar"></div>
+        <div className="main-menu-user-info">
+          <p>
+            {user?.name} ({user?.rights})
+          </p>
+          <a href="">
+            <p>Odhlásit</p>
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
