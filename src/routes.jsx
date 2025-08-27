@@ -8,6 +8,7 @@ import Optotyp from "./components/optotyp/Optotyp";
 import OptotypLayout from "./layouts/OptotypLayout";
 import Vistraining from "./components/vistraining/Vistraining";
 import VistrainingLayout from "./layouts/VistrainingLayout";
+import Logout from "./components/login/Logout";
 // import LoginPage from "./pages/LoginPage";
 // import AdminDashboard from "./pages/AdminDashboard";
 // import NotFound from "./pages/NotFound";
@@ -20,6 +21,7 @@ export default function RoutesConfig() {
         <Route path="/" element={<HomePage />} />
         <Route path="/optotyp" element={<Optotyp />} />
         <Route path="/visual-training" element={<Vistraining />} />
+        <Route path="/logout" element={<Logout />} />
         {/* <Route path="/login" element={<LoginPage />} /> */}
         {/* <Route path="/admin" element={<AdminDashboard />} /> */}
         {/* <Route path="*" element={<NotFound />} /> */}

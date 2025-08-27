@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
+import Logout from "../login/Logout";
 
 const buttons = [
   {
@@ -44,7 +45,7 @@ function MainMenu(prosps) {
           // Pokud není uživatel přihlášen, zobrazíme jen tlačítka s právy 0
           // if (Number(JSON.stringify(user.rights)) >= button.rights)
           console.log("FRNT MainMenu user rights:", user?.rights);
-          if (user?.rights >= button.rights) {
+          if (user?.rights >= button.rights || button.rights === 0) {
             return (
               <button
                 key={button.id}
@@ -62,15 +63,25 @@ function MainMenu(prosps) {
         })}
       </div>
       <div className="main-menu-footer">
-        <div className="main-menu-avatar"></div>
-        <div className="main-menu-user-info">
-          <p>
-            {user?.name} ({user?.rights})
-          </p>
-          <a href="">
-            <p>Odhlásit</p>
-          </a>
-        </div>
+        {user?.name && <div className="main-menu-avatar"></div>}
+        {user?.name && (
+          <div className="main-menu-user-info">
+            <p>
+              {user?.name} ({user?.rights})
+            </p>
+            <a href="/logout">
+              <p>Odhlásit</p>
+            </a>
+          </div>
+        )}
+        {!user?.name && (
+          <div className="main-menu-user-info">
+            <p>(nepřihlášen)</p>
+            <a href="/">
+              <p>Přihlásit</p>
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );
