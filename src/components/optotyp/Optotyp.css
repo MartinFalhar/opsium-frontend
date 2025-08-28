@@ -14,15 +14,51 @@ body {
 }
 
 .optotyp-settings {
-  flex: 0 0 75%;
+  /* flex: 1 1 1; */
   background: var(--color-bg-b11);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   box-shadow: 5px 0 5px rgba(85, 85, 85, 0.3);
   z-index: 1;
   padding: 25px;
+}
+
+.optotyp-left-column {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-b11);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.optotyp-middle-column {
+  flex: 1 1 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-b11);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.optotyp-right-column {
+  flex: 0 0 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  background: var(--color-bg-b11);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .optotyp-help {
@@ -35,4 +71,86 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.optotyp-calibration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-b11);
+  padding: 25px;
+}
+
+.optotyp-calibration-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.optotyp-calibration-btn-shrink { 
+  background: url(../src/styles/svg/shrink-arrow.svg), var(--color-grd-g2);
+  height: 100px;
+  width: 100px;
+  border: none;
+  border-radius: 5px;
+  background-size: 70%, cover;
+  background-repeat: no-repeat;
+  background-position: center 5px, center; 
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s, box-shadow 0.3s;
+  padding-top: 70px;
+  margin-right: 35px;
+}
+.optotyp-calibration-btn-expand { 
+  background: url(../src/styles/svg/expand-arrow.svg), var(--color-grd-g2);
+    height: 100px;
+  width: 100px;
+  border: none;
+  border-radius: 5px;
+  background-size: 60%, cover;
+  background-repeat: no-repeat;
+  background-position: center 8px, center;  
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s, box-shadow 0.3s;
+  padding-top: 70px;
+  margin-right: 35px;
+}
+
+.optotyp-calibration-btn-shrink:hover,
+.optotyp-calibration-btn-expand:hover {
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+
+} 
+
+.optotyp-calibration-btn-shrink:active,
+.optotyp-calibration-btn-expand:active {
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+  transform: translateY(2px);
+  align-items: flex-start;
+  justify-content: center;
+
+} 
+
+.optotyp-calibration-sample {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: --var(--color-grd-g6);
+  height: 150px;
+  width: 240px;
+  font-size: 1.5rem;
+  color: var(--color-bg-b1);
+  border: 1px solid var(--color-el-n);
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 35px;
 }
