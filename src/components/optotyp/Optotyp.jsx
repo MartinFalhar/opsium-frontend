@@ -11,19 +11,21 @@ function Optotyp() {
   const devicePx = cssPx * window.devicePixelRatio;
   
 
-  const [hodnota, setHodnota] = useState(100);
+  const [viewDistance, setViewDistance] = useState(100);
   const [sampleWidth, setSampleWidth] = useState(devicePx);  // initial value in pixels
   const navigate = useNavigate();
   const { user } = useUser();
 
-  const handleClick = (button) => {
+  const handleClick = () => {
     console.log("Optotyp clicked");
-    navigate("/optotyp-testing"); // přechod na stránku
+    navigate(`/optotyp-testing?mm2px=${(sampleWidth/8.56).toFixed(2)}&viewDistance=${viewDistance/10}`); // přechod na stránku s předáním parametru zjištěný kalibrací
   };
 
   const handleChange = (e) => {
-    setHodnota(e.target.value); // uložíme hodnotu slideru do stavu
+    setViewDistance(e.target.value); // uložíme hodnotu slideru do stavu
   };
+
+
 
   return (
     <div className="optotyp-container">
@@ -40,24 +42,24 @@ function Optotyp() {
         <div>
           <h3>Vzdálenost od obrazovky</h3>
           <label htmlFor="slider">
-            Vzdálenost od obrazovky: {hodnota / 10} metrů
+            Vzdálenost od obrazovky: {viewDistance / 10} metrů
           </label>
           <input
             id="slider"
             type="range"
             min="30"
             max="100"
-            value={hodnota}
+            value={viewDistance}
             step="1"
             onChange={handleChange}
           />
-          <p>Akomodační zátěž: {(10 / hodnota).toFixed(2)} [D]</p>
+          <p>Akomodační zátěž: {(10 / viewDistance).toFixed(2)} [D]</p>
         </div>
       <div className="optotyp-calibration">
         <h3>Kalibrace</h3>
         <p>
           Pro správnou funkci aplikace je nutné provést kalibraci. Umístěte se
-          do vzdálenosti {hodnota / 10} metrů od obrazovky a změřte skutečnou
+          do vzdálenosti {viewDistance / 10} metrů od obrazovky a změřte skutečnou
           velikost zobrazeného čtverce pomocí pravítka.
         </p>
         <p>

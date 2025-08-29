@@ -1,5 +1,5 @@
 :root {
-  --card-height: 65vh;
+  --card-height: 55vh;
   --card-width: calc(var(--card-height) / 1.5);
   --rotate: 0deg;
 }
@@ -44,15 +44,6 @@ body {
   opacity: 1;
 }
 
-/* .card:hover {
-  color: rgb(88 199 250 / 100%);
-  transition: color 1s;
-}
-.card:hover:before,
-.card:hover:after {
-  animation: none;
-  opacity: 0;
-} */
 
 .card::before {
   content: "";
@@ -69,7 +60,7 @@ body {
   z-index: -1;
   top: -0%;
   left: -0%;
-  animation: spin 13s linear infinite;
+  animation: spin 10s linear infinite;
 }
 
 .card::after {
@@ -92,13 +83,10 @@ body {
   );
   opacity: 1;
   transition: opacity 0.5s;
-  animation: spin 20s linear infinite;
+  animation: spin 10s linear infinite;
 }
 
-.button-login {
-  position: absolute;
-  right: 18px;
-  bottom: -18px;
+.button-login { 
   background: var(--color-grd-g2);
   /* background: red; */
   color: black;

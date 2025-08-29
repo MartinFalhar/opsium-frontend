@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import "../../styles/styles.css";
-import logo from "./opsium-logo-blk.png";
+import logo from "../../styles/images/opsium-logo-black.png";
 import { useUser } from "../../context/UserContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -46,7 +46,7 @@ function Login() {
   return (
     <div className="card">
       <form onSubmit={handleSubmit}>
-        <img src={logo} style={{ width: "150px", objectFit: "contain" }} />
+        <img src={logo} style={{ width: "200px", objectFit: "contain", marginBottom: "70px" }} />
         <input
           type="email"
           value={email}
@@ -59,7 +59,7 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Heslo"
         />
-        <button className="button-login" type="submit">
+        <button  type="submit" style={{ marginTop: "30px" }} >
           Přihlásit se
         </button>
         {error && <p style={{ color: "red" }}>{error}</p>}

@@ -2,7 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import "./OptotypLayout.css";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 
 function useInputHandler({
@@ -72,7 +72,12 @@ function generateSloanLetters() {
 
 
 function OptotypLayout() {
-  
+  // Získání parametru sampleWidth z URL
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const mm2px = queryParams.get("mm2px");
+  const viewDistance = queryParams.get("viewDistance");
+
   const baseColor = "0,0,0";
   const baseSize = 100; // základní velikost písma
   const [textOpacity, setTextOpacity] = useState(1); // React state pro opacity
@@ -86,10 +91,10 @@ function OptotypLayout() {
       navigate("/optotyp"); // přechod na stránku optotypu
     },
     onClickLeft: () => {
-      setTextSize((prev) => Math.max(prev - 10, 20)); // zmenšení velikosti písma
+      setTextSize((prev) => Math.max(prev - 10, 0)); // zmenšení velikosti písma
       console.log("Klik v levé půlce")},
     onClickRight: () => {
-      setTextSize((prev) => Math.min(prev + 10, 200)); // zvětšení velikosti písma
+      setTextSize((prev) => Math.min(prev + 10, 900)); // zvětšení velikosti písma
       console.log("Klik v pravé půlce")},
     onWheelUp: () => {
       setTextOpacity((prev) => Math.min(prev + 0.1, 1));
@@ -104,12 +109,23 @@ function OptotypLayout() {
       console.log("Scroll kolečkem dolů")},
   });
 
+    /* --- Výpočet výšky optotypu pro zadanou vzdálenost --- */
+function letterSize(viewDistance){
+  // úhel 5 arcminutes -> 5/60 degrees
+  const degrees = 5 / 60;
+  const radians = degrees * Math.PI / 180;
+  const heightMeters = viewDistance * Math.tan(radians); // výška znaku v metrech
+
+  return heightMeters * 1000; // mm
+}
+
   return (
     <div className="optotyp-testing-container" >
-      <p style ={{ color: textColor, fontSize: textSize }}>{generateSloanLetters()}</p>
+      <p style ={{ color: textColor, fontSize: letterSize(viewDistance) }}>{generateSloanLetters()}</p>
       {/* This is where the Optotyp component will be rendered */}
       {/* <Outlet /> */}
       <p className="info">{textSize}/{Math.floor(textOpacity*10)}</p>
+      <p>{mm2px}/{viewDistance}</p>
     </div>
   );
 }
