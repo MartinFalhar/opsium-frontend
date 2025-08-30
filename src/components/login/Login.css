@@ -23,6 +23,11 @@ body {
   background-color: aliceblue;
 }
 
+.login-logo {
+  width: calc(0.7 * var(--card-width));
+  margin-bottom: 30px;
+}
+
 .card {
   background-size: cover;
   background-position: center;
@@ -43,7 +48,6 @@ body {
   box-shadow: 4px 4px 30px rgba(0, 0, 0, 0.3);
   opacity: 1;
 }
-
 
 .card::before {
   content: "";
@@ -86,7 +90,7 @@ body {
   animation: spin 10s linear infinite;
 }
 
-.button-login { 
+.button-login {
   background: var(--color-grd-g2);
   /* background: red; */
   color: black;

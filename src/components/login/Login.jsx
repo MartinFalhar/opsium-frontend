@@ -45,8 +45,8 @@ function Login() {
 
   return (
     <div className="card">
+      <img className="login-logo" src={logo} />
       <form onSubmit={handleSubmit}>
-        <img src={logo} style={{ width: "200px", objectFit: "contain", marginBottom: "70px" }} />
         <input
           type="email"
           value={email}
@@ -59,7 +59,7 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Heslo"
         />
-        <button  type="submit" style={{ marginTop: "30px" }} >
+        <button type="submit" style={{ marginTop: "30px" }}>
           Přihlásit se
         </button>
         {error && <p style={{ color: "red" }}>{error}</p>}
