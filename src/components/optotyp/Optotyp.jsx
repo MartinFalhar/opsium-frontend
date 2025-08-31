@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import "./Optotyp.css";
-import { useUser } from "../../context/UserContext";
 
 function Optotyp() {
   const cardWidth = 8.56; //size of credit card in cm
@@ -13,13 +12,14 @@ function Optotyp() {
   const [viewDistance, setViewDistance] = useState(100);
   const [sampleWidth, setSampleWidth] = useState(devicePx); // initial value in pixels
   const navigate = useNavigate();
-  const { user } = useUser();
+  //Segmented control pro výběr optotypu
+  const [selected, setSelected] = useState("Dálka");
 
   const handleClick = () => {
     console.log("Optotyp clicked");
     navigate(
       `/optotyp-testing?mm2px=${(sampleWidth / 85.6).toFixed(2)}&viewDistance=${
-        viewDistance / 10
+        selected === "Dálka" ? viewDistance / 10 : viewDistance / 100
       }`
     ); // přechod na stránku s předáním parametru zjištěný kalibrací
   };
@@ -32,42 +32,60 @@ function Optotyp() {
     <div className="optotyp-container">
       <div className="optotyp-settings">
         <div className="optotyp-left-column">
-          <h2>Optotyp Settings</h2>
-
-          {user ? (
-            <p>
-              Přihlášen: {user.name} ({user.rights})
-            </p>
-          ) : (
-            <p>Nepřihlášený uživatel</p>
-          )}
+          <h2>Nastavení optotypu</h2>
           <div>
             <h3>Vzdálenost od obrazovky</h3>
-            <label htmlFor="slider">
-              Vzdálenost od obrazovky: {viewDistance / 10} metrů
-            </label>
-            <input
-              id="slider"
-              type="range"
-              min="30"
-              max="100"
-              value={viewDistance}
-              step="1"
-              onChange={handleChange}
-            />
-            <p>Akomodační zátěž: {(10 / viewDistance).toFixed(2)} [D]</p>
+            <div className="optotyp-controler-container">
+              <div className="segmented-control">
+                {["Dálka", "Blízko"].map((value) => (
+                  <button
+                    key={value}
+                    className={`button-controler ${
+                      selected === value ? "active" : ""
+                    }`}
+                    onClick={() => setSelected(value)}
+                  >
+                    {value}
+                  </button>
+                ))}
+              </div>
+              <div className="slider-container">
+                <label htmlFor="slider">
+                  Vzdálenost od obrazovky:{" "}
+                  {selected === "Dálka" ? viewDistance / 10 : viewDistance * 1}{" "}
+                  {selected === "Dálka" ? "m" : "cm"}
+                </label>
+                <input
+                  id="slider"
+                  type="range"
+                  min="20"
+                  max="100"
+                  margin="1"
+                  value={viewDistance}
+                  step="1"
+                  onChange={handleChange}
+                />
+                <p>
+                  Akomodační zátěž:{" "}
+                  {Number(
+                    selected === "Dálka"
+                      ? 10 / viewDistance
+                      : 100 / viewDistance
+                  ).toFixed(2)}{" "}
+                  [D]
+                </p>
+              </div>
+            </div>
           </div>
           <div className="optotyp-calibration">
             <h3>Kalibrace</h3>
             <p>
-              Pro správnou funkci aplikace je nutné provést kalibraci. Umístěte
-              se do vzdálenosti {viewDistance / 10} metrů od obrazovky a změřte
-              skutečnou velikost zobrazeného čtverce pomocí pravítka.
+              Pro správnou zobrazení optotypů je nutné provést kalibraci.
+              Přiložte na obrazovku kreditní kartu (nebo jinou kartu o stejné
+              velikosti) a tlačítky ZMENŠIT a ZVĚTŠIT nastavte velikost
+              červeného čtverce tak, aby těsně lemoval přiloženou kartu.
             </p>
-            <p>
-              Zadejte naměřenou velikost do pole níže (v centimetrech) a
-              potvrďte tlačítkem "Kalibrovat".
-            </p>
+
             <div className="optotyp-calibration-controls">
               <button
                 onClick={() => {
@@ -99,9 +117,9 @@ function Optotyp() {
             <p>1 mm odpovídá {(sampleWidth / 85.6).toFixed(2)} px</p>
           </div>
         </div>
-        <div className="optotyp-middle-column">
+        {/* <div className="optotyp-middle-column">
           <h3>Middle column</h3>
-        </div>
+        </div> */}
         <div className="optotyp-right-column">
           <button className="button-big" onClick={() => handleClick()}>
             Start Test
