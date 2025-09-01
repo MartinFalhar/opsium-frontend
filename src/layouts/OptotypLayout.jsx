@@ -149,6 +149,7 @@ function OptotypLayout() {
       const y = 50 * Math.sin(angle);
       coords.push([x, y]);
     }
+    coords.push([0, 0]); // středový bod
     return coords;
   }
 
