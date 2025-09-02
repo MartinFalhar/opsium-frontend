@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import "./Optotyp.css";
+import OptotypMenu from "./OptotypMenu";
 
 function Optotyp() {
   const navigate = useNavigate();
@@ -103,57 +104,56 @@ function Optotyp() {
                 ))}
               </div>
               {/* //při výběru kalibrace velikosti určuji typ vzoru           */}
-              {typeCalibration === "Velikost" && <div className="segmented-control">
-                {["Karta", "A4", "Euro"].map((value) => (
-                  <button
-                    key={value}
-                    className={`button-controler ${
-                      typeCalibrationSample === value ? "active" : ""
-                    }`}
-                    onClick={() => setTypeCalibrationSample(value)}
-                  >
-                    {value}
-                  </button>
-                ))}
-
-              </div>
-              }
+              {typeCalibration === "Velikost" && (
+                <div className="segmented-control">
+                  {["Karta", "A4", "Euro"].map((value) => (
+                    <button
+                      key={value}
+                      className={`button-controler ${
+                        typeCalibrationSample === value ? "active" : ""
+                      }`}
+                      onClick={() => setTypeCalibrationSample(value)}
+                    >
+                      {value}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="optotyp-calibration-controls">
               <div>
-              <button
-                style={{ marginRight: "20px" }}
-                onClick={() => {
-                  setSampleWidth(sampleWidth - 1);
-                }}
-                // className="optotyp-calibration-btn-shrink"
+                <button
+                  style={{ marginRight: "20px" }}
+                  onClick={() => {
+                    setSampleWidth(sampleWidth - 1);
+                  }}
+                  // className="optotyp-calibration-btn-shrink"
                 >
-                Zmenšit
-              </button>
+                  Zmenšit
+                </button>
 
-
-              <button
-                onClick={() => {
-                  setSampleWidth(sampleWidth + 1);
-                }}
-                // className="optotyp-calibration-btn-expand"
+                <button
+                  onClick={() => {
+                    setSampleWidth(sampleWidth + 1);
+                  }}
+                  // className="optotyp-calibration-btn-expand"
                 >
-                Zvětšit
-              </button>
-                </div>
-            <div
-              //velikost platební karty je 8.56 cm x 5.398 cm
-              className="optotyp-calibration-sample"
-              style={{
-                width: sampleWidth,
-                height: sampleWidth * (5.398 / 8.56),
-              }}
-              >
-              Zde umístěte platební kartu
-            </div>
-            <p>1 mm odpovídá {(sampleWidth / 85.6).toFixed(2)} px</p>
+                  Zvětšit
+                </button>
               </div>
+              <div
+                //velikost platební karty je 8.56 cm x 5.398 cm
+                className="optotyp-calibration-sample"
+                style={{
+                  width: sampleWidth,
+                  height: sampleWidth * (5.398 / 8.56),
+                }}
+              >
+                Zde umístěte platební kartu
+              </div>
+              <p>1 mm odpovídá {(sampleWidth / 85.6).toFixed(2)} px</p>
+            </div>
           </div>
         </div>
         {/* <div className="optotyp-middle-column">
@@ -162,11 +162,14 @@ function Optotyp() {
         <div className="optotyp-right-column">
           <h1>Výběr testů</h1>
           <div className="optotyp-right-column-header">
-            <h3>Spuštění testu</h3>
+            <h3>Kategorie testů</h3>
+            <OptotypMenu onStartTest={handleClick} />
           </div>
-          <button className="button-big" onClick={() => handleClick()}>
-            Start Test
-          </button>
+          <div className="optotyp-right-column-buttons">
+            <button className="button-big" onClick={() => handleClick()}>
+              Start Test
+            </button>
+          </div>
         </div>
       </div>
       <div className="optotyp-help">
