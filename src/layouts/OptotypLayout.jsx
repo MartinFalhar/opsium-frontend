@@ -81,6 +81,7 @@ function OptotypLayout() {
   const queryParams = new URLSearchParams(location.search);
   const mm2px = queryParams.get("mm2px");
   const viewDistance = queryParams.get("viewDistance");
+  const testInfo = queryParams.get("test");
 
   const baseColor = "0,0,0";
   const [baseSize, setBaseSize] = useState(1); // základní velikost písma, použita decimální notace
@@ -176,6 +177,7 @@ function OptotypLayout() {
           <p className="info" style={{ color: "grey", fontSize: "15px" }}>
             {" "}
             {baseSize.toFixed(2)}/{Math.floor(textOpacity * 10)}
+            {testInfo}
           </p>
         </>
       ) : (

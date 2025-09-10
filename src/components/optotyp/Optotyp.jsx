@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import "./Optotyp.css";
 import OptotypMenu from "./OptotypMenu";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Optotyp() {
   const navigate = useNavigate();
 
@@ -18,13 +20,31 @@ function Optotyp() {
   const [selected, setSelected] = useState("Dálka");
   const [typeCalibration, setTypeCalibration] = useState("Velikost");
   const [typeCalibrationSample, setTypeCalibrationSample] = useState("Karta");
+  //zachytání vybraných testů
+  const [selectedTests, setSelectedTests] = useState([]);
 
   const handleClick = () => {
-    console.log("Optotyp clicked");
     navigate(
       `/optotyp-testing?mm2px=${(sampleWidth / 85.6).toFixed(2)}&viewDistance=${
         selected === "Dálka" ? viewDistance / 10 : viewDistance / 100
-      }`
+      }&test=${JSON.stringify(selectedTests)}`
+    ); // přechod na stránku s předáním parametru zjištěný kalibrací
+  };
+
+    const handleClickSave = async () => {
+    
+    const res = await fetch(`${API_URL}/saveoptotyp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(selectedTests),
+    });
+  };
+
+    const handleClickLoad = () => {
+    navigate(
+      `/optotyp-testing?mm2px=${(sampleWidth / 85.6).toFixed(2)}&viewDistance=${
+        selected === "Dálka" ? viewDistance / 10 : viewDistance / 100
+      }&test=${JSON.stringify(selectedTests)}`
     ); // přechod na stránku s předáním parametru zjištěný kalibrací
   };
 
@@ -163,9 +183,17 @@ function Optotyp() {
           <h1>Výběr testů</h1>
           <div className="optotyp-right-column-header">
             <h3>Kategorie testů</h3>
-            <OptotypMenu onStartTest={handleClick} />
+            <OptotypMenu onStartTest={setSelectedTests} />
           </div>
           <div className="optotyp-right-column-buttons">
+            <div style={{ display: "flex", alignItems: "center", flexFlow:"column",  marginRight:"120px" }}>
+              <button className="button" onClick={() => handleClickSave()}>
+                Uložit
+              </button>
+              <button className="button" onClick={() => handleClickLoad()}>
+                Nahrát
+              </button>
+            </div>
             <button className="button-big" onClick={() => handleClick()}>
               Start Test
             </button>

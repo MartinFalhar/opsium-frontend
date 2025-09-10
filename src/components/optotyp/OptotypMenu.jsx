@@ -1,45 +1,96 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const mainMenu = [
   {
     id: "m1",
     label: "Vizus",
-    sub: ["Jeden řádek", "Sub 1-2", "Sub 1-3", "Sub 1-4", "Sub 1-5"],
+    sub: [
+      {
+        name: "Jeden řádek",
+        id: "",
+        testID: "1",
+        img: "/optotyp/1-1.png",
+        value1Name: "Startovní hodnota",
+        value2Name: "Počet znaků",
+        value1: "",
+        value2: "",
+      },
+      {
+        name: "Druhý řádek",
+        id: "",
+        testID: "2",
+        img: "/optotyp/1-1.png",
+        value1Name: "Start",
+        value2Name: "End",
+        value1: "",
+        value2: "",
+      },
+    ],
   },
   {
     id: "m2",
     label: "Astigmatimus",
-    sub: ["Body", "Sub 2-2", "Sub 2-3", "Sub 2-4", "Sub 2-5"],
+    sub: [
+      {
+        name: "Body",
+        id: "",
+        testID: "3",
+        img: "/optotyp/2-1.png",
+        value1Name: "Formace",
+        value2Name: "Počet bodů",
+        value1: "",
+        value2: "",
+      },
+      {
+        name: "Body 2",
+        id: "",
+        testID: "4",
+        img: "/optotyp/2-1.png",
+        value1Name: "Start",
+        value2Name: "End",
+        value1: "",
+        value2: "",
+      },
+    ],
   },
-  {
-    id: "m3",
-    label: "Dokorekce",
-    sub: ["Sub 3-1", "Sub 3-2", "Sub 3-3", "Sub 3-4", "Sub 3-5"],
-  },
-  {
-    id: "m4",
-    label: "BINO",
-    sub: ["Sub 4-1", "Sub 4-2", "Sub 4-3", "Sub 4-4", "Sub 4-5"],
-  },
-  {
-    id: "m5",
-    label: "Stereo",
-    sub: ["Sub 5-1", "Sub 5-2", "Sub 5-3", "Sub 5-4", "Sub 5-5"],
-  },
+  // {
+  //   id: "m3",
+  //   label: "Dokorekce",
+  //   sub: ["Sub 3-1", "Sub 3-2", "Sub 3-3", "Sub 3-4", "Sub 3-5"],
+  // },
+  // {
+  //   id: "m4",
+  //   label: "BINO",
+  //   sub: ["Sub 4-1", "Sub 4-2", "Sub 4-3", "Sub 4-4", "Sub 4-5"],
+  // },
+  // {
+  //   id: "m5",
+  //   label: "Stereo",
+  //   sub: ["Sub 5-1", "Sub 5-2", "Sub 5-3", "Sub 5-4", "Sub 5-5"],
+  // },
 ];
 
 function OptotypMenu({ onStartTest }) {
+
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [items, setItems] = useState([]);
   const [dragIndex, setDragIndex] = useState(null);
   const [hoveredItemId, setHoveredItemId] = useState(null);
 
   const handleAdd = (subItem) => {
+    subItem.id = Date.now().toString();
+    onStartTest([...items, {...subItem}]);
     setItems([
-      ...items,
-      { id: Date.now().toString(), label: subItem, value1: "", value2: "" },
+      ...items, {...subItem}
     ]);
   };
+
+    useEffect(() => {
+    // vytvoří objekt { cat1: item1, cat2: item2, ... }
+    const itemsByTestID = items.map(item => 
+    (item.testID +"-"+item.value1+"-"+item.value2));
+    onStartTest(itemsByTestID);
+  }, [items, onStartTest]);
 
   const handleDragStart = (index) => {
     setDragIndex(index);
@@ -67,12 +118,12 @@ function OptotypMenu({ onStartTest }) {
     );
   };
 
-    const handleDelete = (idToDelete) => {
+  const handleDelete = (idToDelete) => {
     setItems(items.filter((item) => item.id !== idToDelete));
   };
 
   return (
-    <div style={{ display: "flex"}}>
+    <div style={{ display: "flex" }}>
       {/* Levý sloupec - hlavní menu */}
       <div style={{ flex: 1, borderRight: "1px solid #ccc", padding: "10px" }}>
         <h3>Hlavní menu</h3>
@@ -85,6 +136,7 @@ function OptotypMenu({ onStartTest }) {
               cursor: "pointer",
               background:
                 selectedMenu?.id === menu.id ? "#e0e0e0" : "transparent",
+              fontSize: "0.8rem",
             }}
           >
             {menu.label}
@@ -100,9 +152,14 @@ function OptotypMenu({ onStartTest }) {
             <div
               key={i}
               onClick={() => handleAdd(sub)}
-              style={{ padding: "8px", cursor: "pointer" }}
+              style={{ padding: "8px", cursor: "pointer", fontSize: "0.8rem", display: "flex", alignItems: "center" }}
             >
-              {sub} ➕
+              <img
+                src={sub.img}
+                alt={sub.name}
+                style={{ width: "50px", marginRight: "10px" }}
+              />
+              ➕
             </div>
           ))
         ) : (
@@ -111,11 +168,10 @@ function OptotypMenu({ onStartTest }) {
       </div>
 
       {/* Pravý sloupec - vybrané položky s drag&drop */}
-      <div className="items" style={{ flex: 2, padding: "10px",
-        overflowY: "auto",
-        height: "60vh",
-      
-       }}>
+      <div
+        className="items"
+        style={{ flex: 2, padding: "10px", overflowY: "auto", height: "60vh" }}
+      >
         <h3>Vybrané položky</h3>
         {items.map((item, index) => (
           <div
@@ -133,13 +189,14 @@ function OptotypMenu({ onStartTest }) {
               border: "1px solid #ccc",
               borderRadius: "8px",
               cursor: "grab",
-              position: "relative"
-              
+              position: "relative",
             }}
           >
-            <strong>{item.label}</strong>
+
+            <strong>{item.name}</strong>          
             <div>
-              <label>Hodnota 1: </label>
+              <img src={item.img} alt="" />
+              <label>{item.value1Name} </label>
               <input
                 type="text"
                 value={item.value1}
@@ -149,7 +206,7 @@ function OptotypMenu({ onStartTest }) {
               />
             </div>
             <div>
-              <label>Hodnota 2: </label>
+              <label>{item.value2Name}</label>
               <input
                 type="text"
                 value={item.value2}
