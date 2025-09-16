@@ -189,49 +189,6 @@ a.visited {
   text-decoration: none;
 }
 
-.button-main-menu {
-  display: flex;
-  align-items: center;
-  width: 166px;
-  height: 41px;
-  background: var(--color-bg-b3);
-  color: var(--color-bg-b12);
-  font-weight: 400;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 1px 13px rgba(0, 0, 0, 0.3);
-  font-size: var(--font-size-main-menu);
-
-  text-align: left;
-  padding-left: 15px;
-  margin-top: 20px;
-}
-
-.button-main-menu:hover {
-  background: var(--color-bg-b2);
-}
-
-.button-main-menu.active {
-  background: var(--color-grd-g6);
-}
-
-.button-main-menu::before {
-  content: "";
-  display: inline-block;
-  width: var(--icon-size);
-  height: var(--icon-size);
-  flex: 0 0 auto;
-  background-repeat: no-repeat;
-  background-size: contain;
-  fill: var(--color-bg-b11);
-  /* simple star svg, url-encoded */
-  background-image: url("./svg/optotyp.svg");
-  transition: filter 0.12s ease, transform 0.12s ease,
-    background-image 0.12s ease;
-  padding: 0 1px 0 15px;
-}
-
 .button-big {
   width: 166px;
   height: 82px;
@@ -264,47 +221,6 @@ button {
   text-align: center;
   color: var(--color-bg-b1);
   font-size: var(--font-size-large);
-}
-
-.main-menu-container {
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-}
-
-.main-menu-footer {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 10px;
-  color: var(--color-bg-b12);
-  font-size: 0.9rem;
-}
-
-.main-menu-avatar {
-  background-image: url("./svg/person.svg"), var(--color-grd-g3);
-  bottom: 10px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-size: 60%, cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: var(--color-bg-b10);
-  text-align: center;
-  font-size: 0.8rem;
-  color: var(--color-bg-b12);
-  margin-right: 15px;
-}
-
-.main-menu-user-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
 
 input {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import "./OptotypMenu.css";
 
-const mainMenu = [
+const optotypList = [
   {
     id: "m1",
     label: "Vizus",
@@ -70,32 +71,106 @@ const mainMenu = [
   // },
 ];
 
-function OptotypMenu({ onStartTest }) {
-
+//z rodičovské funkce Optotyp dávám funkci actualStartTests,
+//která předává OptotypLayout sekvenci, podle které složi set
+//Proměnná initialItems je pro předání hodnot získáne z databáze
+//který si klient uložil
+function OptotypMenu({ actualStartTests, initialItems = [] }) {
+  //registr vybrané položky menu
   const [selectedMenu, setSelectedMenu] = useState(null);
+  //registr vybraných/nahraných optotypů
   const [items, setItems] = useState([]);
+  //obsluha drag and drop
   const [dragIndex, setDragIndex] = useState(null);
   const [hoveredItemId, setHoveredItemId] = useState(null);
 
+  //jakmile se změní initialItems, což je třeba při nahrání
+  //spustí funkci mapInitialItemsToFullItems, která
+  //podle načteného klíče vygeneruje plnohodnotný element,
+  // který je načten do items
+  useEffect(() => {
+    //kontrola, zda obsahuje hodnotu
+    if (initialItems && initialItems.length > 0) {
+      const mapped = mapInitialItemsToFullItems(initialItems);
+      // nastav jen když se liší od aktuálních items
+      //výkonově důležitá komponenta
+      //same je boolean, první krok kontroluj, jestli je true
+      //když je mapped stejně velké jako items
+      //druhá podmínka je pro kontrolu názvu testID
+      //funkce every je true, pokud podmínka platí pro všechny
+      //prvky
+      //items[i]?.testID -> optional chaining operator
+      //prevence vzniku chyby
+      const same =
+        mapped.length === items.length &&
+        mapped.every((m, i) => m.testID === items[i]?.testID);
+      //pokud je rozdíl (same je false) , provede aktualizaci items
+      if (!same) {
+        setItems(mapped);
+      }
+    }
+  }, [initialItems]);
+
+  //Po pridani upravim ITEMS ale i zavolám funkci actualStartTests,
+  // s kterym pracuje rodic
+  // subItem je vybraná položka z podmenu
+  //acttualStartTest se aktualizuje, protože se předá OptotypLayout
+  //setItems pak hlídá aktuální menu
   const handleAdd = (subItem) => {
+    //časové razoitko jako id
     subItem.id = Date.now().toString();
-    onStartTest([...items, {...subItem}]);
-    setItems([
-      ...items, {...subItem}
-    ]);
+    actualStartTests([...items, { ...subItem }]);
+    setItems([...items, { ...subItem }]);
   };
 
-    useEffect(() => {
-    // vytvoří objekt { cat1: item1, cat2: item2, ... }
-    const itemsByTestID = items.map(item => 
-    (item.testID +"-"+item.value1+"-"+item.value2));
-    onStartTest(itemsByTestID);
-  }, [items, onStartTest]);
+  //funkce generující item element na základě importované klíče
+  //z databáze se obdrží JSONB objekt s testID, value1 a value2
+  //což je určení o jaký optotyp se jedná a jaké má parametry
+  function mapInitialItemsToFullItems(initialItems) {
+    // Pro každý item z initialItems najdi šablonu v optotypList.sub podle testID
+    return initialItems
+      .map((initItem) => {
+        // Najdi odpovídající sub položku podle testID
+        const template = optotypList
+          //vytvoří ploché pole z položek podmenu
+          .flatMap((menu) => menu.sub)
+          //aby následně hledal konkrétní odpovídající test se
+          //shodou testID
+          .find((sub) => sub.testID === initItem.testID);
+        //pokud nenajde na jeden záznam, vrací null
+        if (!template) return null; // nebo nějaké ošetření chyby
 
+        // Vytvoř nový objekt podle šablony, ale s hodnotami z initialItems
+        return {
+          ...template,
+          id: Date.now().toString() + Math.random(), // unikátní id
+          value1: initItem.value1,
+          value2: initItem.value2,
+        };
+      })
+      .filter(Boolean); // odstraní případné null, pokud by šablona nebyla nalezena
+  }
+
+  //Pri jakekoliv zmene aktualizuj seznam items
+  //POZOR, je zde duplicita useEffect na jeden element
+  //toto je pro ošetření manipulace menu uživatelem
+  //aktualizuje se jak items tak i seznam pro
+  //funkci actualStartTests
+  //první useEffect je pak pro hlidání loadMenu
+  useEffect(() => {
+    const itemsByTestID = items.map((item) => ({
+      testID: item.testID,
+      value1: item.value1,
+      value2: item.value2,
+    }));
+    actualStartTests(itemsByTestID);
+  }, [items, actualStartTests]);
+  //DRAG-START
   const handleDragStart = (index) => {
     setDragIndex(index);
   };
 
+  //DRAG-START
   const handleDragEnd = (result) => {
     if (!result.destination) return;
     const newItems = Array.from(items);
@@ -104,6 +179,7 @@ function OptotypMenu({ onStartTest }) {
     setItems(newItems);
   };
 
+  //DROP
   const handleDrop = (index) => {
     if (dragIndex === null) return;
     const newItems = [...items];
@@ -112,22 +188,26 @@ function OptotypMenu({ onStartTest }) {
     setItems(newItems);
     setDragIndex(null);
   };
+
+  //hlídá změnu VALUE 1 a VALUE 2
+  //volá se při každém INPUTu
   const handleChange = (id, field, value) => {
     setItems(
       items.map((item) => (item.id === id ? { ...item, [field]: value } : item))
     );
   };
 
+  //DELETE
   const handleDelete = (idToDelete) => {
     setItems(items.filter((item) => item.id !== idToDelete));
   };
-
+  //RENDER KOMPONENTY
   return (
     <div style={{ display: "flex" }}>
       {/* Levý sloupec - hlavní menu */}
       <div style={{ flex: 1, borderRight: "1px solid #ccc", padding: "10px" }}>
         <h3>Hlavní menu</h3>
-        {mainMenu.map((menu) => (
+        {optotypList.map((menu) => (
           <div
             key={menu.id}
             onClick={() => setSelectedMenu(menu)}
@@ -149,17 +229,8 @@ function OptotypMenu({ onStartTest }) {
         <h3>Podmenu</h3>
         {selectedMenu ? (
           selectedMenu.sub.map((sub, i) => (
-            <div
-              key={i}
-              onClick={() => handleAdd(sub)}
-              style={{ padding: "8px", cursor: "pointer", fontSize: "0.8rem", display: "flex", alignItems: "center" }}
-            >
-              <img
-                src={sub.img}
-                alt={sub.name}
-                style={{ width: "50px", marginRight: "10px" }}
-              />
-              ➕
+            <div className="subMenu" key={i} onClick={() => handleAdd(sub)}>
+              <img src={sub.img} alt={sub.name} />➕
             </div>
           ))
         ) : (
@@ -175,6 +246,7 @@ function OptotypMenu({ onStartTest }) {
         <h3>Vybrané položky</h3>
         {items.map((item, index) => (
           <div
+            className="selectedMenuItems"
             key={item.id}
             draggable
             onDragStart={() => setDragIndex(index)}
@@ -182,18 +254,8 @@ function OptotypMenu({ onStartTest }) {
             onDrop={() => handleDrop(index)}
             onMouseEnter={() => setHoveredItemId(item.id)} // Nastavení hoveredItemId při najetí myši
             onMouseLeave={() => setHoveredItemId(null)} // Zrušení hoveredItemId při opuštění myší
-            style={{
-              padding: "10px",
-              marginBottom: "8px",
-              background: "#f9f9f9",
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              cursor: "grab",
-              position: "relative",
-            }}
           >
-
-            <strong>{item.name}</strong>          
+            <strong>{item.name}</strong>
             <div>
               <img src={item.img} alt="" />
               <label>{item.value1Name} </label>
@@ -217,16 +279,8 @@ function OptotypMenu({ onStartTest }) {
             </div>
             {hoveredItemId === item.id && ( // Podmíněné zobrazení "X"
               <span
+                className="deleteSign"
                 onClick={() => handleDelete(item.id)}
-                style={{
-                  position: "absolute",
-                  top: "5px",
-                  right: "10px",
-                  cursor: "pointer",
-                  color: "red",
-                  fontSize: "1rem", // Větší velikost "X"
-                  fontWeight: "bold",
-                }}
               >
                 X
               </span>

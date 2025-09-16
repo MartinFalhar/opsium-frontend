@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import Logout from "../login/Logout";
+import "./MainMenu.css";
+import menuIcon from "../../styles/svg/mirror-line.svg";
 
 const buttons = [
   {
@@ -31,12 +33,14 @@ function MainMenu(prosps) {
     navigate(button.path); // přechod na stránku
   };
 
-  console.log("FRNT MainMenu user:", user);
-
   return (
     <div className="main-menu-container">
       <div className="main-menu">
-        <h1>Menu</h1>
+        <div className="main-menu-header">
+          <h1>Menu</h1>
+          <img className="main-menu-icon" src={menuIcon} alt="Menu"></img>
+        </div>
+        {console.log("FRNT MainMenu user rights:", user?.rights, user?.name)}
         {buttons.map((button) => {
           // Kontrola práv uživatele
           // user.rights = user.rights || 0; // Zajištění, že rights existují a jsou číslo
@@ -44,7 +48,7 @@ function MainMenu(prosps) {
 
           // Pokud není uživatel přihlášen, zobrazíme jen tlačítka s právy 0
           // if (Number(JSON.stringify(user.rights)) >= button.rights)
-          console.log("FRNT MainMenu user rights:", user?.rights);
+
           if (user?.rights >= button.rights || button.rights === 0) {
             return (
               <button
