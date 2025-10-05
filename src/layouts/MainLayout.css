@@ -40,7 +40,7 @@
   flex-direction: column;
   justify-content: top;
   align-items: top;
-  padding: 15px;
+  padding: 0px;
   font-size: 1rem;
   background: var(--color-bg-b3);
 }

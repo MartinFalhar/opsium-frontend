@@ -110,7 +110,6 @@
     rgba(81, 119, 158, 1),
     rgba(255, 255, 255, 1)
   );
-  --font-size-main-menu: 0.9rem;
   --icon-size: 20px;
   --font-size-xsmall: 0.7rem;
   --font-size-small: 0.8rem;
@@ -143,7 +142,7 @@ body {
 
 h1 {
   font-size: 1.1rem;
-  color: var(--color-bg-b2);
+  color: var(--color-bg-b5);
   text-align: left;
 }
 
@@ -231,4 +230,5 @@ input {
   font-size: var(--font-size-regular);
   width: 80%;
   max-width: 300px;
+  padding: 10px;
 }

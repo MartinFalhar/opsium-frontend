@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Footer from "../components/footers/Footer";
 import MainHeader from "../components/headers/MainHeader";
@@ -6,12 +7,18 @@ import MainMenu from "../components/main-menu/MainMenu";
 
 import "./MainLayout.css";
 const MainLayout = () => {
+  //state evidence velikosti menu
+  const [isMenuExtended, setIsMenuExtended] = useState(true);
+
+
   return (
     <div className="layout-main">
       <MainHeader className="layout-header" />
       <section className="layout-section">
-        <nav className="layout-nav">
-          <MainMenu rights={0} />
+        <nav className="layout-nav"
+              style={{ width: isMenuExtended ? "200px" : "60px" }}
+        >
+          <MainMenu rights={0} isMenuExtended={isMenuExtended} setIsMenuExtended={setIsMenuExtended}/>
         </nav>
         <div className="layout-content">
           <Outlet />

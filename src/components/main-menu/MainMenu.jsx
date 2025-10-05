@@ -6,27 +6,41 @@ import Logout from "../login/Logout";
 import "./MainMenu.css";
 import menuIcon from "../../styles/svg/mirror-line.svg";
 
+
+
 const buttons = [
+  
+  { id: "clients", 
+    label: "Klienti",
+    rights: 1,
+    path: "/",
+    icon: "clients"
+  },
   {
     id: "optotyp",
     label: "Optotyp",
     onClick: () => console.log("Optotyp clicked"),
     rights: 0,
     path: "/optotyp",
+    icon: "optotyp"
   },
   {
     id: "visual-training",
     label: "Zrakový trénink",
     rights: 0,
     path: "/visual-training",
+    icon: "eye"
   },
-  { id: "clients", label: "Klienti", rights: 1, path: "/" },
 ];
 
-function MainMenu(prosps) {
+function MainMenu({isMenuExtended, setIsMenuExtended}) {
+  //state evidence pro změnu stylu
   const [activeButton, setActiveButton] = useState(null);
   const navigate = useNavigate();
+  //práce s parametry uživatele
   const { user } = useUser();
+
+
 
   const handleClick = (button) => {
     setActiveButton(button.id); // změna stylu
@@ -37,9 +51,12 @@ function MainMenu(prosps) {
     <div className="main-menu-container">
       <div className="main-menu">
         <div className="main-menu-header">
-          <h1>Menu</h1>
-          <img className="main-menu-icon" src={menuIcon} alt="Menu"></img>
+          {isMenuExtended ? <h1 style={{paddingLeft:
+          "20px"
+          }}>Menu</h1> : ""}
+          <img onClick={() => {setIsMenuExtended(!isMenuExtended)}} className="main-menu-icon" src={menuIcon} alt="Menu"></img>
         </div>
+        {console.log(`Menu is ${isMenuExtended ? "full" : "shrinked"}`)}
         {console.log("FRNT MainMenu user rights:", user?.rights, user?.name)}
         {buttons.map((button) => {
           // Kontrola práv uživatele
@@ -54,12 +71,16 @@ function MainMenu(prosps) {
               <button
                 key={button.id}
                 id={button.id}
+                style={{
+                  width:isMenuExtended ? "200px" : "60px",
+
+                }}
                 className={`button-main-menu ${
                   activeButton === button.id ? "active" : ""
-                }`}
+                } ${button.icon}`}
                 onClick={() => handleClick(button)}
               >
-                {button.label}
+                {isMenuExtended ? button.label : ""}
               </button>
             );
           }
@@ -68,7 +89,7 @@ function MainMenu(prosps) {
       </div>
       <div className="main-menu-footer">
         {user?.name && <div className="main-menu-avatar"></div>}
-        {user?.name && (
+        {user?.name && isMenuExtended && (
           <div className="main-menu-user-info">
             <p>
               {user?.name} ({user?.rights})
