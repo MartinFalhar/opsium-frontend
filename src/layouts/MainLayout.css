@@ -8,12 +8,11 @@
   margin: 0;
 }
 .layout-header {
-  flex: 0 0 auto;
+  flex: 0 0 70px;
   display: flex;
   flex-direction: row;
   background: var(--color-bg-b1);
   margin: 0;
-  padding: 10px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 }
 
