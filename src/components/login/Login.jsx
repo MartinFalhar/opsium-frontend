@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
@@ -15,6 +15,36 @@ function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { setUser } = useUser();
+  const [heroImg, setHeroImg] = useState(null);
+
+  const heroImgID = Math.floor(Math.random() * 3 + 1);
+  console.log("Hero image ID:", heroImgID);
+
+  const [imageSrc, setImageSrc] = useState(null);
+
+  const heroImgInfoLoad = async () => {
+    const res = await fetch(`${API_URL}/hero_img_info`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: heroImgID }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setUser(data);
+      console.log("FRNT hero image data:", data);
+      setHeroImg(data);
+    } else {
+      setError(data.message);
+    }
+  };
+
+  useEffect(() => {
+    heroImgInfoLoad();
+    // heroImgLoad();
+    setImageSrc(
+      `${API_URL}/hero_img/${heroImgID < 10 ? `0${heroImgID}` : `${heroImgID}`}`
+    );
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,13 +60,11 @@ function Login() {
       // nebo cookie, podle implementace
       setUser(data);
       console.log("FRNT Response data:", data);
-
       // Zkontrolujeme, jestli se uložil do localStorage
       console.log(
         "Co je v localStorage po uložení usera:",
         JSON.parse(localStorage.getItem("user"))
       );
-
       navigate("/"); // přesměrování na domovskou stránku s právy
     } else {
       setError(data.message);
@@ -44,26 +72,41 @@ function Login() {
   };
 
   return (
-    <div className="card">
-      <img className="login-logo" src={logo} />
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Heslo"
-        />
-        <button type="submit" style={{ marginTop: "30px" }}>
-          Přihlásit se
-        </button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-      </form>
+    <div className="login-container">
+      <div className="card">
+        <img className="login-logo" src={logo} />
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Heslo"
+          />
+          <button type="submit" style={{ marginTop: "30px" }}>
+            Přihlásit se
+          </button>
+          {error && <p style={{ color: "red" }}>{error}</p>}
+        </form>
+      </div>
+
+      <div
+        className="login-hero-image"
+        style={{
+          backgroundImage: `url(${ imageSrc })`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        {/* <img src={imageSrc} alt="Hero" /> */}
+
+      </div>
     </div>
   );
 }

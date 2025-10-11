@@ -1,6 +1,6 @@
 :root {
   --card-height: 55vh;
-  --card-width: calc(var(--card-height) / 1.5);
+  --card-width: calc(var(--card-height) / 1.3);
   --rotate: 0deg;
 }
 
@@ -23,20 +23,36 @@ body {
   background-color: aliceblue;
 }
 
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: calc(2 * var(--card-width));
+}
+
+.login-hero-image {
+  width: var(--card-width);
+  height: var(--card-height);
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  box-shadow: 4px 4px 30px rgba(0, 0, 0, 0.3);
+}
+
 .login-logo {
-  width: calc(0.7 * var(--card-width));
-  margin-bottom: 30px;
+  width: calc(0.5 * var(--card-width));
+  margin: 25px 0 50px 0;
 }
 
 .card {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  width: var(--card-width);
+  width: calc(var(--card-width) * 0.9);
   height: var(--card-height);
   padding: 3px;
   position: relative;
-  border-radius: 30px;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -53,7 +69,8 @@ body {
   content: "";
   width: 100%;
   height: 100%;
-  border-radius: 30px;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
   background-image: linear-gradient(
     var(--rotate),
     #e0e7f0,
