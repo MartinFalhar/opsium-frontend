@@ -31,7 +31,7 @@ function Login() {
     const data = await res.json();
     if (res.ok) {
       setUser(data);
-      console.log("FRNT hero image data:", data);
+      console.log("xxxxxx hero image data:", data);
       setHeroImg(data);
     } else {
       setError(data.message);
@@ -98,14 +98,26 @@ function Login() {
       <div
         className="login-hero-image"
         style={{
-          backgroundImage: `url(${ imageSrc })`,
+          backgroundImage: `url(${imageSrc})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
         }}
       >
-        {/* <img src={imageSrc} alt="Hero" /> */}
-
+        <div className="hero-text">
+          <h1>
+            {heroImg &&
+              (Array.isArray(heroImg)
+                ? heroImg[0]?.hero_img_label
+                : heroImg.hero_img_label)}
+          </h1>
+          <p>
+            {heroImg &&
+              (Array.isArray(heroImg)
+                ? heroImg[0]?.hero_img_desc
+                : heroImg.hero_img_desc)}
+          </p>
+        </div>
       </div>
     </div>
   );

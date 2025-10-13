@@ -6,15 +6,13 @@ import Logout from "../login/Logout";
 import "./MainMenu.css";
 import menuIcon from "../../styles/svg/mirror-line.svg";
 
-
-
 const buttons = [
-  
-  { id: "clients", 
+  {
+    id: "clients",
     label: "Klienti",
     rights: 1,
-    path: "/",
-    icon: "clients"
+    path: "/clients",
+    icon: "clients",
   },
   {
     id: "optotyp",
@@ -22,25 +20,23 @@ const buttons = [
     onClick: () => console.log("Optotyp clicked"),
     rights: 0,
     path: "/optotyp",
-    icon: "optotyp"
+    icon: "optotyp",
   },
   {
     id: "visual-training",
     label: "Zrakový trénink",
     rights: 0,
     path: "/visual-training",
-    icon: "eye"
+    icon: "eye",
   },
 ];
 
-function MainMenu({isMenuExtended, setIsMenuExtended}) {
+function MainMenu({ isMenuExtended, setIsMenuExtended }) {
   //state evidence pro změnu stylu
   const [activeButton, setActiveButton] = useState(null);
   const navigate = useNavigate();
   //práce s parametry uživatele
   const { user } = useUser();
-
-
 
   const handleClick = (button) => {
     setActiveButton(button.id); // změna stylu
@@ -51,10 +47,15 @@ function MainMenu({isMenuExtended, setIsMenuExtended}) {
     <div className="main-menu-container">
       <div className="main-menu">
         <div className="main-menu-header">
-          {isMenuExtended ? <h1 style={{paddingLeft:
-          "20px"
-          }}>Menu</h1> : ""}
-          <img onClick={() => {setIsMenuExtended(!isMenuExtended)}} className="main-menu-icon" src={menuIcon} alt="Menu"></img>
+          {isMenuExtended ? <h1 style={{ paddingLeft: "20px" }}>Menu</h1> : ""}
+          <img
+            onClick={() => {
+              setIsMenuExtended(!isMenuExtended);
+            }}
+            className="main-menu-icon"
+            src={menuIcon}
+            alt="Menu"
+          ></img>
         </div>
         {console.log(`Menu is ${isMenuExtended ? "full" : "shrinked"}`)}
         {console.log("FRNT MainMenu user rights:", user?.rights, user?.name)}
@@ -72,8 +73,7 @@ function MainMenu({isMenuExtended, setIsMenuExtended}) {
                 key={button.id}
                 id={button.id}
                 style={{
-                  width:isMenuExtended ? "200px" : "60px",
-
+                  width: isMenuExtended ? "200px" : "60px",
                 }}
                 className={`button-main-menu ${
                   activeButton === button.id ? "active" : ""
