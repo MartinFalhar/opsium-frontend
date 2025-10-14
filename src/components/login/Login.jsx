@@ -31,7 +31,6 @@ function Login() {
     const data = await res.json();
     if (res.ok) {
       setUser(data);
-      console.log("xxxxxx hero image data:", data);
       setHeroImg(data);
     } else {
       setError(data.message);
@@ -39,8 +38,9 @@ function Login() {
   };
 
   useEffect(() => {
+    //nacteni info o uvodnim obrazku
     heroImgInfoLoad();
-    // heroImgLoad();
+    //nacteni obrazku ze serveru
     setImageSrc(
       `${API_URL}/hero_img/${heroImgID < 10 ? `0${heroImgID}` : `${heroImgID}`}`
     );

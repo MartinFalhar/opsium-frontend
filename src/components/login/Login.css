@@ -132,7 +132,7 @@ input {
 }
 
 .hero-text {
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   height: 50px;
   color: white;
   font-size: 1.5rem;

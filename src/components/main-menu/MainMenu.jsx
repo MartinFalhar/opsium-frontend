@@ -10,7 +10,7 @@ const buttons = [
   {
     id: "clients",
     label: "Klienti",
-    rights: 1,
+    rights: 0,
     path: "/clients",
     icon: "clients",
   },
