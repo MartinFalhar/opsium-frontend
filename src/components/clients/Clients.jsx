@@ -1,17 +1,27 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import "./Clients.css";
+import { useSetHeaderClients } from "../../context/UserContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Clients(props) {
-  const [clients, setClients] = useState([]);
   const [searchClient, setSearchClient] = useState("");
+
+  const [clients, setClients] = useState([]);
+
+  const { setHeaderClients } = useSetHeaderClients();
+
+  const addClient = (newClient) => {
+    setHeaderClients((prev) => {
+      const exists = prev.some((client) => client.id === newClient.id);
+      if (exists) return prev;
+      return [...prev, newClient];
+    });
+  };
 
   useEffect(() => {
     const loadClients = async () => {
-      console.log("Loading clients...");
       const res = await fetch(`${API_URL}/clients`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -20,7 +30,6 @@ function Clients(props) {
       const data = await res.json();
       if (res.ok) {
         setClients(data);
-        console.log("Clients data:", data);
       } else {
         setError(data.message);
       }
@@ -51,7 +60,11 @@ function Clients(props) {
         <div className="clients-list-container">
           Seznam klientů
           {clients.map((client) => (
-            <div key={client.id} className="client-item">
+            <div
+              key={client.id}
+              className="client-item"
+              onClick={() => addClient(client)}
+            >
               <h2>
                 {`${client.degree_front} ${client.name} ${client.surname} ${client.degree_post}`}{" "}
               </h2>

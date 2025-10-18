@@ -57,7 +57,6 @@ function MainMenu({ isMenuExtended, setIsMenuExtended }) {
             alt="Menu"
           ></img>
         </div>
-        {console.log(`Menu is ${isMenuExtended ? "full" : "shrinked"}`)}
         {console.log("FRNT MainMenu user rights:", user?.rights, user?.name)}
         {buttons.map((button) => {
           // Kontrola práv uživatele

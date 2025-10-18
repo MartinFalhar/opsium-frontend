@@ -10,6 +10,7 @@ import Vistraining from "./components/vistraining/Vistraining";
 import VistrainingLayout from "./layouts/VistrainingLayout";
 import Logout from "./components/login/Logout";
 import Clients from "./components/clients/Clients";
+import Client from "./components/client/Client";
 // import LoginPage from "./pages/LoginPage";
 // import AdminDashboard from "./pages/AdminDashboard";
 // import NotFound from "./pages/NotFound";
@@ -24,6 +25,7 @@ export default function RoutesConfig() {
         <Route path="/visual-training" element={<Vistraining />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/clients" element={<Clients />} />
+        <Route path="/client/:id" element={<Client />} />
         {/* <Route path="/login" element={<LoginPage />} /> */}
         {/* <Route path="/admin" element={<AdminDashboard />} /> */}
         {/* <Route path="*" element={<NotFound />} /> */}

@@ -4,6 +4,7 @@ const UserContext = createContext(null);
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [headerClients, setHeaderClients] = useState([]);
 
   // Načtení uživatele z localStorage při startu aplikace
   useEffect(() => {
@@ -23,12 +24,22 @@ export function UserProvider({ children }) {
   }, [user]);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider
+      value={{ user, setUser, headerClients, setHeaderClients }}
+    >
       {children}
     </UserContext.Provider>
   );
 }
 
 export function useUser() {
+  return useContext(UserContext);
+}
+
+export function useHeaderClients() {
+  return useContext(UserContext);
+}
+
+export function useSetHeaderClients() {
   return useContext(UserContext);
 }

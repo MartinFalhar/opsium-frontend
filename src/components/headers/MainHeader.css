@@ -1,7 +1,7 @@
 .layout-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: left;
   padding: 0px;
   background-color: #f8f9fa; /* Light background for contrast */
 }
@@ -17,12 +17,11 @@
   margin-left: 20px;
   color: azure;
 }
- .layout-header img.header-logo {
+.layout-header img.header-logo {
   cursor: pointer;
-  
 }
 
-.time_day_conatiner {
+.time_day_container {
   width: 200px;
   display: flex;
   justify-content: center;
@@ -39,5 +38,29 @@
 .day_of_week {
   color: var(--color-bg-b10);
   margin: 0;
-  font-size: 1.0rem;
+  font-size: 1rem;
+}
+
+.spacer {
+  width: 2px;
+  height: 45px;
+  border: var(--color-bg-b2) solid 1px;
+}
+
+.header-client-item {
+  width: 250px;
+  /* height: 50px; */
+  border-bottom: 0.5px solid var(--color-bg-b9);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  padding: 10px;
+  color: white;
+  background: var(--color-grd-g2);
+  margin-right: 10px;
+}
+.header-client-item:hover {
+  background-color: var(--color-bg-b9);
+  cursor: pointer;
 }

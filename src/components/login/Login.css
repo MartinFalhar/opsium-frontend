@@ -63,7 +63,8 @@ body {
   color: #789ac1;
   /* color: #fff; */
   box-shadow: 4px 4px 30px rgba(0, 0, 0, 0.3);
-  opacity: 1;
+  opacity: 0.99;
+  /* background: var(--color-grd-g6); */
 }
 
 .card::before {
@@ -74,15 +75,17 @@ body {
   border-bottom-left-radius: 30px;
   background-image: linear-gradient(
     var(--rotate),
-    #e0e7f0,
-    #d2d5da 43%,
-    #789ac1
+    var(--color-bg-b6),
+    var(--color-bg-b6),
+    var(--color-el-a)
   );
+  /* #789ac1 */
+
   position: absolute;
   z-index: -1;
   top: -0%;
   left: -0%;
-  animation: spin 10s linear infinite;
+  animation: spin 20s linear infinite;
 }
 
 .card::after {
@@ -99,13 +102,13 @@ body {
   filter: blur(calc(var(--card-height) / 6));
   background-image: linear-gradient(
     var(--rotate),
-    #e0e7f0,
-    #d2d5da 43%,
-    #789ac1
+    var(--color-bg-b6),
+    var(--color-bg-b6),
+    var(--color-el-g)
   );
   opacity: 1;
   transition: opacity 0.5s;
-  animation: spin 10s linear infinite;
+  animation: spin 13s linear infinite;
 }
 
 .button-login {
