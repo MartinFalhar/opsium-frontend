@@ -6,6 +6,7 @@
   width: 100vw;
   padding: 0;
   margin: 0;
+  background-color: var(--color-bg-b1);
 }
 .layout-header {
   flex: 0 0 70px;
@@ -13,7 +14,7 @@
   flex-direction: row;
   background: var(--color-bg-b1);
   margin: 0;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+
 }
 
 .layout-header h1 {
@@ -29,19 +30,21 @@
   flex-direction: row;
   align-items: center;
   padding: 0;
-  height: 100%;
+
 }
 .layout-nav {
   width: 200px;
+  height: 100%;
   flex-shrink: 0;
   display: flex;
-  height: 100%;
   flex-direction: column;
-  justify-content: top;
-  align-items: top;
+  justify-content: space-between;
+  align-items: start;
   padding: 0px;
   font-size: 1rem;
   background: var(--color-bg-b1);
+
+
 }
 .layout-content {
   flex: 1;
@@ -53,6 +56,8 @@
   padding: 0;
   margin: 0;
   background: var(--color-bg-b3);
+  border-radius: 25px 0 0 0;
+  overflow: hidden;
 }
 .layout-footer {
   flex: 0 0 auto;

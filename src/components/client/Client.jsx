@@ -3,58 +3,72 @@ import { useHeaderClients } from "../../context/UserContext";
 import "./Client.css";
 import { useState } from "react";
 import menuIcon from "../../styles/svg/mirror-line.svg";
+import ClientDashboard from "../client-dashboard/ClientDashboard";
+import ClientInvoices from "../client-invoices/ClientInvoices";
+import ClientVisTraining from "../client-vis-training/ClientVisTraining";
+import ClientOptometry from "../client-optometry/ClientOptometry";
+import ClientLab from "../client-lab/ClientLab";
 
 function Client() {
   const buttons = [
     {
-      id: "clients",
+      id: "1",
       label: "Přehled",
       rights: 0,
-      path: "/clients",
+      component: ClientDashboard,
       icon: "clients",
     },
     {
-      id: "optotyp",
+      id: "2",
       label: "Objednávky",
-      onClick: () => console.log("Optotyp clicked"),
+      onClick: () => console.log("Invoices clicked"),
       rights: 0,
-      path: "/optotyp",
+      component: ClientInvoices,
       icon: "optotyp",
     },
     {
-      id: "visual-training",
+      id: "3",
       label: "Optometrie",
       rights: 0,
-      path: "/visual-training",
+      component: ClientOptometry,
       icon: "eye",
     },
     {
-      id: "1",
+      id: "4",
       label: "Trénink",
       rights: 0,
-      path: "/visual-training",
+      component: ClientVisTraining,
       icon: "eye",
     },
     {
-      id: "2",
+      id: "5",
       label: "Laboratoř",
       rights: 0,
-      path: "/visual-training",
+      component: ClientLab,
       icon: "eye",
     },
   ];
 
   const { id } = useParams();
+  const [menuComponent, setMenuComponent] = useState(null);
   const [activeButton, setActiveButton] = useState(null);
   const { headerClients } = useHeaderClients();
   // Načti klienta např. z kontextu nebo databáze
   const client = headerClients.find((c) => c.id === parseInt(id));
-  console.log("Client component, id:", id, "client:", client);
+
+  const handleClick = (button) => {
+    setActiveButton(button.id);
+    setMenuComponent(() => button.component);
+  };
+
+  const Component = menuComponent;
+
   return (
     <div className="client-container">
       <div className="client-menu">
         <div className="client-menu">
           <div className="client-menu-header">
+            <h1>Klient</h1>
             <img
               onClick={() => {
                 setIsMenuExtended(!isMenuExtended);
@@ -66,13 +80,6 @@ function Client() {
           </div>
 
           {buttons.map((button) => {
-            // Kontrola práv uživatele
-            // user.rights = user.rights || 0; // Zajištění, že rights existují a jsou číslo
-            // user.rights = 1; // Zajištění, že rights existují a jsou číslo
-
-            // Pokud není uživatel přihlášen, zobrazíme jen tlačítka s právy 0
-            // if (Number(JSON.stringify(user.rights)) >= button.rights)
-
             return (
               <button
                 key={button.id}
@@ -92,9 +99,9 @@ function Client() {
         </div>
       </div>
       <div className="client-data">
-        <h1 className="">Client Component</h1>
-        <h2>{client.name}</h2>
+        {Component ? <Component client={client} /> : null}
       </div>
+
     </div>
   );
 }
