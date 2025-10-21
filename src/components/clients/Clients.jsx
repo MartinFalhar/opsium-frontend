@@ -41,33 +41,33 @@ function Clients(props) {
     <div className="clients-container">
       <div className="clients-left-column">
         <div className="clients-search-container">
-          <h1>Najdi klienta</h1>
           <div className="client-search">
             <input
+              className="client-search-input"
               type="text"
               value={searchClient}
               onChange={(e) => setSearchClient(e.target.value)}
               placeholder="Hledej klienta"
             />
-            <button type="submit" style={{ marginTop: "30px" }}>
+            <button type="submit">
               Hledej
             </button>
-          </div>
-          <div className="client-add">
-            <button>Přidat klienta</button>
+            <div className="client-add">
+              <button>Přidat klienta</button>
+            </div>
           </div>
         </div>
         <div className="clients-list-container">
-          Seznam klientů
+          <h1>Nalezeno {clients.length} klientů</h1>
           {clients.map((client) => (
             <div
               key={client.id}
               className="client-item"
               onClick={() => addClient(client)}
             >
-              <h2>
+              <h1>
                 {`${client.degree_front} ${client.name} ${client.surname} ${client.degree_post}`}{" "}
-              </h2>
+              </h1>
               <p>{`${client.street} ${client.city} ${client.post_code}`}</p>
             </div>
           ))}

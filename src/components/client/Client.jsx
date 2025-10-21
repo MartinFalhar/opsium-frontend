@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useHeaderClients } from "../../context/UserContext";
 import "./Client.css";
 import { useState } from "react";
+import { useEffect } from "react";
 import menuIcon from "../../styles/svg/mirror-line.svg";
 import ClientDashboard from "../client-dashboard/ClientDashboard";
 import ClientInvoices from "../client-invoices/ClientInvoices";
@@ -55,6 +56,13 @@ function Client() {
   const { headerClients } = useHeaderClients();
   // Načti klienta např. z kontextu nebo databáze
   const client = headerClients.find((c) => c.id === parseInt(id));
+
+  useEffect(() => {
+    if (headerClients) {
+      setMenuComponent(() => buttons[0].component);
+      setActiveButton(buttons[0].id);
+    }
+  }, [headerClients]);
 
   const handleClick = (button) => {
     setActiveButton(button.id);

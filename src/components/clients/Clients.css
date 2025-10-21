@@ -1,12 +1,12 @@
 html,
 body {
-  background: var(--color-bg-b11);
   height: 100%;
   margin: 0;
 }
 
 .clients-container {
   flex: 1;
+  background: var(--color-bg-b3);
   display: flex;
   flex-direction: row;
   min-height: 0;
@@ -18,26 +18,31 @@ body {
   flex: 0 0 75%;
   display: flex;
   flex-direction: column;
-  background: var(--color-bg-b11);
-  margin-right: 15px;
+  background: var(--color-bg-b3);
+
+  /* margin-right: 15px; */
   /* justify-content: space-between; */
-  align-items: left;
-  padding: 10px;
+  /* align-items: left; */
 }
 
 .clients-right-column {
+  background: var(--color-bg-b2);
   flex: 0 0 25%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  background: var(--color-bg-b11);
-  border: 0.5px solid var(--color-bg-b9);
+  box-shadow: 0 10px 13px rgba(0, 0, 0, 0.7);
+  z-index: 1;
+}
+
+.clients-list-container {
+  padding-left: 50px;
+  padding-right: 50px;
 }
 
 .client-item {
   width: 100%;
-  /* height: 50px; */
   border-bottom: 0.5px solid var(--color-bg-b9);
   display: flex;
   flex-direction: column;
@@ -45,11 +50,53 @@ body {
   padding: 10px;
 }
 
+.client-item h1 {
+  font-size: var(--font-size-xlarge);
+  margin: 3px;
+  color: var(--color-bg-b11);
+  font-weight: normal;
+  letter-spacing: 1px;
+}
+
+.client-item p {
+  font-size: var(--font-size-large);
+  margin: 3px;
+  color: var(--color-bg-b8);
+}
+
 .client-item:hover {
   background-color: var(--color-bg-b9);
   cursor: pointer;
 }
-.client-item h2 {
-  font-size: larger;
-  margin: 3px;
+
+.client-item:hover p {
+  color: var(--color-bg-b1);
+}
+
+.client-item:hover h1 {
+  color: var(--color-bg-b1);
+  font-weight: bold;
+}
+
+.client-search {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 15px;
+  background: var(--color-grd-g13);
+  width: 100%;
+  height: 60px;
+  margin-top: 50px;
+  padding-left: 50px;
+}
+
+.client-search input {
+  font-size: x-large;
+  margin: 0;
+  width: 600px;
+}
+
+.client-search button {
+  margin: 0;
 }

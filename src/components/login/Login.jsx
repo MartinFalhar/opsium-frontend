@@ -17,7 +17,7 @@ function Login() {
   const { setUser } = useUser();
   const [heroImg, setHeroImg] = useState(null);
 
-  const heroImgID = Math.floor(Math.random() * 3 + 1);
+  const heroImgID = Math.floor(Math.random() * 6 + 1);
   console.log("Hero image ID:", heroImgID);
 
   const [imageSrc, setImageSrc] = useState(null);
