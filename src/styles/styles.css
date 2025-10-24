@@ -148,7 +148,7 @@ h1 {
 }
 
 h2 {
-  font-size: 1rem;
+  font-size: 1.2rem;
   text-align: left;
   background: var(--color-grd-g6);
   -webkit-background-clip: text;
@@ -226,10 +226,10 @@ button {
 input {
   padding: 0px;
   background-color: var(--color-bg-b11);
-  border: 1px solid var(--color-bg-b12);
-  border-radius: 5px;
+  border: 1px solid var(--color-bg-b8);
+  border-radius: 10px;
   font-size: var(--font-size-regular);
-  width: 80%;
+  width: 100%;
   max-width: 300px;
   padding: 10px;
 }

@@ -5,7 +5,7 @@ import { useUser } from "../../context/UserContext";
 import "./Superadmin.css";
 
 import SuperadminDashboard from "./SuperadminDashboard";
-import SuperadminAccount from "./SuperadminAccount";
+import SuperadminAdminPanel from "./SuperadminAdminPanel";
 import SuperadminData from "./SuperadminData";
 import SuperadminPassword from "./SuperadminPassword";
 import SuperadminSubUser from "./SuperadminSubUser";
@@ -26,9 +26,9 @@ function Superadmin(props) {
     },
     {
       id: "2",
-      label: "Nastavení účtu",
+      label: "ADMIN panel",
       rights: 0,
-      component: SuperadminAccount,
+      component: SuperadminAdminPanel,
       icon: "eye",
     },
     {

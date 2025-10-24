@@ -3,10 +3,13 @@ body {
   padding: 0;
 }
 
-.settings-container {
+.superadmin-content-container {
   display: flex;
   width: 100%;
   height: 100%;
+  flex-direction: column;
+  background: var(--color-bg-b3);
+
   background: var(--color-bg-b3);
 }
 
@@ -23,4 +26,66 @@ body {
   margin-top: 16px;
   width: 150px;
   height: 150px;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 15px;
+  background: var(--color-grd-g13);
+  width: 100%;
+  height: 50px;
+  margin-top: 50px;
+  padding-left: 50px;
+}
+
+.app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #eef1f5;
+}
+
+.open-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.open-button:hover {
+  background-color: #0056b3;
+}
+
+/* ---- MODÁL ---- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  width: 320px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+}
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }

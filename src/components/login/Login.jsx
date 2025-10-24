@@ -7,7 +7,6 @@ import logo from "../../styles/images/opsium-logo-black.png";
 import { useUser } from "../../context/UserContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
-console.log("API URL:", API_URL);
 
 function Login() {
   const [email, setEmail] = useState("");
