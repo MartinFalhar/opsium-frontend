@@ -4,11 +4,11 @@ import "./Client.css";
 import { useState } from "react";
 import { useEffect } from "react";
 import menuIcon from "../../styles/svg/mirror-line.svg";
-import ClientDashboard from "../client-dashboard/ClientDashboard";
-import ClientInvoices from "../client-invoices/ClientInvoices";
-import ClientVisTraining from "../client-vis-training/ClientVisTraining";
-import ClientOptometry from "../client-optometry/ClientOptometry";
-import ClientLab from "../client-lab/ClientLab";
+import ClientDashboard from "./ClientDashboard";
+import ClientInvoices from "./ClientInvoices";
+import ClientVisTraining from "./ClientVisTraining";
+import ClientOptometry from "./ClientOptometry";
+import ClientLab from "./ClientLab";
 
 function Client() {
   const buttons = [
@@ -72,44 +72,41 @@ function Client() {
   const Component = menuComponent;
 
   return (
-    <div className="client-container">
-      <div className="client-menu">
-        <div className="client-menu">
-          <div className="client-menu-header">
-            <h1>Klient</h1>
-            <img
-              onClick={() => {
-                setIsMenuExtended(!isMenuExtended);
-              }}
-              className="client-menu-icon"
-              src={menuIcon}
-              alt="Menu"
-            ></img>
-          </div>
-
-          {buttons.map((button) => {
-            return (
-              <button
-                key={button.id}
-                id={button.id}
-                style={{
-                  width: "200px",
-                }}
-                className={`button-client-menu ${
-                  activeButton === button.id ? "active" : ""
-                } ${button.icon}`}
-                onClick={() => handleClick(button)}
-              >
-                {button.label}
-              </button>
-            );
-          })}
+    <div className="container">
+      <div className="secondary-menu">
+        <div className="secondary-menu-header">
+          <h1>Klient</h1>
+          <img
+            onClick={() => {
+              setIsMenuExtended(!isMenuExtended);
+            }}
+            className="secondary-menu-icon"
+            src={menuIcon}
+            alt="Menu"
+          ></img>
         </div>
+
+        {buttons.map((button) => {
+          return (
+            <button
+              key={button.id}
+              id={button.id}
+              style={{
+                width: "200px",
+              }}
+              className={`button-secondary-menu ${
+                activeButton === button.id ? "active" : ""
+              } ${button.icon}`}
+              onClick={() => handleClick(button)}
+            >
+              {button.label}
+            </button>
+          );
+        })}
       </div>
-      <div className="client-data">
+      <div className="left-container">
         {Component ? <Component client={client} /> : null}
       </div>
-
     </div>
   );
 }

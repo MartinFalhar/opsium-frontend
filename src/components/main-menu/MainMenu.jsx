@@ -1,10 +1,19 @@
 import React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
-import Logout from "../login/Logout";
+import Logout from "../settings/SettingsLogout";
 import "./MainMenu.css";
 import menuIcon from "../../styles/svg/mirror-line.svg";
+
+const login_button = {
+  id: "login",
+  label: "Přihlásit se",
+  rights: 0,
+  path: "/",
+  pathLogged: "/settings",
+  icon: "login",
+};
 
 const buttons = [
   {
@@ -64,19 +73,42 @@ const buttons = [
     path: "/optotyp",
     icon: "optotyp",
   },
+  {
+    id: "superadmin",
+    label: "SUPERADMIN",
+    rights: 999,
+    path: "/superadmin",
+    icon: "optotyp",
+  },
 ];
 
 function MainMenu({ isMenuExtended, setIsMenuExtended }) {
   //state evidence pro změnu stylu
-  const [activeButton, setActiveButton] = useState(null);
+  const [activeButton, setActiveButton] = useState("login");
   const navigate = useNavigate();
   //práce s parametry uživatele
   const { user } = useUser();
 
   const handleClick = (button) => {
-    setActiveButton(button.id); // změna stylu
-    navigate(button.path); // přechod na stránku
+    // změna stylu
+    setActiveButton(button.id);
+    // přechod na stránku
+    navigate(
+      button.id === "login"
+        ? user?.name
+          ? button.pathLogged
+          : button.path
+        : button.path
+    );
   };
+
+  useEffect(() => {
+    console.log("MainMenu useEffect user:", user);
+    //pokud je uživatel přihlášen, automaticky otevřít klienty
+    if (user?.name) {
+      handleClick(buttons[0]);
+    }
+  }, [user]);
 
   return (
     <div className="main-menu-container">
@@ -121,8 +153,33 @@ function MainMenu({ isMenuExtended, setIsMenuExtended }) {
           return null; // Pokud uživatel nemá práva, tlačítko se nezobrazí
         })}
       </div>
+
       <div className="main-menu-footer">
-        {user?.name && <div className="main-menu-avatar"></div>}
+        <button
+          key={login_button.id}
+          id={login_button.id}
+          style={{
+            width: isMenuExtended ? "200px" : "60px",
+          }}
+          className={`button-main-menu ${
+            activeButton === login_button.id ? "active" : ""
+          } ${!user?.name ? login_button.icon : "settings"}`}
+          onClick={() => handleClick(login_button)}
+        >
+          {/* {user?.name && <div className="main-menu-avatar"></div>} */}
+
+          {user?.name && isMenuExtended && (
+            <div className="main-menu-user-info">
+              <p>
+                {user?.name} ({user?.rights})
+              </p>
+            </div>
+          )}
+
+          {!user?.name && (isMenuExtended ? login_button.label : "")}
+        </button>
+
+        {/* {user?.name && <div className="main-menu-avatar"></div>}
         {user?.name && isMenuExtended && (
           <div className="main-menu-user-info">
             <p>
@@ -140,7 +197,7 @@ function MainMenu({ isMenuExtended, setIsMenuExtended }) {
               <p>Přihlásit</p>
             </a>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

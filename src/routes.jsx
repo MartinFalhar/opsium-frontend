@@ -8,9 +8,12 @@ import Optotyp from "./components/optotyp/Optotyp";
 import OptotypLayout from "./layouts/OptotypLayout";
 import Vistraining from "./components/vistraining/Vistraining";
 import VistrainingLayout from "./layouts/VistrainingLayout";
-import Logout from "./components/login/Logout";
+import Logout from "./components/settings/SettingsLogout";
 import Clients from "./components/clients/Clients";
 import Client from "./components/client/Client";
+import Settings from "./components/settings/Settings";
+
+import Superadmin from "./components/superadmin/Superadmin";
 // import LoginPage from "./pages/LoginPage";
 // import AdminDashboard from "./pages/AdminDashboard";
 // import NotFound from "./pages/NotFound";
@@ -26,9 +29,11 @@ export default function RoutesConfig() {
         <Route path="/logout" element={<Logout />} />
         <Route path="/clients" element={<Clients />} />
         <Route path="/client/:id" element={<Client />} />
-        {/* <Route path="/login" element={<LoginPage />} /> */}
-        {/* <Route path="/admin" element={<AdminDashboard />} /> */}
-        {/* <Route path="*" element={<NotFound />} /> */}
+        <Route path="/settings" element={<Settings />} />
+
+        <Route path="/superadmin" element={<Superadmin />} />
+
+        <Route path="*" />
       </Route>
 
       <Route element={<OptotypLayout />}>

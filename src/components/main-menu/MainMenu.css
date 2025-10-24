@@ -1,5 +1,5 @@
 :root {
-    --font-size-main-menu: 1.1rem;
+  --font-size-main-menu: 0.9rem;
 }
 
 .main-menu-container {
@@ -88,8 +88,8 @@
 .button-main-menu {
   display: flex;
   align-items: center;
-  width: 200px; 
-  height: 60px;
+  width: 200px;
+  height: 50px;
   background: var(--colosr-bg-b3);
   color: var(--color-bg-b12);
   font-weight: 400;
@@ -105,14 +105,29 @@
 }
 
 .button-main-menu.clients::before {
-  background-image: url("../../styles/svg/optician.svg");  
+  background-image: url("../../styles/svg/optician.svg");
 }
 
 .button-main-menu.optotyp::before {
-  background-image: url("../../styles/svg/optotyp.svg");  
+  background-image: url("../../styles/svg/optotyp.svg");
 }
 
 .button-main-menu.eye::before {
   background-image: url("../../styles/svg/eye.svg");
+  font-size: 0.5rem;
+}
+
+.button-main-menu.person::before {
+  background-image: url("../../styles/svg/person.svg");
+  font-size: 0.5rem;
+}
+
+.button-main-menu.login::before {
+  background-image: url("../../styles/svg/login.svg");
+  font-size: 0.5rem;
+}
+
+.button-main-menu.settings::before {
+  background-image: url("../../styles/svg/settings.svg");
   font-size: 0.5rem;
 }

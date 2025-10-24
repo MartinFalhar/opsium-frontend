@@ -1,4 +1,3 @@
-import "./ClientOptometry.css";
 import { useState } from "react";
 
 function ClientOptometry() {
@@ -6,11 +5,11 @@ function ClientOptometry() {
 
   return (
     <div className="container">
-      <div className="box">
+      <div className="info-box">
         <h1>CLIENT OPTOMETRY - external module</h1>
       </div>
 
-      <div className="sph-cyl-modul">
+      <div className="info-box">
         <label htmlFor="sph">SPH</label>
         <input
           type="text"
@@ -19,7 +18,7 @@ function ClientOptometry() {
           placeholder="SPH"
         />
       </div>
-        <button type="submit">Uložit</button>
+      <button type="submit">Uložit</button>
     </div>
   );
 }

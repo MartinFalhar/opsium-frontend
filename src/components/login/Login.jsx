@@ -65,7 +65,7 @@ function Login() {
         "Co je v localStorage po uložení usera:",
         JSON.parse(localStorage.getItem("user"))
       );
-      navigate("/"); // přesměrování na domovskou stránku s právy
+      navigate("/clients"); // přesměrování na domovskou stránku s právy
     } else {
       setError(data.message);
     }
