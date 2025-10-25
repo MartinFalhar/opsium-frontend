@@ -74,6 +74,13 @@ const buttons = [
     icon: "optotyp",
   },
   {
+    id: "admin",
+    label: "* ADMIN *",
+    rights: 10,
+    path: "/admin",
+    icon: "optotyp",
+  },
+  {
     id: "superadmin",
     label: "SUPERADMIN",
     rights: 999,
@@ -124,7 +131,6 @@ function MainMenu({ isMenuExtended, setIsMenuExtended }) {
             alt="Menu"
           ></img>
         </div>
-        {console.log("FRNT MainMenu user rights:", user?.rights, user?.name)}
         {buttons.map((button) => {
           // Kontrola práv uživatele
           // user.rights = user.rights || 0; // Zajištění, že rights existují a jsou číslo

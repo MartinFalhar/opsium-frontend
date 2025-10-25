@@ -1,9 +1,9 @@
 import React from "react";
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import Footer from "../components/footers/Footer";
-import MainHeader from "../components/headers/MainHeader";
-import MainMenu from "../components/main-menu/MainMenu";
+import Footer from "../features/footers/Footer";
+import MainHeader from "../features/headers/MainHeader";
+import MainMenu from "../features/main-menu/MainMenu";
 
 import "./MainLayout.css";
 const MainLayout = () => {

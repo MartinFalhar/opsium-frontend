@@ -15,7 +15,7 @@ import menuIcon from "../../styles/svg/mirror-line.svg";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function Superadmin(props) {
+function Superadmin() {
   const buttons = [
     {
       id: "1",
@@ -26,7 +26,7 @@ function Superadmin(props) {
     },
     {
       id: "2",
-      label: "ADMIN panel",
+      label: "SUP-ADMIN panel",
       rights: 0,
       component: SuperadminAdminPanel,
       icon: "eye",
@@ -73,6 +73,8 @@ function Superadmin(props) {
   //zachycení kliku na tlačítko menu
   const [activeButton, setActiveButton] = useState(null);
 
+
+
   //handling kliků na tlačítka menu
   const handleClick = (button) => {
     setActiveButton(button.id);
@@ -80,20 +82,7 @@ function Superadmin(props) {
   };
 
   useEffect(() => {
-    // const loadClients = async () => {
-    //   const res = await fetch(`${API_URL}/clients`, {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ clients }),
-    //   });
-    //   const data = await res.json();
-    //   if (res.ok) {
-    //     setClients(data);
-    //   } else {
-    //     setError(data.message);
-    //   }
-    // };
-    // loadClients();
+
     handleClick(buttons[0]);
   }, []);
 
@@ -101,7 +90,7 @@ function Superadmin(props) {
     <div className="container">
       <div className="secondary-menu">
         <div className="secondary-menu-header">
-          <h1>Můj účet</h1>
+          <h1>SuperAdmin</h1>
           <img
             onClick={() => {
               setIsMenuExtended(!isMenuExtended);

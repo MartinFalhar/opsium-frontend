@@ -45,7 +45,7 @@ function MainHeader() {
     minute: "2-digit",
   });
 
-  console.log("Header clients:", headerClients);
+
   return (
     <header className="layout-header">
       {/* <img
