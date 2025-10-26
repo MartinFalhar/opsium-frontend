@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect} from "react";
 import "./Admin.css";
 import Modal from "../../components/modal/Modal.jsx";
 import { useUser } from "../../context/UserContext";
@@ -35,7 +35,6 @@ function AdminPanel() {
         body: JSON.stringify({ organization: user.organization }),
       });
       const data = await res.json();
-      console.log("ADMIN organizace:", user.organization);
       if (res.ok) {
         setUsers(data);
       } else {
@@ -57,12 +56,13 @@ function AdminPanel() {
       surname: values.surname,
       email: values.email,
       password: values.password,
+      //zde je USER organization z CONTEXTu, což je organization ADMINA, který uživatele vytváří
       organization: user.organization,
       rights: 1,
+      
     };
-
     try {
-      const res = await fetch(`${API_URL}/register_user`, {
+      const res = await fetch(`${API_URL}/create_user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),
@@ -94,24 +94,16 @@ function AdminPanel() {
         />
       </div>
       <div className="clients-list-container">
-        <h1>Nalezeno {users.length} uživatelů</h1>
+        
+        <h1>Nalezeno {users.length} uživatel{users.length  == 0 ? "ů" : (users.length === 1 ? "" : (users.length in [2,3,4] ? "é" : "ů"))}</h1>
 
-        {users && (users?.map((client) => (
+        {users?.length > 0 && (users?.map((client) => (
           <div key={client.id} className="client-item" onClick={() => null}>
             <h1>{`${client.name} ${client.surname} (${client.rights})`}</h1>
             <p>{`Email: ${client.email} // ID Organizace: ${client.organization}`}</p>
           </div>
         )))}
       </div>
-
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Nový ADMIN účet</h2>
-          </div>
-        </div>
-      )}
-
       <div>
         {showModal && (
           <Modal

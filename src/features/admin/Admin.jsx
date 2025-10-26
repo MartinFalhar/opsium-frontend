@@ -61,7 +61,7 @@ function Admin() {
     <div className="container">
       <div className="secondary-menu">
         <div className="secondary-menu-header">
-          <h1>SuperAdmin</h1>
+          <h1>* ADMIN *</h1>
           <img
             onClick={() => {
               setIsMenuExtended(!isMenuExtended);
@@ -91,6 +91,7 @@ function Admin() {
       </div>
       <div className="left-container">
         {Component ? <Component client={user} /> : null}
+
       </div>
       <div className="right-container">
         <h1>INFO</h1>

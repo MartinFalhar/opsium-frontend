@@ -16,6 +16,10 @@ import menuIcon from "../../styles/svg/mirror-line.svg";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Superadmin() {
+
+  //předává data přihlášeného uživatele
+  const { user } = useUser();
+
   const buttons = [
     {
       id: "1",
@@ -63,9 +67,6 @@ function Superadmin() {
 
   //nastavuje komponentu z menu
   const [menuComponent, setMenuComponent] = useState(null);
-
-  //předává data přihlášeného uživatele
-  const { user } = useUser();
 
   //nutné pro správnou manipulaci s komponentou menu
   const Component = menuComponent;
@@ -119,10 +120,12 @@ function Superadmin() {
         })}
       </div>
       <div className="left-container">
-        {Component ? <Component client={user} /> : null}
+        {Component ? <Component userData={user} /> : null}
       </div>
       <div className="right-container">
         <h1>INFO</h1>
+        <p>Jste přihlášen jako SuperAdmin.</p>
+        <pre>Organization:{user.organization}</pre>
       </div>
     </div>
   );

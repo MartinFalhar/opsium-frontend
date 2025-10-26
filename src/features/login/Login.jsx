@@ -22,7 +22,7 @@ function Login() {
   const [imageSrc, setImageSrc] = useState(null);
 
   const heroImgInfoLoad = async () => {
-    const res = await fetch(`${API_URL}/hero_img_info`, {
+    const res = await fetch(`${API_URL}/pages/hero_img_info`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: heroImgID }),
@@ -41,7 +41,7 @@ function Login() {
     heroImgInfoLoad();
     //nacteni obrazku ze serveru
     setImageSrc(
-      `${API_URL}/hero_img/${heroImgID < 10 ? `0${heroImgID}` : `${heroImgID}`}`
+      `${API_URL}/pages/hero_img/${heroImgID < 10 ? `0${heroImgID}` : `${heroImgID}`}`
     );
   }, []);
 
@@ -57,11 +57,12 @@ function Login() {
     if (res.ok) {
       // localStorage.setItem("token", data.token);
       // nebo cookie, podle implementace
+      
       setUser(data);
       console.log("FRNT Response data:", data);
       // Zkontrolujeme, jestli se uložil do localStorage
       console.log(
-        "Co je v localStorage po uložení usera:",
+        "Co je v localStorage po přihlášení USER:",
         JSON.parse(localStorage.getItem("user"))
       );
       navigate("/clients"); // přesměrování na domovskou stránku s právy

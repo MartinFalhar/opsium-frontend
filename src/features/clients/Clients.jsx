@@ -1,15 +1,30 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import "./Clients.css";
+import Modal from "../../components/modal/Modal.jsx";
 import { useSetHeaderClients } from "../../context/UserContext";
+import { useUser } from "../../context/UserContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function Clients(props) {
+function Clients() {
+  const { user } = useUser();
+
+  const [error, setError] = useState(null);
+
+
+    const fields = [
+    { varName: "degree_front", label: "Titul před", input: "text", required: false },
+    { varName: "name", label: "Jméno", input: "text", required: true },
+    { varName: "surname", label: "Příjmení", input: "text", required: true },
+    { varName: "degree_post", label: "Titul za", input: "text", required: false },
+
+  ];
+
   const [searchClient, setSearchClient] = useState("");
 
   const [clients, setClients] = useState([]);
-
+const [showModal, setShowModal] = useState(false);
   const { setHeaderClients } = useSetHeaderClients();
 
   const addClient = (newClient) => {
@@ -37,9 +52,23 @@ function Clients(props) {
     loadClients();
   }, []);
 
+    const handleSubmit = async (values) => {
+    const newClient = {
+      degree_front: values.degree_front,
+      name: values.name,
+      surname: values.surname,
+      degree_post: values.degree_post,
+      id_user: user.id,
+    };  
+    console.log("New client to add:", newClient);
+  }
+
   return (
     <div className="clients-container">
       <div className="clients-left-column">
+        <div className="button-group">
+          <button onClick={() => setShowModal(true)}>Přidat klienta</button>
+        </div>
         <div className="clients-search-container">
           <div className="client-search">
             <input
@@ -49,12 +78,7 @@ function Clients(props) {
               onChange={(e) => setSearchClient(e.target.value)}
               placeholder="Hledej klienta"
             />
-            <button type="submit">
-              Hledej
-            </button>
-            <div className="client-add">
-              <button>Přidat klienta</button>
-            </div>
+            <button type="submit">Hledej</button>
           </div>
         </div>
         <div className="clients-list-container">
@@ -72,8 +96,16 @@ function Clients(props) {
             </div>
           ))}
         </div>
+      </div>{" "}
+      <div>
+        {showModal && (
+          <Modal
+            fields={fields}
+            onSubmit={handleSubmit}
+            onClose={() => setShowModal(false)}
+          />
+        )}
       </div>
-
       <div className="clients-right-column">
         <h1>Filtry</h1>
       </div>

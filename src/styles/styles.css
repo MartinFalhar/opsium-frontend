@@ -217,7 +217,7 @@ button {
   cursor: pointer;
   box-shadow: 0 1px 13px rgba(0, 0, 0, 0.3);
   font-size: var(--font-size-main-menu);
-  margin-top: 20px;
+  /* margin-top: 20px; */
   text-align: center;
   color: var(--color-bg-b1);
   font-size: var(--font-size-large);
@@ -271,6 +271,14 @@ input {
   height: 150px;
 }
 
+.button-group {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  padding-left: 50px;
+  margin-top: 3px;
+}
+
 /* ----------- SECONDARY MENU */
 .secondary-menu {
   display: flex;
@@ -304,7 +312,7 @@ input {
   display: flex;
   align-items: center;
   width: 200px;
-  height: 50px;
+  height: 40px;
   background: var(--color-bg-b3);
   color: var(--color-bg-b12);
   font-weight: 400;

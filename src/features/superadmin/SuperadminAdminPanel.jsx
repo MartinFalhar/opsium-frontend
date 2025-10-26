@@ -55,10 +55,11 @@ function SuperadminAdminPanel() {
       email: values.email,
       password: values.password,
       rights: 10,
+
     };
 
     try {
-      const res = await fetch(`${API_URL}/register_user`, {
+      const res = await fetch(`${API_URL}/create_admin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newAdmin),

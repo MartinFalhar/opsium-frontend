@@ -41,7 +41,7 @@ function Optotyp() {
   //uložení setu optotypu do databáze
   //posílání POST na backend
   const handleClickSave = async () => {
-    const res = await fetch(`${API_URL}/saveoptotyp`, {
+    const res = await fetch(`${API_URL}/optotypes/saveoptotyp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -53,7 +53,7 @@ function Optotyp() {
 
   //získá uložené sety pro uživatele
   const handleClickLoad = async () => {
-    const res = await fetch(`${API_URL}/loadoptotyp`, {
+    const res = await fetch(`${API_URL}/optotypes/loadoptotyp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -8,9 +8,6 @@ body {
   width: 100%;
   height: 100%;
   flex-direction: column;
-  background: var(--color-bg-b3);
-
-  background: var(--color-bg-b3);
 }
 
 .content-container {
@@ -63,30 +60,5 @@ body {
   background-color: #0056b3;
 }
 
-/* ---- MODÁL ---- */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-}
 
-.modal {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  width: 320px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
-}
-.button-group {
-  display: flex;
-  justify-content: flex-start;
-  gap: 10px;
-  padding-left: 50px;
-}
+
