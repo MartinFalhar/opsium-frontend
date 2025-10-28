@@ -5,6 +5,7 @@ import "./Login.css";
 import "../../styles/styles.css";
 import logo from "../../styles/images/opsium-logo-black.png";
 import { useUser } from "../../context/UserContext";
+import PuffLoaderSpinner from "../../components/loader/PuffLoaderSpinner.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -16,13 +17,24 @@ function Login() {
   const { setUser } = useUser();
   const [heroImg, setHeroImg] = useState(null);
 
-  const heroImgID = Math.floor(Math.random() * 6 + 1);
-  console.log("Hero image ID:", heroImgID);
-
   const [imageSrc, setImageSrc] = useState(null);
 
+  let heroImgID = "";
+
+  useEffect(() => {
+    heroImgID = Math.floor(Math.random() * 6 + 1);
+
+    //nacteni info o uvodnim obrazku
+    heroImgInfoLoad();
+    //nacteni obrazku ze serveru
+    setImageSrc(
+      `${API_URL}/hero_img/${heroImgID < 10 ? `0${heroImgID}` : `${heroImgID}`}`
+    );
+  }, []);
+
+
   const heroImgInfoLoad = async () => {
-    const res = await fetch(`${API_URL}/pages/hero_img_info`, {
+    const res = await fetch(`${API_URL}/hero_img_info`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: heroImgID }),
@@ -36,17 +48,11 @@ function Login() {
     }
   };
 
-  useEffect(() => {
-    //nacteni info o uvodnim obrazku
-    heroImgInfoLoad();
-    //nacteni obrazku ze serveru
-    setImageSrc(
-      `${API_URL}/pages/hero_img/${heroImgID < 10 ? `0${heroImgID}` : `${heroImgID}`}`
-    );
-  }, []);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const res = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -57,9 +63,8 @@ function Login() {
     if (res.ok) {
       // localStorage.setItem("token", data.token);
       // nebo cookie, podle implementace
-      
+
       setUser(data);
-      console.log("FRNT Response data:", data);
       // Zkontrolujeme, jestli se uložil do localStorage
       console.log(
         "Co je v localStorage po přihlášení USER:",

@@ -37,7 +37,7 @@ const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const loadClients = async () => {
-      const res = await fetch(`${API_URL}/clients`, {
+      const res = await fetch(`${API_URL}/client/clients`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ clients }),

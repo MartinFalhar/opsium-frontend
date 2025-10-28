@@ -24,7 +24,21 @@ function Admin() {
     },
     {
       id: "2",
-      label: "ADMIN panel",
+      label: "Účty",
+      rights: 0,
+      component: AdminPanel,
+      icon: "eye",
+    },
+    {
+      id: "3",
+      label: "Uživatelé",
+      rights: 0,
+      component: AdminPanel,
+      icon: "eye",
+    },
+    {
+      id: "4",
+      label: "Pobočky",
       rights: 0,
       component: AdminPanel,
       icon: "eye",

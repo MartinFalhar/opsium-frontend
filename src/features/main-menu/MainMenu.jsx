@@ -110,7 +110,6 @@ function MainMenu({ isMenuExtended, setIsMenuExtended }) {
   };
 
   useEffect(() => {
-    console.log("MainMenu useEffect user:", user);
     //pokud je uživatel přihlášen, automaticky otevřít klienty
     if (user?.name) {
       handleClick(buttons[0]);

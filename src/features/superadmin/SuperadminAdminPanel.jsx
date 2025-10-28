@@ -26,7 +26,7 @@ function SuperadminAdminPanel() {
 
   useEffect(() => {
     const loadUsers = async () => {
-      const res = await fetch(`${API_URL}/admin_list`, {
+      const res = await fetch(`${API_URL}/admin/admin_list`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ users }),
@@ -59,7 +59,7 @@ function SuperadminAdminPanel() {
     };
 
     try {
-      const res = await fetch(`${API_URL}/create_admin`, {
+      const res = await fetch(`${API_URL}/admin/create_admin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newAdmin),

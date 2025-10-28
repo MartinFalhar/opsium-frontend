@@ -76,9 +76,10 @@ body {
   border-bottom-left-radius: 30px;
   background-image: linear-gradient(
     var(--rotate),
-    var(--color-bg-b6),
-    var(--color-bg-b6),
-    var(--color-el-a)
+      var(--color-bg-b4),
+      var(--color-bg-b10),
+      var(--color-bg-b4)
+    /* var(--color-el-a) */
   );
   /* #789ac1 */
 
@@ -86,7 +87,7 @@ body {
   z-index: -1;
   top: -0%;
   left: -0%;
-  animation: spin 20s linear infinite;
+  animation: reverse-spin 20s linear infinite;
 }
 
 .card::after {
@@ -103,13 +104,14 @@ body {
   filter: blur(calc(var(--card-height) / 6));
   background-image: linear-gradient(
     var(--rotate),
-    var(--color-bg-b6),
-    var(--color-bg-b6),
-    var(--color-el-g)
+    var(--color-bg-b10),
+    var(--color-bg-b10),
+    var(--color-bg-b4)
+    /* var(--color-el-e) */
   );
   opacity: 1;
   transition: opacity 0.5s;
-  animation: spin 13s linear infinite;
+  animation: spin 10s linear infinite;
 }
 
 .button-login {

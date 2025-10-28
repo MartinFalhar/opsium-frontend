@@ -29,7 +29,7 @@ function AdminPanel() {
   //načtení uživatelů z DB
   useEffect(() => {
     const loadUsers = async () => {
-      const res = await fetch(`${API_URL}/users_list`, {
+      const res = await fetch(`${API_URL}/admin/users_list`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ organization: user.organization }),
@@ -62,7 +62,7 @@ function AdminPanel() {
       
     };
     try {
-      const res = await fetch(`${API_URL}/create_user`, {
+      const res = await fetch(`${API_URL}/admin/create_user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),
