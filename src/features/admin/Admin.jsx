@@ -5,8 +5,10 @@ import { useUser } from "../../context/UserContext";
 import "./Admin.css";
 
 
-import AdminPanel from "./AdminPanel";
 import AdminDashboard from "./AdminDashboard";
+import AdminAccounts from "./AdminAccounts";
+import AdminMembers from "./AdminMembers";
+import AdminBranches from "./AdminBranches";
 
 
 import menuIcon from "../../styles/svg/mirror-line.svg";
@@ -26,21 +28,21 @@ function Admin() {
       id: "2",
       label: "Účty",
       rights: 0,
-      component: AdminPanel,
+      component: AdminAccounts,
       icon: "eye",
     },
     {
       id: "3",
-      label: "Uživatelé",
+      label: "Členové",
       rights: 0,
-      component: AdminPanel,
+      component: AdminMembers,
       icon: "eye",
     },
     {
       id: "4",
       label: "Pobočky",
       rights: 0,
-      component: AdminPanel,
+      component: AdminBranches,
       icon: "eye",
     },
 
@@ -78,7 +80,7 @@ function Admin() {
           <h1>* ADMIN *</h1>
           <img
             onClick={() => {
-              setIsMenuExtended(!isMenuExtended);
+              // setIsMenuExtended(!isMenuExtended);
             }}
             className="secondary-menu-icon"
             src={menuIcon}

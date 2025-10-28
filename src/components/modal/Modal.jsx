@@ -42,8 +42,8 @@ export default function Modal({ fields, onSubmit, onClose }) {
           </div>
 
           <div className="modal-actions">
-            <button type="submit">Potvrdit</button>
             <button type="button" onClick={onClose}>Zavřít</button>
+            <button type="submit">Potvrdit</button>
           </div>
         </form>
       </div>

@@ -1,11 +1,11 @@
 import React, { useState, useEffect} from "react";
 import "./Admin.css";
 import Modal from "../../components/modal/Modal.jsx";
-import { useUser } from "../../context/UserContext";
+import { useUser } from "../../context/UserContext.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function AdminPanel() {
+function AdminAccounts() {
   const { user } = useUser();
   const fields = [
     { varName: "name", label: "Jméno", input: "text", required: true },
@@ -117,4 +117,4 @@ function AdminPanel() {
   );
 }
 
-export default AdminPanel;
+export default AdminAccounts;

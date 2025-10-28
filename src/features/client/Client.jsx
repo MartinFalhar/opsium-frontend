@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useHeaderClients } from "../../context/UserContext";
+
 import "./Client.css";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -9,6 +9,7 @@ import ClientInvoices from "./ClientInvoices";
 import ClientVisTraining from "./ClientVisTraining";
 import ClientOptometry from "./ClientOptometry";
 import ClientLab from "./ClientLab";
+import { useUser } from "../../context/UserContext";
 
 function Client() {
   const buttons = [
@@ -53,7 +54,7 @@ function Client() {
   const { id } = useParams();
   const [menuComponent, setMenuComponent] = useState(null);
   const [activeButton, setActiveButton] = useState(null);
-  const { headerClients } = useHeaderClients();
+  const { headerClients } = useUser();
   // Načti klienta např. z kontextu nebo databáze
   const client = headerClients.find((c) => c.id === parseInt(id));
 
@@ -78,7 +79,7 @@ function Client() {
           <h1>Klient</h1>
           <img
             onClick={() => {
-              setIsMenuExtended(!isMenuExtended);
+              // setIsMenuExtended(!isMenuExtended);
             }}
             className="secondary-menu-icon"
             src={menuIcon}

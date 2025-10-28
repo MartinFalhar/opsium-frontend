@@ -279,6 +279,8 @@ input {
   margin-top: 3px;
 }
 
+
+
 /* ----------- SECONDARY MENU */
 .secondary-menu {
   display: flex;
@@ -386,9 +388,11 @@ input {
   width: 320px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
 }
-.button-group {
+
+.modal-actions {
   display: flex;
-  justify-content: flex-start;
-  gap: 10px;
-  padding-left: 50px;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 25px;
 }

@@ -14,10 +14,11 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { setUser } = useUser();
+  const { setUser, setMembers } = useUser();
   const [heroImg, setHeroImg] = useState(null);
 
   const [imageSrc, setImageSrc] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   let heroImgID = "";
 
@@ -31,7 +32,6 @@ function Login() {
       `${API_URL}/hero_img/${heroImgID < 10 ? `0${heroImgID}` : `${heroImgID}`}`
     );
   }, []);
-
 
   const heroImgInfoLoad = async () => {
     const res = await fetch(`${API_URL}/hero_img_info`, {
@@ -48,10 +48,35 @@ function Login() {
     }
   };
 
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const loadMembers = async () => {
+      // zapneme loader
+      setIsLoading(true);
+      try {
+        const res = await fetch(`${API_URL}/admin/members_list`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ organization: data.id }),
+        });
+        const dataMember = await res.json();
+
+        if (res.ok) {
+          console.log(dataMember);
+          setMembers(dataMember);
+        } else {
+          setError(data.message);
+          console.error("Error loading users:", data.message);
+        }
+      } catch (err) {
+        console.error("Chyba při načítání:", err);
+        setError("Chyba při načítání dat.");
+      } finally {
+        // vypneme loader
+        setIsLoading(false); 
+      }
+    };
 
     const res = await fetch(`${API_URL}/login`, {
       method: "POST",
@@ -63,13 +88,17 @@ function Login() {
     if (res.ok) {
       // localStorage.setItem("token", data.token);
       // nebo cookie, podle implementace
-
-      setUser(data);
+      console.log(data);
+      await setUser(data);
+      //Pokud je vše v pořádku, stáhnu si
+      //seznam členů pro daný USER-ACCOUNT
+      await loadMembers(data.id);
       // Zkontrolujeme, jestli se uložil do localStorage
       console.log(
         "Co je v localStorage po přihlášení USER:",
         JSON.parse(localStorage.getItem("user"))
       );
+
       navigate("/clients"); // přesměrování na domovskou stránku s právy
     } else {
       setError(data.message);
@@ -93,9 +122,13 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Heslo"
           />
-          <button type="submit" style={{ marginTop: "30px" }}>
-            Přihlásit se
-          </button>
+          <PuffLoaderSpinner active={isLoading} />
+
+          {!isLoading && (
+            <button type="submit" style={{ marginTop: "30px" }}>
+              Přihlásit se
+            </button>
+          )}
           {error && <p style={{ color: "red" }}>{error}</p>}
         </form>
       </div>
@@ -110,12 +143,12 @@ function Login() {
         }}
       >
         <div className="hero-text">
-          <h1>
+          <h2>
             {heroImg &&
               (Array.isArray(heroImg)
                 ? heroImg[0]?.hero_img_label
                 : heroImg.hero_img_label)}
-          </h1>
+          </h2>
           <p>
             {heroImg &&
               (Array.isArray(heroImg)

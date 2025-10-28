@@ -2,14 +2,16 @@ import React from "react";
 import { useEffect, useState } from "react";
 import "./Clients.css";
 import Modal from "../../components/modal/Modal.jsx";
-import { useSetHeaderClients } from "../../context/UserContext";
+
 import { useUser } from "../../context/UserContext";
+
+
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Clients() {
-  const { user } = useUser();
 
+  const { user, setHeaderClients } = useUser();
   const [error, setError] = useState(null);
 
 
@@ -25,7 +27,7 @@ function Clients() {
 
   const [clients, setClients] = useState([]);
 const [showModal, setShowModal] = useState(false);
-  const { setHeaderClients } = useSetHeaderClients();
+
 
   const addClient = (newClient) => {
     setHeaderClients((prev) => {

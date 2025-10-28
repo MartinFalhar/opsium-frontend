@@ -7,8 +7,8 @@ const override = {
   borderColor: "red",
 };
 
-function PuffLoaderSpinner({ active = true }) {
-
+function PuffLoaderSpinner({ active  }) {
+ if (!active) return null;
   return (
     <div className="sweet-loading">
       <PuffLoader
