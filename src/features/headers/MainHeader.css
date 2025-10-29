@@ -48,6 +48,7 @@
 }
 
 .header-client-item {
+  position: relative;
   width: 250px;
   /* height: 50px; */
   border-bottom: 0.5px solid var(--color-bg-b9);
@@ -188,4 +189,14 @@
 
 .modal-member-item:hover {
   background-color: #f0f0f0;
+}
+
+.deleteSign {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  cursor: pointer;
+  color: red;
+  font-size: 1rem;
+  font-weight: bold;
 }

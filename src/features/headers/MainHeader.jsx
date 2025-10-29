@@ -10,6 +10,7 @@ function MainHeader() {
   const [time, setTime] = useState(new Date());
   const [showMemberModal, setShowMemberModal] = useState(false);
   const [activeMember, setActiveMember] = useState(null);
+  const [hoveredItemId, setHoveredItemId] = useState(null);
   const navigate = useNavigate();
 
   const { members, headerClients } = useUser();
@@ -77,7 +78,6 @@ function MainHeader() {
         <p className="day_of_week">
           {formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)}
         </p>
-      
       </div>
       <div className="header-clients-list">
         {headerClients.length > 0 &&
@@ -88,9 +88,22 @@ function MainHeader() {
                 key={client.id}
                 className="header-client-item"
                 onClick={() => handleClientLayout(client.id)}
+                onMouseEnter={() => setHoveredItemId(client.id)} // Nastavení hoveredItemId při najetí myši
+                onMouseLeave={() => setHoveredItemId(null)} // Zrušení hoveredItemId při opuštění myší
               >
-                <p><strong>{`${client.degree_front} ${client.name} ${client.surname} ${client.degree_post}`}</strong></p>
-                <p>{`${client.street}, ${client.city}`}</p>
+                <p>
+                  <strong>{`${client.degree_front} ${client.name} ${client.surname} ${client.degree_post}`}</strong>
+                </p>
+                <p>{`${client.street}, ${client.city} (${client.id}/${client.id_user})`}</p>
+
+                {hoveredItemId === client.id && ( // Podmíněné zobrazení "X"
+                  <span
+                    className="deleteSign"
+                    // onClick={() => handleDelete(client.id)}
+                  >
+                    X
+                  </span>
+                )}
               </div>
             );
           })}

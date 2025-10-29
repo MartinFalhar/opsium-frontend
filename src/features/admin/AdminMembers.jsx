@@ -39,7 +39,7 @@ function AdminMembers() {
           setMembers(data);
         } else {
           setError(data.message);
-          console.error("Error loading users:", data.message);
+          console.error("Error loading users:", error);
         }
       } catch (err) {
         console.error("Chyba při načítání:", err);
