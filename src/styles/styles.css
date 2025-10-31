@@ -233,6 +233,8 @@ input {
   max-width: 300px;
   padding: 10px;
 }
+/* ----------- ICONS*/
+
 /* ----------- SUB-MAIN MENU CONTENT*/
 .container {
   display: flex;
@@ -246,7 +248,7 @@ input {
   display: flex;
   flex-direction: column;
   background: var(--color-bg-b3);
-
+  overflow-y: auto;
 }
 
 .right-container {
@@ -269,6 +271,7 @@ input {
   margin-left: 16px;
   width: 30%;
   height: 150px;
+  min-width: 150px;
 }
 
 .button-group {
@@ -278,8 +281,6 @@ input {
   padding-left: 50px;
   margin-top: 3px;
 }
-
-
 
 /* ----------- SECONDARY MENU */
 .secondary-menu {
@@ -351,19 +352,70 @@ input {
 .secondary-settings-menu.active {
   background: var(--color-grd-g3);
   color: var(--color-bg-b1);
+  font-weight: bolder;
+}
+
+.button-secondary-menu::before {
+  content: "";
+  display: inline-block;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex: 0 0 auto;
+  background-repeat: no-repeat;
+  background-size: contain;
+  fill: var(--color-bg-b11);
+  /* simple star svg, url-encoded */
+  transition: filter 0.72s ease, transform 0.72s ease,
+    background-image 0.72s ease;
+  padding: 0 1px 0 15px;
+}
+
+.button-secondary-menu:hover {
+  background: var(--color-bg-b2);
+}
+
+.button-secondary-menu.active {
+  background: var(--color-grd-g3);
+  color: var(--color-bg-b1);
   font-weight: bold;
 }
 
-.button-secondary-menu.clients::before {
-  background-image: url("../../styles/svg/optician.svg");
+.button-secondary-menu {
+  display: flex;
+  align-items: center;
+  width: 200px;
+  height: 50px;
+  background: var(--color-bg-b3);
+  color: var(--color-bg-b12);
+  font-weight: 400;
+  border-radius: 0px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 13px rgba(0, 0, 0, 0.3);
+  font-size: var(--font-size-main-menu);
+  text-align: left;
+  padding-left: 20px;
+  margin-top: 0px;
+  letter-spacing: 0.8px;
+}
+.button-secondary-menu.dashboard::before {
+  background-image: url("../../src/styles/svg/dashboard-3.svg");
+  font-size: 0.5rem;
 }
 
-.button-secondary-menu.optotyp::before {
-  background-image: url("../../styles/svg/optotyp.svg");
+.button-secondary-menu.invoices::before {
+  background-image: url("../../src/styles/svg/invoice-duotone.svg");
 }
 
-.button-secondary-menu.eye::before {
-  background-image: url("../../styles/svg/eye.svg");
+.button-secondary-menu.optometry::before {
+  background-image: url("../../src/styles/svg/optician.svg");
+}
+
+.button-secondary-menu.training::before {
+  background-image: url("../../src/styles/svg/eye-tracking-outline.svg");
+}
+.button-secondary-menu.lab::before {
+  background-image: url("../../src/styles/svg/lab.svg");
   font-size: 0.5rem;
 }
 

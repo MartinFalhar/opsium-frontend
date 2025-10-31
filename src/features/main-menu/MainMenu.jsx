@@ -27,43 +27,43 @@ const buttons = [
     id: "shop",
     label: "Obchod",
     rights: 0,
-    path: "/clients",
-    icon: "eye",
+    path: "/shop",
+    icon: "shop",
   },
   {
     id: "asistent",
     label: "Asistent",
     rights: 0,
-    path: "/clients",
-    icon: "eye",
+    path: "/assistant",
+    icon: "assistant",
   },
   {
     id: "store",
     label: "Sklad",
     rights: 0,
-    path: "/clients",
-    icon: "eye",
+    path: "/store",
+    icon: "box",
   },
   {
     id: "catalog",
     label: "Katalog",
     rights: 0,
-    path: "/clients",
-    icon: "eye",
+    path: "/catalog",
+    icon: "catalog",
   },
   {
     id: "insurance",
     label: "Pojišťovna",
     rights: 0,
-    path: "/clients",
-    icon: "eye",
+    path: "/insurance",
+    icon: "insurance",
   },
   {
     id: "agenda",
     label: "Agenda",
     rights: 0,
-    path: "/clients",
-    icon: "eye",
+    path: "/agenda",
+    icon: "dashboard",
   },
   {
     id: "optotyp",
@@ -75,17 +75,17 @@ const buttons = [
   },
   {
     id: "admin",
-    label: "* ADMIN *",
+    label: "Admin",
     rights: 10,
     path: "/admin",
-    icon: "optotyp",
+    icon: "admin",
   },
   {
     id: "superadmin",
     label: "SUPERADMIN",
     rights: 999,
     path: "/superadmin",
-    icon: "optotyp",
+    icon: "superadmin",
   },
 ];
 
@@ -159,7 +159,10 @@ function MainMenu({ isMenuExtended, setIsMenuExtended }) {
         })}
       </div>
 
-      <div className="main-menu-footer">
+      <div className="main-menu-footer"
+                style={{
+            width: isMenuExtended ? "" : "60px",
+          }}>
         <button
           key={login_button.id}
           id={login_button.id}

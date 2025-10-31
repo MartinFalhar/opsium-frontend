@@ -192,11 +192,26 @@
 }
 
 .deleteSign {
-  position: absolute;
+  /* position: absolute;
   top: 5px;
-  right: 10px;
+  right: 5px; */
   cursor: pointer;
-  color: red;
   font-size: 1rem;
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deleteSign img {
+  width: 15px;
+  height: 15px;
+  opacity: 0.8;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  margin-right: 0;
+}
+
+.deleteSign img:hover {
+  opacity: 1;
+  transform: scale(1.3);
 }

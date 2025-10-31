@@ -18,7 +18,7 @@ function Client() {
       label: "Přehled",
       rights: 0,
       component: ClientDashboard,
-      icon: "clients",
+      icon: "dashboard",
     },
     {
       id: "2",
@@ -26,28 +26,28 @@ function Client() {
       onClick: () => console.log("Invoices clicked"),
       rights: 0,
       component: ClientInvoices,
-      icon: "optotyp",
+      icon: "invoices",
     },
     {
       id: "3",
       label: "Optometrie",
       rights: 0,
       component: ClientOptometry,
-      icon: "eye",
+      icon: "optometry",
     },
     {
       id: "4",
       label: "Trénink",
       rights: 0,
       component: ClientVisTraining,
-      icon: "eye",
+      icon: "training",
     },
     {
       id: "5",
       label: "Laboratoř",
       rights: 0,
       component: ClientLab,
-      icon: "eye",
+      icon: "lab",
     },
   ];
 

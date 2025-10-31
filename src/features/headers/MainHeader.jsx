@@ -4,6 +4,7 @@ import "./MainHeader.css";
 // import { useHeaderClients } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
+import closeIcon from "../../styles/svg/close.svg";
 
 function MainHeader() {
   // const navigate = useNavigate();
@@ -13,7 +14,7 @@ function MainHeader() {
   const [hoveredItemId, setHoveredItemId] = useState(null);
   const navigate = useNavigate();
 
-  const { members, headerClients } = useUser();
+  const { members, headerClients, setHeaderClients } = useUser();
 
   // const handleLogoClick = () => {
   //   navigate("/"); // Navigate to the home page when the logo is clicked
@@ -64,6 +65,12 @@ function MainHeader() {
     setShowMemberModal(false);
   };
 
+  const handleDelete = (id) => {
+    
+    setHeaderClients(headerClients.filter((item) => item.id !== id));
+
+  }
+
   return (
     <header className="layout-header">
       {/* <img
@@ -73,6 +80,7 @@ function MainHeader() {
         onClick={handleLogoClick}
         className="header-logo"
       ></img>*/}
+
       <div className="time_day_container">
         <p className="time">{formattedTime}</p>
         <p className="day_of_week">
@@ -92,17 +100,18 @@ function MainHeader() {
                 onMouseLeave={() => setHoveredItemId(null)} // Zrušení hoveredItemId při opuštění myší
               >
                 <p>
-                  <strong>{`${client.degree_front} ${client.name} ${client.surname} ${client.degree_post}`}</strong>
-                </p>
+                  <strong>{`${client.degree_front} ${client.name} ${client.surname} ${client.degree_post}`}</strong>                </p>
+
                 <p>{`${client.street}, ${client.city} (${client.id}/${client.id_user})`}</p>
 
                 {hoveredItemId === client.id && ( // Podmíněné zobrazení "X"
-                  <span
-                    className="deleteSign"
-                    // onClick={() => handleDelete(client.id)}
-                  >
-                    X
-                  </span>
+                  <div className="deleteSign">
+                    <img
+                      src={closeIcon}
+                      alt="Close"               
+                      onClick={() => handleDelete(client.id)}
+                    />
+                  </div>
                 )}
               </div>
             );

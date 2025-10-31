@@ -5,7 +5,8 @@ import "./Login.css";
 import "../../styles/styles.css";
 import logo from "../../styles/images/opsium-logo-black.png";
 import { useUser } from "../../context/UserContext";
-import PuffLoaderSpinner from "../../components/loader/PuffLoaderSpinner.jsx";
+import PuffLoaderSpinnerDark from "../../components/loader/PuffLoaderSpinnerDark.jsx";
+import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -34,26 +35,35 @@ function Login() {
   }, []);
 
   const heroImgInfoLoad = async () => {
-    const res = await fetch(`${API_URL}/hero_img_info`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: heroImgID }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      setUser(data);
-      setHeroImg(data);
-    } else {
-      setError(data.message);
+    setIsLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/hero_img_info`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: heroImgID }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUser(data);
+        setHeroImg(data);
+      } else {
+        setError(data.message);
+      }
+    } catch (err) {
+      console.error("Chyba při načítání:", err);
+      setError("Chyba při načítání dat.");
+    } finally {
+      setIsLoading(false); // 👈 vypneme loader
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    setIsLoading(true);
 
     const loadMembers = async () => {
       // zapneme loader
-      setIsLoading(true);
       try {
         const res = await fetch(`${API_URL}/admin/members_list`, {
           method: "POST",
@@ -74,7 +84,7 @@ function Login() {
         setError("Chyba při načítání dat.");
       } finally {
         // vypneme loader
-        setIsLoading(false); 
+        setIsLoading(false);
       }
     };
 
@@ -109,7 +119,7 @@ function Login() {
     <div className="login-container">
       <div className="card">
         <img className="login-logo" src={logo} />
-        <form onSubmit={handleSubmit}>
+        <form className="login-form" onSubmit={handleSubmit}>
           <input
             type="email"
             value={email}
@@ -122,14 +132,14 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Heslo"
           />
-          <PuffLoaderSpinner active={isLoading} />
+          <PuffLoaderSpinnerDark active={isLoading} />
 
           {!isLoading && (
             <button type="submit" style={{ marginTop: "30px" }}>
               Přihlásit se
             </button>
           )}
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          <div className="error">{error && <p>{error}</p>}</div>
         </form>
       </div>
 
@@ -149,6 +159,7 @@ function Login() {
                 ? heroImg[0]?.hero_img_label
                 : heroImg.hero_img_label)}
           </h2>
+
           <p>
             {heroImg &&
               (Array.isArray(heroImg)
@@ -156,6 +167,13 @@ function Login() {
                 : heroImg.hero_img_desc)}
           </p>
         </div>
+        {isLoading &&
+
+          <div className="loader-image">
+          <PuffLoaderSpinnerLarge active={isLoading} />
+          <p>Aktivuji databázi, čekej...</p>
+        </div>
+        }
       </div>
     </div>
   );
