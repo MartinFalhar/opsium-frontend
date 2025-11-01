@@ -30,7 +30,7 @@ body {
   width: calc(2 * var(--card-width));
 }
 
-.login-hero-image {
+.login-hero-image{
   width: var(--card-width);
   height: var(--card-height);
   border-top-right-radius: 30px;
@@ -38,6 +38,17 @@ body {
   box-shadow: 4px 4px 30px rgba(189, 179, 179, 0.3);
   overflow: hidden;
   background: var(--color-bg-b4);
+  /* animation: fadeIn 2s ease-in-out forwards; */
+}
+
+/* jednoduchá animace pro pozvolné zobrazení */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .login-logo {
@@ -150,6 +161,10 @@ input {
   padding: 5px 20px;
 }
 
+.hero-text p {
+  color: var(--color-bg-b4);
+}
+
 .login-form {
   display: flex;
   flex-direction: column;
@@ -161,13 +176,3 @@ input {
   color: red;
 }
 
-.loader-image {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-top: 100px;
-  color: var(--color-bg-b10);
-  opacity: 1;
-  gap: 30px;
-}

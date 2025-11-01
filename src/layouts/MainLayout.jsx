@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState  } from "react";
 import { Outlet } from "react-router-dom";
 import Footer from "../features/footers/Footer";
 import MainHeader from "../features/headers/MainHeader";
@@ -9,6 +9,21 @@ import "./MainLayout.css";
 const MainLayout = () => {
   //state evidence velikosti menu
   const [isMenuExtended, setIsMenuExtended] = useState(true);
+
+
+
+  // useEffect(() => {
+  //   // Collapse menu automatically when viewing a client layout
+  //   // match paths like /client or /client/123
+  //   const isClientPath = /^\/client(\/|$)/.test(location.pathname);
+  //   if (isClientPath && isMenuExtended) {
+  //     setIsMenuExtended(false);
+  //   }
+
+
+
+  //   // optional: expand menu when leaving client view — keep current behaviour
+  // }, [location.pathname, isMenuExtended]);
 
 
   return (

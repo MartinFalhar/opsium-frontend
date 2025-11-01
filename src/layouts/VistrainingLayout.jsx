@@ -2,7 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import "./VistrainingLayout.css"; 
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import magentaImg from "../styles/images/magenta.png";
 import cyanImg from "../styles/images/cyan.png";
@@ -37,6 +37,8 @@ function VistrainingLayout() {
   const [history, setHistory] = useState([]);
   const [imgDistance, setImgDistance] = useState(0);
   const navigate = useNavigate();
+  
+  const location = useLocation();
 
     useInputHandler({
     onEsc: () => {
@@ -59,16 +61,17 @@ function VistrainingLayout() {
     console.log("Aktuální imgDistance:", imgDistance);
     setHistory((prev) => [...prev, imgDistance]);
     console.log("Aktuální historie:", history);
+    console.log(`${location.pathname}`)
   }, [imgDistance]);
 
   return (
     <div className="visual-training-container">
       <img className="cyan" src={magentaImg} style={{
-        height:"250px", 
+        height:"250px",width:"300px" ,
         transform: `translateX(${-imgDistance}px)`,
         }}/>
       <img className="magenta" src={cyanImg} style={{
-        height:"250px",
+        height:"250px",width:"300px" ,
          transform: `translateX(${+imgDistance}px)`,
          }}/>
 

@@ -7,11 +7,12 @@
   justify-content: center;
   margin: 0;
   gap: "20px";
-  background-color: #FAFDF2;
+  background-color: #fafdf2;
 }
 
-.cyan, .magenta {
-    -webkit-user-select: none; /* pro Safari */
+.cyan,
+.magenta {
+  -webkit-user-select: none; /* pro Safari */
   -moz-user-select: none; /* pro Firefox */
   -ms-user-select: none; /* pro Internet Explorer/Edge */
   user-select: none; /* standardní syntaxe */
@@ -22,3 +23,8 @@
   transition: "transform 0.3s ease";
   opacity: 0.5;
 }
+
+.info p {
+  color: var(--color-bg-b1);
+}
+

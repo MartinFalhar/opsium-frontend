@@ -158,16 +158,20 @@ h2 {
 }
 
 h3 {
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   color: var(--color-bg-b2);
   text-align: left;
+  background: var(--color-grd-g7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
 
-  padding-bottom: 15px;
 }
 
 p {
   font-size: 0.9rem;
-  color: var(--color-bg-b1);
+  color: var(--color-bg-b11);
   text-align: left;
 }
 
@@ -264,14 +268,15 @@ input {
 }
 
 .info-box {
-  border: 1px solid #18c942;
+  border: 1px solid var(--color-el-e);
   padding: 16px;
   border-radius: 8px;
   margin-top: 16px;
   margin-left: 16px;
-  width: 30%;
+  width: 150px;
   height: 150px;
   min-width: 150px;
+  background: var(--color-bg-b1);
 }
 
 .button-group {

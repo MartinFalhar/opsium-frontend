@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import Logout from "../settings/SettingsLogout";
 import "./MainMenu.css";
@@ -95,6 +95,7 @@ function MainMenu({ isMenuExtended, setIsMenuExtended }) {
   const navigate = useNavigate();
   //práce s parametry uživatele
   const { user } = useUser();
+  const location = useLocation();
 
   const handleClick = (button) => {
     // změna stylu
@@ -115,6 +116,12 @@ function MainMenu({ isMenuExtended, setIsMenuExtended }) {
       handleClick(buttons[0]);
     }
   }, [user]);
+
+    useEffect(() => {
+    //pokud je uživatel přihlášen, automaticky otevřít klienty
+    if (location.pathname.includes("client")) {
+      setActiveButton("clients");}
+  }, [location]);
 
   return (
     <div className="main-menu-container">

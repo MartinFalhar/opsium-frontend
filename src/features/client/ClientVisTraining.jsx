@@ -37,7 +37,10 @@ function ClientVisTraining() {
             })}
           </div>
         ) : (
-          <div>No data</div>
+          <div className="info">
+            <p>Press START to preceed exercise.</p>
+            <p>The graph with the activity will be shown here.</p>
+          </div>
         )}
 
         <button className="button-big" onClick={handleClick}>

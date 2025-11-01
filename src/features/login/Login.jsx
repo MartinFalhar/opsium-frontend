@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
@@ -21,18 +21,56 @@ function Login() {
   const [imageSrc, setImageSrc] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  let heroImgID = "";
+  const [heroImgID, setHeroImgID] = useState(() =>
+    Math.floor(Math.random() * 6 + 1)
+  );
+
+  const imageHeroText = [
+    { title: "Opsium", desc: "A digi-medicine for an eye-optics" },
+    { title: "Optical Illusion", desc: "Mind-blowing images" },
+    { title: "Eye Beauty", desc: "The iris synechia with the lens" },
+    { title: "Eye diagnostic", desc: "It was a hard day today!" },
+    { title: "Eye beauty", desc: "Autumn in the eye" },
+    { title: "Eye diagnostic", desc: "The stroma world of the cornea" },
+    { title: "Eye diagnostic", desc: "Fluorescein symphony" },
+  ];
 
   useEffect(() => {
-    heroImgID = Math.floor(Math.random() * 6 + 1);
-
+    const interval = setInterval(() => {
+      const newId = Math.floor(Math.random() * 6 + 1);
+      setHeroImgID(newId);
+    }, 5000); // každých 5 sekund
+    // heroImgID = Math.floor(Math.random() * 6 + 1);
     //nacteni info o uvodnim obrazku
-    heroImgInfoLoad();
+    // heroImgInfoLoad();
     //nacteni obrazku ze serveru
-    setImageSrc(
-      `${API_URL}/hero_img/${heroImgID < 10 ? `0${heroImgID}` : `${heroImgID}`}`
-    );
+    // setImageSrc(
+    //   `${API_URL}/hero_img/${heroImgID < 10 ? `0${heroImgID}` : `${heroImgID}`}`
+    // );
+    //nacteni obrazku ze frontendu
+    // frontend/uploads/hero_img/hero01.png
+    // const interval = setInterval(() => {
+    //   heroImgID = Math.floor(Math.random() * 6 + 1);
+    // }, 500);
+    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const filename = heroImgID < 10 ? `0${heroImgID}` : heroImgID;
+    const newImageSrc = `../../uploads/hero_img/hero${filename}.png`;
+    setImageSrc(newImageSrc);
+    // heroImgInfoLoad(heroImgID);
+  }, [heroImgID]);
+  //   setImageSrc(
+  //     `../../uploads/hero_img/hero${
+  //       heroImgID < 10 ? `0${heroImgID}` : `${heroImgID}`
+  //     }.png`
+  //   );
+  //   heroImgInfoLoad();
+  //   console.log(imageSrc);
+
+  //   return () => clearInterval(interval);
+  // }, []);
 
   const heroImgInfoLoad = async () => {
     setIsLoading(true);
@@ -77,7 +115,7 @@ function Login() {
           setMembers(dataMember);
         } else {
           setError(data.message);
-          console.error("Error loading users:", data.message);
+          console.error("Error loading users:", error);
         }
       } catch (err) {
         console.error("Chyba při načítání:", err);
@@ -88,30 +126,35 @@ function Login() {
       }
     };
 
-    const res = await fetch(`${API_URL}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
-    if (res.ok) {
-      // localStorage.setItem("token", data.token);
-      // nebo cookie, podle implementace
-      console.log(data);
-      await setUser(data);
-      //Pokud je vše v pořádku, stáhnu si
-      //seznam členů pro daný USER-ACCOUNT
-      await loadMembers(data.id);
-      // Zkontrolujeme, jestli se uložil do localStorage
-      console.log(
-        "Co je v localStorage po přihlášení USER:",
-        JSON.parse(localStorage.getItem("user"))
-      );
+      const data = await res.json();
+      if (res.ok) {
+        // localStorage.setItem("token", data.token);
+        // nebo cookie, podle implementace
+        console.log(data);
+        await setUser(data);
+        //Pokud je vše v pořádku, stáhnu si
+        //seznam členů pro daný USER-ACCOUNT
+        await loadMembers(data.id);
+        // Zkontrolujeme, jestli se uložil do localStorage
+        console.log(
+          "Co je v localStorage po přihlášení USER:",
+          JSON.parse(localStorage.getItem("user"))
+        );
 
-      navigate("/clients"); // přesměrování na domovskou stránku s právy
-    } else {
-      setError(data.message);
+        navigate("/clients"); // přesměrování na domovskou stránku s právy
+      } else {
+        setError(data.message);
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Nepodařilo se načíst klienty.");
     }
   };
 
@@ -153,7 +196,7 @@ function Login() {
         }}
       >
         <div className="hero-text">
-          <h2>
+          {/* <h2>
             {heroImg &&
               (Array.isArray(heroImg)
                 ? heroImg[0]?.hero_img_label
@@ -165,15 +208,24 @@ function Login() {
               (Array.isArray(heroImg)
                 ? heroImg[0]?.hero_img_desc
                 : heroImg.hero_img_desc)}
+          </p> */}
+          <h2>
+            {" "}
+            {
+              imageHeroText[
+                (heroImgID - 1 + imageHeroText.length) % imageHeroText.length
+              ]?.title
+            }{" "}
+          </h2>
+          <p>
+            {" "}
+            {
+              imageHeroText[
+                (heroImgID - 1 + imageHeroText.length) % imageHeroText.length
+              ]?.desc
+            }{" "}
           </p>
         </div>
-        {isLoading &&
-
-          <div className="loader-image">
-          <PuffLoaderSpinnerLarge active={isLoading} />
-          <p>Aktivuji databázi, čekej...</p>
-        </div>
-        }
       </div>
     </div>
   );

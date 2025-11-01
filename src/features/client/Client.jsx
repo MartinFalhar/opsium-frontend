@@ -1,15 +1,16 @@
-import { useParams } from "react-router-dom";
-
 import "./Client.css";
 import { useState } from "react";
 import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useUser } from "../../context/UserContext";
+
+
 import menuIcon from "../../styles/svg/mirror-line.svg";
 import ClientDashboard from "./ClientDashboard";
 import ClientInvoices from "./ClientInvoices";
 import ClientVisTraining from "./ClientVisTraining";
 import ClientOptometry from "./ClientOptometry";
 import ClientLab from "./ClientLab";
-import { useUser } from "../../context/UserContext";
 
 function Client() {
   const buttons = [
@@ -50,21 +51,29 @@ function Client() {
       icon: "lab",
     },
   ];
-
+  //bere ID parametr z URL
   const { id } = useParams();
   const [menuComponent, setMenuComponent] = useState(null);
   const [activeButton, setActiveButton] = useState(null);
   const { headerClients } = useUser();
-  // Načti klienta např. z kontextu nebo databáze
-  const client = headerClients.find((c) => c.id === parseInt(id));
+  const navigate = useNavigate();
+
+  // Načti klienta z headerClients, ID načtené skrz useParams je
+  //vždy STRING, proto PARSEINT
+  const client = headerClients?.find((c) => c?.id === parseInt(id));
 
   useEffect(() => {
-    if (headerClients) {
-      setMenuComponent(() => buttons[0].component);
-      setActiveButton(buttons[0].id);
+    // Pokud nemáme headerClients nebo klienta, přesměrujeme na CLIENTS
+    if (!headerClients?.length || !client) {
+      navigate('/clients');
+      return;
     }
-  }, [headerClients]);
+    // Nastavíme výchozí sekundárního MENU jen pokud máme platná data
+    setMenuComponent(() => buttons[0].component);
+    setActiveButton(buttons[0].id);
+  }, [headerClients, client, id, navigate]);
 
+  //obsluha sekundárního MENU
   const handleClick = (button) => {
     setActiveButton(button.id);
     setMenuComponent(() => button.component);

@@ -50,20 +50,39 @@
 .header-client-item {
   position: relative;
   width: 250px;
-  /* height: 50px; */
-  border-bottom: 0.5px solid var(--color-bg-b9);
+  height: 60px;
   border-radius: 5px;
   display: flex;
   flex-direction: column;
   align-items: left;
   padding: 10px;
   color: white;
-  background: var(--color-grd-g2);
+  border: 0.5px solid var(--color-bg-b6);
+  background: var(--color-bg-b1);
   margin-right: 10px;
 }
+
+.header-client-item p {
+  color: var(--color-bg-b10);
+}
+
 .header-client-item:hover {
-  background-color: var(--color-bg-b9);
+  background: var(--color-bg-b2);
   cursor: pointer;
+  
+}
+.header-client-item:hover p {
+  color: var(--color-bg-b12);
+}
+
+.header-client-item.active {
+  border: 0.5px solid var(--color-bg-b1);
+  background: var(--color-grd-g2);
+  color: var(--color-bg-b1);
+}
+
+.header-client-item.active p {
+  color: var(--color-bg-b1);
 }
 
 .layout-header {
@@ -86,21 +105,17 @@
   width: 1px;
 }
 
-.header-clients-list
-{ 
+.header-clients-list {
   display: flex;
   flex-direction: row;
-  
 }
 
-
+/* === Modalní okno s MEMBERS === */
 .members-list {
   display: flex;
   align-items: center;
   gap: 10px;
 }
-
-
 
 /* === Kulatý avatar s iniciály === */
 /* .member-avatar {
@@ -117,11 +132,15 @@
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
 } */
- .member-avatar {
+.member-avatar {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: linear-gradient(45deg, rgba(251, 214, 71, 1), rgba(242, 104, 147, 1));
+  background: linear-gradient(
+    45deg,
+    rgba(251, 214, 71, 1),
+    rgba(242, 104, 147, 1)
+  );
   background-size: 200% 200%; /* pro animaci gradientu */
   color: var(--color-bg-b1);
   font-weight: 600;
@@ -154,7 +173,7 @@
     background-position: 0% 50%;
   }
 } */
-/* === Modal === */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -189,6 +208,12 @@
 
 .modal-member-item:hover {
   background-color: #f0f0f0;
+}
+
+.modal-pin-info {
+  font-size: x-small;
+  color: var(--color-el-g);
+  margin-top: 10px;
 }
 
 .deleteSign {
