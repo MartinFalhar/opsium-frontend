@@ -1,0 +1,23 @@
+.store-left-column {
+  flex: 0 0 75%;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-b3);
+  height: 100vh;
+  /* margin-right: 15px; */
+  /* justify-content: space-between; */
+  /* align-items: left; */
+}
+
+
+.store-list-container {
+  flex: 1;
+  flex-wrap: wrap;           /* ✅ zalamuje do nového řádku */
+  align-content: flex-start; /* ✅ zarovná horní část při více řádcích */
+  gap: 10px;                 /* mezery mezi boxy */
+  overflow-y: auto;          /* ✅ svislý scrollbar při přeplnění */
+  overflow-x: hidden;        /* zabrání horizontálnímu scrollu */
+
+  padding: 10px;
+  box-sizing: border-box;
+}

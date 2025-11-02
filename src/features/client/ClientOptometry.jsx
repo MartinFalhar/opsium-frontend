@@ -1,8 +1,8 @@
-import { useState } from "react";
+// import { useState } from "react";
 import "./ClientOptometry.css";
 
 function ClientOptometry() {
-  const [sph, setSph] = useState("");
+  // const [sph, setSph] = useState("");
 
   return (
     <div className="optometry-container">

@@ -11,7 +11,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 function Store() {
   const { user, setHeaderClients } = useUser();
   const [error, setError] = useState(null);
-   const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fields = [
     {
@@ -36,9 +36,7 @@ function Store() {
     },
   ];
 
-    const [searchClient, setSearchClient] = useState("");
-
-
+  const [searchInStore, setSearchInStore] = useState("");
 
   const [clients, setClients] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -51,16 +49,18 @@ function Store() {
     });
   };
 
-  useEffect(() => {
-       setIsLoading(true);
+  const handleSearchInStore = async (values) => {
+    console.log(values);
+    setIsLoading(true);
     const loadClients = async () => {
       try {
-        const res = await fetch(`${API_URL}/client/clients`, {
+        const res = await fetch(`${API_URL}/store/search`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: user.id }),
+          body: JSON.stringify({ searchText: values }),
         });
         const data = await res.json();
+        console.log(data);
         if (res.ok) {
           setClients(data);
         } else {
@@ -74,7 +74,7 @@ function Store() {
     };
     console.log(user.id);
     loadClients();
-  }, []);
+  };
 
   const handleSubmit = async (values) => {
     const newClient = {
@@ -107,7 +107,7 @@ function Store() {
 
   return (
     <div className="clients-container">
-      <div className="clients-left-column">
+      <div className="store-left-column">
         <div className="button-group">
           <button onClick={() => setShowModal(true)}>Přidat klienta</button>
         </div>
@@ -116,32 +116,38 @@ function Store() {
             <input
               className="client-search-input"
               type="text"
-              value={searchClient}
-              onChange={(e) => setSearchClient(e.target.value)}
+              value={searchInStore}
+              onChange={(e) => setSearchInStore(e.target.value)}
               placeholder="Hledej klienta"
             />
-            <button type="submit">Hledej</button>
+            <button
+              type="submit"
+              onClick={() => handleSearchInStore(searchInStore)}
+            >
+              Hledej
+            </button>
           </div>
         </div>
-        <div className="clients-list-container">
+        <div className="store-list-container">
           <h1>Nalezeno {clients.length} klientů</h1>
-          {clients.length > 0 && clients.map((client) => (
-            <div
-              key={client.id}
-              className="client-item"
-              onClick={() => addClient(client)}
-            >
-              <h1>
-                {`${client.degree_front} ${client.name} ${client.surname} ${client.degree_post}`}{" "}
-              </h1>
-              <p>{`${client.street} ${client.city} ${client.post_code}`}</p>
-            </div>
-          ))}
+          {clients.length > 0 &&
+            clients.map((client) => (
+              <div
+                key={client.id}
+                className="client-item"
+                onClick={() => addClient(client)}
+              >
+                <h1>
+                  {`${client.ean} ${client.product} ${client.collection} ${client.color}`}{" "}
+                </h1>
+                <p>{`${client.supplier} ${client.quantity}ks ${client.price} Kč`}</p>
+              </div>
+            ))}
         </div>
         <div className="info-box">
-            <h2>STORE EXTERNAL MODULE</h2>
+          <h2>STORE EXTERNAL MODULE</h2>
         </div>
-                <PuffLoaderSpinnerLarge active={isLoading} />
+        <PuffLoaderSpinnerLarge active={isLoading} />
       </div>{" "}
       <div>
         {showModal && (
