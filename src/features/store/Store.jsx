@@ -1,15 +1,13 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useState } from "react";
 import "./Store.css";
 import Modal from "../../components/modal/Modal.jsx";
-
-import { useUser } from "../../context/UserContext";
 import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
+import Pagination from "../../components/pagination/Pagination.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Store() {
-  const { user, setHeaderClients } = useUser();
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,79 +35,52 @@ function Store() {
   ];
 
   const [searchInStore, setSearchInStore] = useState("");
-
   const [clients, setClients] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  //PAGINATION HOOKS
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 6;
 
-  const addClient = (newClient) => {
-    setHeaderClients((prev) => {
-      const exists = prev.some((client) => client.id === newClient.id);
-      if (exists) return prev;
-      return [...prev, newClient];
-    });
-  };
+  useEffect(() => {
+    handleSearchInStore(searchInStore);
+  }, [page]);
 
   const handleSearchInStore = async (values) => {
-    console.log(values);
     setIsLoading(true);
-    const loadClients = async () => {
+    const loadItems = async () => {
       try {
-        const res = await fetch(`${API_URL}/store/search`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ searchText: values }),
-        });
+        const res = await fetch(
+          `${API_URL}/store/search?page=${page}&limit=${limit}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ searchText: values }),
+          }
+        );
         const data = await res.json();
-        console.log(data);
+
         if (res.ok) {
-          setClients(data);
+          setClients(data.items);
+          setTotalPages(data.totalPages);
+          setIsLoading(false);
         } else {
           setError(data.message);
-          console.error("Error loading users:", error);
+          console.error("Error loading items:", error);
         }
       } catch (err) {
         console.error("Fetch error:", err);
         setError("Nepodařilo se načíst klienty.");
       }
     };
-    console.log(user.id);
-    loadClients();
-  };
-
-  const handleSubmit = async (values) => {
-    const newClient = {
-      degree_front: values.degree_front,
-      name: values.name,
-      surname: values.surname,
-      degree_post: values.degree_post,
-      birth_date: values.birth_date,
-      id_user: user.id,
-    };
-    console.log("New client to add:", newClient);
-
-    try {
-      const res = await fetch(`${API_URL}/client/create_client`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newClient),
-      });
-
-      if (res.ok) {
-        alert("Úspěšně odesláno!");
-      } else {
-        alert("Chyba při odesílání.");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Server je nedostupný.");
-    }
+    loadItems();
   };
 
   return (
     <div className="clients-container">
       <div className="store-left-column">
         <div className="button-group">
-          <button onClick={() => setShowModal(true)}>Přidat klienta</button>
+          <button onClick={() => setShowModal(true)}>Přidat položku</button>
         </div>
         <div className="clients-search-container">
           <div className="client-search">
@@ -118,6 +89,11 @@ function Store() {
               type="text"
               value={searchInStore}
               onChange={(e) => setSearchInStore(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearchInStore(searchInStore);
+                }
+              }}
               placeholder="Hledej klienta"
             />
             <button
@@ -129,14 +105,24 @@ function Store() {
           </div>
         </div>
         <div className="store-list-container">
-          <h1>Nalezeno {clients.length} klientů</h1>
+          <div className="store-list-header">
+            <div className="store-info-box">
+              <h2>STORE EXTERNAL MODULE</h2>
+            </div>
+            <h1>Zobrazeno položek: {clients.length} ks</h1>
+            <h1>
+              Klienti (strana {page}/{totalPages})
+            </h1>
+          </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={(p) => setPage(p)}
+          />
+          {!clients.length > 0 && <PuffLoaderSpinnerLarge active={isLoading} />}
           {clients.length > 0 &&
             clients.map((client) => (
-              <div
-                key={client.id}
-                className="client-item"
-                onClick={() => addClient(client)}
-              >
+              <div key={client.id} className="client-item">
                 <h1>
                   {`${client.ean} ${client.product} ${client.collection} ${client.color}`}{" "}
                 </h1>
@@ -144,11 +130,7 @@ function Store() {
               </div>
             ))}
         </div>
-        <div className="info-box">
-          <h2>STORE EXTERNAL MODULE</h2>
-        </div>
-        <PuffLoaderSpinnerLarge active={isLoading} />
-      </div>{" "}
+      </div>
       <div>
         {showModal && (
           <Modal
