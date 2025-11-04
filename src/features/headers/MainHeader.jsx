@@ -26,6 +26,8 @@ function MainHeader() {
   };
 
   useEffect(() => {
+    setActiveMember(members[0]);
+    console.log("Members:", members);
     // Nastaví interval na 1 minutu (60 000 ms)
     const interval = setInterval(() => {
       setTime(new Date());
@@ -36,8 +38,6 @@ function MainHeader() {
 
     // Vyčištění při odpojení komponenty
     return () => clearInterval(interval);
-
-
   }, []);
 
   // Formát dne a datumu v češtině
@@ -105,13 +105,13 @@ function MainHeader() {
           {formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)}
         </p>
       </div>
-      
-        {headerClients.length === 0 &&
+
+      {headerClients.length === 0 && (
         <p className="">
           {`${headerClients.length === 0 ? "(Pracovní pole je prázdné)" : ""}`}
-          </p>
-}
-      
+        </p>
+      )}
+
       <div className="header-clients-list">
         {headerClients.length > 0 &&
           headerClients.map((client) => {

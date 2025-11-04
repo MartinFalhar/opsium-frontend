@@ -5,7 +5,7 @@ function AdminDashboard({ client }) {
       <div className="info-box">
         <h1>AdminDashboard - external module</h1>
       </div>
-      <div>
+      <div className="info-box">
         <h1>User ID: {client.id}</h1>
         <h1>User Name: {client.name}</h1>
         <h1>User Email: {client.email}</h1>

@@ -5,149 +5,98 @@ import Modal from "../../components/modal/Modal.jsx";
 
 import { useUser } from "../../context/UserContext";
 
+import CatalogLens from "./CatalogLens.jsx";
+import CatalogContactLens from "./CatalogContactLens.jsx";
+import CatalogSolutionsDrops from "./CatalogSolutionsDrops.jsx";
+
+import menuIcon from "../../styles/svg/mirror-line.svg";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Catalog() {
-  const { user, setHeaderClients } = useUser();
-  const [error, setError] = useState(null);
-
-  const fields = [
+  const buttons = [
     {
-      varName: "degree_front",
-      label: "Titul před",
-      input: "text",
-      required: false,
-    },
-    { varName: "name", label: "Jméno", input: "text", required: true },
-    { varName: "surname", label: "Příjmení", input: "text", required: true },
-    {
-      varName: "degree_post",
-      label: "Titul za",
-      input: "text",
-      required: false,
+      id: "1",
+      label: "Brýlové čočky",
+      rights: 0,
+      component: CatalogLens,
+      icon: "clients",
     },
     {
-      varName: "birth_date",
-      label: "Datum narození",
-      input: "date",
-      required: true,
+      id: "2",
+      label: "Kontaktní čočky",
+      rights: 0,
+      component: CatalogContactLens,
+      icon: "eye",
+    },
+    {
+      id: "3",
+      label: "Roztoky a kapky",
+      rights: 0,
+      component: CatalogSolutionsDrops,
+      icon: "eye",
     },
   ];
 
-  const [searchClient, setSearchClient] = useState("");
+  //nastavuje komponentu z menu
+  const [menuComponent, setMenuComponent] = useState(null);
 
-  const [clients, setClients] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  //předává data přihlášeného uživatele
+  const { user } = useUser();
 
-  const addClient = (newClient) => {
-    setHeaderClients((prev) => {
-      const exists = prev.some((client) => client.id === newClient.id);
-      if (exists) return prev;
-      return [...prev, newClient];
-    });
+  //nutné pro správnou manipulaci s komponentou menu
+  const Component = menuComponent;
+
+  //zachycení kliku na tlačítko menu
+  const [activeButton, setActiveButton] = useState(null);
+
+  //handling kliků na tlačítka menu
+  const handleClick = (button) => {
+    setActiveButton(button.id);
+    setMenuComponent(() => button.component);
   };
 
   useEffect(() => {
-    const loadClients = async () => {
-      try {
-        const res = await fetch(`${API_URL}/client/clients`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: user.id }),
-        });
-        const data = await res.json();
-        if (res.ok) {
-          setClients(data);
-        } else {
-          setError(data.message);
-          console.error("Error loading users:", error);
-        }
-      } catch (err) {
-        console.error("Fetch error:", err);
-        setError("Nepodařilo se načíst klienty.");
-      }
-    };
-    console.log(user.id);
-    loadClients();
+    handleClick(buttons[0]);
   }, []);
 
-  const handleSubmit = async (values) => {
-    const newClient = {
-      degree_front: values.degree_front,
-      name: values.name,
-      surname: values.surname,
-      degree_post: values.degree_post,
-      birth_date: values.birth_date,
-      id_user: user.id,
-    };
-    console.log("New client to add:", newClient);
-
-    try {
-      const res = await fetch(`${API_URL}/client/create_client`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newClient),
-      });
-
-      if (res.ok) {
-        alert("Úspěšně odesláno!");
-      } else {
-        alert("Chyba při odesílání.");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Server je nedostupný.");
-    }
-  };
-
   return (
-    <div className="clients-container">
-      <div className="clients-left-column">
-        <div className="button-group">
-          <button onClick={() => setShowModal(true)}>Přidat klienta</button>
+    <div className="container">
+      <div className="secondary-menu">
+        <div className="secondary-menu-header">
+          <h1>CATALOG</h1>
+          <img
+            onClick={() => {
+              // setIsMenuExtended(!isMenuExtended);
+            }}
+            className="secondary-menu-icon"
+            src={menuIcon}
+            alt="Menu"
+          ></img>
         </div>
-        <div className="clients-search-container">
-          <div className="client-search">
-            <input
-              className="client-search-input"
-              type="text"
-              value={searchClient}
-              onChange={(e) => setSearchClient(e.target.value)}
-              placeholder="Hledej klienta"
-            />
-            <button type="submit">Hledej</button>
-          </div>
-        </div>
-        <div className="clients-list-container">
-          <h1>Nalezeno {clients.length} klientů</h1>
-          {clients.length > 0 && clients.map((client) => (
-            <div
-              key={client.id}
-              className="client-item"
-              onClick={() => addClient(client)}
+        {buttons.map((button) => {
+          return (
+            <button
+              key={button.id}
+              id={button.id}
+              style={{
+                width: "200px",
+              }}
+              className={`button-secondary-menu ${
+                activeButton === button.id ? "active" : ""
+              } ${button.icon}`}
+              onClick={() => handleClick(button)}
             >
-              <h1>
-                {`${client.degree_front} ${client.name} ${client.surname} ${client.degree_post}`}{" "}
-              </h1>
-              <p>{`${client.street} ${client.city} ${client.post_code}`}</p>
-            </div>
-          ))}
-        </div>
-        <div className="info-box">
-            <h2>Catalog EXTERNAL MODULE</h2>
-        </div>
-      </div>{" "}
-      <div>
-        {showModal && (
-          <Modal
-            fields={fields}
-            onSubmit={handleSubmit}
-            onClose={() => setShowModal(false)}
-          />
-        )}
+              {button.label}
+            </button>
+          );
+        })}
       </div>
-      <div className="clients-right-column">
-        <h1>Filtry</h1>
+      <div className="left-container">
+        {Component ? <Component client={user} /> : null}
+      </div>
+      <div className="right-container">
+        <h1>INFO</h1>
       </div>
     </div>
   );

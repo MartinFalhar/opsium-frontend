@@ -61,6 +61,7 @@ function Login() {
     setImageSrc(newImageSrc);
     // heroImgInfoLoad(heroImgID);
   }, [heroImgID]);
+
   //   setImageSrc(
   //     `../../uploads/hero_img/hero${
   //       heroImgID < 10 ? `0${heroImgID}` : `${heroImgID}`
@@ -100,21 +101,19 @@ function Login() {
     setError(null);
     setIsLoading(true);
 
-    const loadMembers = async () => {
-      // zapneme loader
+    const loadMembers = async (adminID) => {
       try {
         const res = await fetch(`${API_URL}/admin/members_list`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ organization: data.id }),
+          body: JSON.stringify({ organization: adminID }),
         });
         const dataMember = await res.json();
 
         if (res.ok) {
-          console.log(dataMember);
           setMembers(dataMember);
         } else {
-          setError(data.message);
+          setError(dataMember.message);
           console.error("Error loading users:", error);
         }
       } catch (err) {
@@ -137,7 +136,7 @@ function Login() {
       if (res.ok) {
         // localStorage.setItem("token", data.token);
         // nebo cookie, podle implementace
-        console.log(data);
+
         await setUser(data);
         //Pokud je vše v pořádku, stáhnu si
         //seznam členů pro daný USER-ACCOUNT
