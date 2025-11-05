@@ -57,7 +57,7 @@ function Login() {
 
   useEffect(() => {
     const filename = heroImgID < 10 ? `0${heroImgID}` : heroImgID;
-    const newImageSrc = `../../uploads/hero_img/hero${filename}.png`;
+    const newImageSrc = `./hero_img/hero${filename}.png`;
     setImageSrc(newImageSrc);
     // heroImgInfoLoad(heroImgID);
   }, [heroImgID]);
