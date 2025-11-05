@@ -195,7 +195,7 @@ function MainHeader() {
           onClick={() => setShowMemberModal(false)}
         >
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Vyber člena</h3>
+            <h2>Vyber člena</h2>
             {members?.map((member) => (
               <div
                 key={member.id}

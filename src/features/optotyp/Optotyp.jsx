@@ -84,7 +84,7 @@ function Optotyp() {
         <div className="optotyp-left-column">
           <h1>Nastavení optotypu</h1>
           <div className="optotyp-distance-settings">
-            <h3>Vzdálenost od obrazovky</h3>
+            <h1>Vzdálenost od obrazovky</h1>
             <div className="optotyp-controler-container">
               <div className="segmented-control">
                 {["Dálka", "Blízko"].map((value) => (
@@ -132,7 +132,7 @@ function Optotyp() {
             </div>
           </div>
           <div className="optotyp-calibration">
-            <h3>Kalibrace</h3>
+            <h1>Kalibrace</h1>
             <div className="optotyp-calibration-selection">
               {/* //výběr kalibrace velikosti nebo barvy           */}
               <div className="segmented-control">
@@ -203,7 +203,7 @@ function Optotyp() {
         <div className="optotyp-right-column">
           <h1>Výběr testů</h1>
           <div className="optotyp-right-column-header">
-            <h3>Kategorie testů</h3>
+            <h5>Kategorie testů</h5>
             <OptotypMenu
               actualStartTests={setSelectedTests}
               initialItems={selectedTests}
@@ -235,7 +235,7 @@ function Optotyp() {
         </div>
       </div>
       <div className="optotyp-help">
-        <h2>Optotyp Help</h2>
+        <h1>Optotyp Help</h1>
         <p>
           Pro správnou zobrazení optotypů je nutné provést kalibraci. Přiložte
           na obrazovku kreditní kartu (nebo jinou kartu o stejné velikosti) a

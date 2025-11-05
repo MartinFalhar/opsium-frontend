@@ -212,11 +212,12 @@ function OptotypMenu({ actualStartTests, initialItems = [] }) {
             key={menu.id}
             onClick={() => setSelectedMenu(menu)}
             style={{
+              color: "var(--color-bg-b11)",
               padding: "8px",
               cursor: "pointer",
               background:
                 selectedMenu?.id === menu.id ? "#e0e0e0" : "transparent",
-              fontSize: "0.8rem",
+              fontSize: "0.9rem",
             }}
           >
             {menu.label}

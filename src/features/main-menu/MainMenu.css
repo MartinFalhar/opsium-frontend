@@ -1,7 +1,3 @@
-:root {
-  --font-size-main-menu: 0.9rem;
-}
-
 .main-menu-container {
   display: flex;
   height: 100%;
@@ -33,7 +29,6 @@
   margin-bottom: 10px;
   color: var(--color-bg-b12);
   font-size: 0.9rem;
- 
 }
 
 .main-menu-avatar {

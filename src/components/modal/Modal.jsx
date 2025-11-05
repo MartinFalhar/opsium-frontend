@@ -11,7 +11,6 @@ export default function Modal({ fields, onSubmit, onClose }) {
     setValues((prev) => ({ ...prev, [varName]: value }));
   };
 
-
   return (
     <div className="modal-overlay">
       <div className="modal">
@@ -42,7 +41,9 @@ export default function Modal({ fields, onSubmit, onClose }) {
           </div>
 
           <div className="modal-actions">
-            <button type="button" onClick={onClose}>Zavřít</button>
+            <button type="button" onClick={onClose}>
+              Zavřít
+            </button>
             <button type="submit">Potvrdit</button>
           </div>
         </form>

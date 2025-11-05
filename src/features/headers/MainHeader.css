@@ -31,14 +31,14 @@
 
 .time {
   color: var(--color-bg-b10);
-  font-size: x-large;
+  font-size: clamp(var(--font-size-small), 1.8vw, 3rem);
   font-weight: bold;
 }
 
 .day_of_week {
   color: var(--color-bg-b10);
   margin: 0;
-  font-size: 1rem;
+  font-size: clamp(var(--font-size-small), 1vw, 2rem);
 }
 
 .spacer {
@@ -69,7 +69,6 @@
 .header-client-item:hover {
   background: var(--color-bg-b2);
   cursor: pointer;
-  
 }
 .header-client-item:hover p {
   color: var(--color-bg-b12);
