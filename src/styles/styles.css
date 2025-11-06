@@ -215,6 +215,21 @@ p {
   font-weight: 400;
 }
 
+.p-empty-info {
+  font-size: clamp(var(--font-size-small), 0.8vw, var(--font-size-regular));
+  color: var(--color-bg-b9);
+  text-align: left;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.p-dbf-info {
+  font-size: clamp(var(--font-size-small), 0.8vw, var(--font-size-regular));
+  color: var(--color-el-n);
+  text-align: left;
+  font-weight: 400;
+}
+
 label {
   font-size: clamp(var(--font-size-small), 2vw, var(--font-size-regular));
   color: var(--color-bg-b1);

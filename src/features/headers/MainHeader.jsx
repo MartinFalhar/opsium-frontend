@@ -107,8 +107,8 @@ function MainHeader() {
       </div>
 
       {headerClients.length === 0 && (
-        <p className="">
-          {`${headerClients.length === 0 ? "(Pracovní pole je prázdné)" : ""}`}
+        <p className="p-empty-info">
+          {`${headerClients.length === 0 ? "< Pracovní pole je prázdné >" : ""}`}
         </p>
       )}
 

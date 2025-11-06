@@ -1,12 +1,12 @@
 .optometry-container input {
-    width:auto;
-    height: 15px;
-    border-radius: 3px;
-    font-size: small;
+  width: auto;
+  height: 15px;
+  border-radius: 3px;
+  font-size: small;
 }
 
 .optometry-natural-vizus input {
-    width: 50px;
+  width: 50px;
 }
 
 .optometry-container {
@@ -25,9 +25,9 @@
   background: var(--color-bg-b3);
   overflow-y: auto;
   width: 100%;
-  padding: 10px;
-    height: calc(100vh - 100px); /* nebo jiná výška */
-  overflow: hidden;            /* rodič bez scrollu */
+  /* padding: 10px; */
+  height: calc(100vh - 100px); /* nebo jiná výška */
+  overflow: hidden; /* rodič bez scrollu */
 }
 
 .optometry-right-container {
@@ -46,7 +46,7 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-    border: 1px solid var(--color-el-e);
+  border: 1px solid var(--color-el-e);
   border-radius: 0px;
   width: 98%;
   height: 50px;
@@ -73,6 +73,15 @@
   right: 2px;
 }
 
+.nv-input:focus {
+  outline: none;
+  box-shadow: 0 0 15px var(--color-el-f);
+  border-color: transparent;
+  border-bottom: 2px solid var(--color-el-m);
+  /* border: 1px solid var(--color-el-m); */
+  transition: all 0.2s ease;
+}
+
 .optometry-info-box {
   border: 1px solid var(--color-el-e);
   padding: 16px;
@@ -85,8 +94,10 @@
   background: var(--color-bg-b1);
 }
 
-.optometry-anamnesis {
-  border: 1px solid var(--color-el-e);
+.optometry-natural-vizus {
+  /* border: 1px solid var(--color-el-e); */
+  border: 1px solid var(--color-bg-b6);
+  background: var(--color-bg-b1);
   padding: 8px;
   border-radius: 8px;
   margin-top: 16px;
@@ -94,21 +105,97 @@
   width: 350px;
   height: 150px;
   min-width: 150px;
-  background: var(--color-bg-b1);
-}
-
-.optometry-anamnesis h3 {
-    font-size: smaller;
 }
 
 .optometry-area {
   display: flex;
-  flex-wrap: wrap;           /* ✅ zalamuje do nového řádku */
-  align-content: flex-start; /* ✅ zarovná horní část při více řádcích */
-  gap: 10px;                 /* mezery mezi boxy */
-  overflow-y: auto;          /* ✅ svislý scrollbar při přeplnění */
-  overflow-x: hidden;        /* zabrání horizontálnímu scrollu */
-  height: 100%;              /* přizpůsobí výšku rodiči */
-  padding: 10px;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 0px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  flex: 1;
+  /* padding: 10px; */
   box-sizing: border-box;
+  margin: 0px;
+}
+
+.optometry-area .w25 {
+  width: 23%;
+}
+.optometry-area .w50 {
+  width: 48%;
+}
+.optometry-area .w75 {
+  width: 73%;
+}
+.optometry-area .w100 {
+  width: 98%;
+}
+
+.optometry-item {
+  border: 1px solid var(--color-bg-b6);
+  padding: 8px;
+  border-radius: 8px;
+  margin-top: 1%;
+  margin-left: 1%;
+  margin-right: 1%;
+  height: 10vw;
+  min-width: 150px;
+  background: var(--color-bg-b3);
+  color: var(--color-bg-b12);
+  margin-bottom: 5px;
+}
+
+.optometry-item:active {
+  padding: 10px;
+border: 2px solid var(--color-el-e);
+  box-shadow: 0 0 10px var(--color-el-e);
+  border: 1px solid var(--color-bg-b6);
+  padding: 8px;
+  border-radius: 8px;
+  margin-top: 1%;
+  margin-left: 1%;
+  margin-right: 1%;
+  height: 10vw;
+  min-width: 150px;
+  background: var(--color-bg-b1);
+  color: var(--color-bg-b12);
+  margin-bottom: 5px;
+}
+
+.optometry-item-head {
+  width: 100%;
+  height: 20%;
+}
+
+.optometry-item-body {
+  width: 100%;
+  height: 80%;
+}
+
+.optometry-item-textarea {
+  padding: 5px;
+  border: none;
+  /* border-radius: 5px; */
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg-b3);
+  font-size: 1vw;
+  color: var(--color-bg-b12);
+  outline: none;
+  resize: none;
+}
+
+.optometry-item-textarea:active {
+  background: var(--color-bg-b12);
+  color: var(--color-bg-b3);
+
+}
+
+
+
+.optometry-item h3 {
+  font-size: smaller;
 }

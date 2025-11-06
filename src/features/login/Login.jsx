@@ -175,8 +175,8 @@ function Login() {
             placeholder="Heslo"
           />
           <PuffLoaderSpinnerDark active={isLoading} />
-          {isLoading && <p>Chvíli strpení, aktivuji databázi..</p>}
-          {isLoading && <p>Může to trvat déle jak 30 sekund.</p>}
+          {isLoading && <p className="p-dbf-info">Chvíli strpení, aktivuji databázi..</p>}
+          {isLoading && <p className="p-dbf-info">Může to trvat více jak 30 sekund. :-)</p>}
 
           {!isLoading && (
             <button type="submit" style={{ marginTop: "30px" }}>
