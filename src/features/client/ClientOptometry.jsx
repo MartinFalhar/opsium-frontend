@@ -1,12 +1,50 @@
 // import { useState } from "react";
 import "./ClientOptometry.css";
+import OptometryAnamnesis from "../../components/optometry/OptometryAnamnesis";
+import OptometryNaturalVisus from "../../components/optometry/OptometryNaturalVisus";
+import { useEffect, useState } from "react";
 
 function ClientOptometry() {
+  const optometryItems = [
+    {
+      id: "1",
+      width: "w50",
+      component: OptometryAnamnesis,
+    },
+    {
+      id: "2",
+      width: "w25",
+      component: OptometryNaturalVisus,
+    },
+  ];
+
+  const [activeItem, setActiveItem] = useState(null);
+  const [activeElement, setActiveElement] = useState(null);
+
   // const [sph, setSph] = useState("");
+  // const Component = menuComponent;
+  // const [itemsComponent, setItemsComponent] = useState([]);
+
+  // useEffect (()=> {
+  //   optometryItems.map(()=> {
+  //     const Component = optometryItems.component;
+  //     setItemsComponent((prev) => ({...prev , Component}));
+  //   })
+  // }, [optometryItems]);
+
+  // useEffect (() => {
+  //   if (activeElement == 0) {
+  //     console.log(`Son says good night.`)
+
+  //   }
+
+
+  // }, [activeElement])
 
   return (
     <div className="optometry-container">
       <div className="optometry-left-container">
+        {/* Horni MENU */}
         <div className="optometry-control-bar">
           <button className="optometry-control-bar-button">Vizus</button>
           <button className="optometry-control-bar-button">ASTG</button>
@@ -15,296 +53,52 @@ function ClientOptometry() {
           <button className="optometry-control-bar-button">MEDIC</button>
           <button type="submit">Uložit</button>
         </div>
-
         <div className="optometry-area">
-          <div className="optometry-item w25">
-            <div className="optometry-item-head">
-              <p>Anamnéza</p>
-            </div>
-            <div className="optometry-item-body">
-              <textarea className="optometry-item-textarea" />
-            </div>
-          </div>
-
-          <div className="optometry-item w50">
-            <div className="optometry-item-head">
-              <p>Anamnéza</p>
-            </div>
-            <div className="optometry-item-body">
-              <textarea className="optometry-item-textarea" />
-            </div>
-          </div>
-
-          <div className="optometry-item w25">
-            <div className="optometry-item-head">
-              <p>Anamnéza</p>
-            </div>
-            <div className="optometry-item-body">
-              <textarea className="optometry-item-textarea" />
-            </div>
-          </div>
-
-          <div
-            className="optometry-natural-vizus"
-            style={{
-              width: "230px",
-              padding: "10px",
-              border: "2px solid var(--color-el-e)",
-              boxShadow: "0 0 10px var(--color-el-e)",
-            }}
-          >
-            <p
-              style={{
-                color: "var(--color-bg-b12)",
-                marginBottom: "5px",
-              }}
-            >
-              NATURÁLNÍ VIZUSX
-            </p>
-            <div
-              //NV container
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignContent: "center",
-                height: "80%",
-                width: "200px",
-                paddingLeft: "15px",
-              }}
-            >
+          {/* OPTOMETRY ITEMS */}
+          {optometryItems.map((item) => {
+            const Component = item.component;
+            return (
               <div
-                className="NV-PL-eye"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-evenly",
-                  alignContent: "center",
-                  height: "80%",
-                  gap: "10px",
-                }}
+                key={item.id}
+                id={item.id}
+                className={`optometry-item ${item.width} ${
+                  activeItem === item.id ? "active" : ""
+                } ${
+                  activeElement == 0 && activeItem === item.id ? "move" : ""
+                }`}
+                onClick={() => setActiveItem(item.id)}
               >
-                <p
-                  style={{
-                    fontSize: "1.1vw",
-                    fontWeight: "bold",
-                    color: "var(--color-bg-b12)",
-                  }}
-                >
-                  P
-                </p>
-                <p
-                  style={{
-                    fontSize: "1.1vw",
-                    fontWeight: "bold",
-                    color: "var(--color-bg-b12)",
-                  }}
-                >
-                  L
-                </p>
+                <Component isActive={activeItem === item.id ? true : false} setActiveElement={setActiveElement}/>
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-evenly",
-                  alignContent: "center",
-                  height: "80%",
-                  gap: "0px",
-                }}
-              >
-                <input
-                  className="nv-input"
-                  type="text"
-                  placeholder="Vizus P"
-                  style={{
-                    background: "var(--color-bg-b1)",
-                    borderRadius: "0px",
-                    fontSize: "1.0vw",
-                    borderTop: "none",
-                    borderLeft: "none",
-                    borderRight: "none",
-                    borderBottom: "1px solid var(--color-el-m)",
-                    color: "var(--color-bg-b12)",
-                    fontWeight: "bold",
-                    width: "80px",
-                    height: "30px",
-                    padding: "5px",
-                    textAlign: "center",
-                  }}
-                />
-                <input
-                  className="nv-input"
-                  type="text"
-                  placeholder=""
-                  style={{
-                    background: "var(--color-bg-b1)",
-                    borderRadius: "0px",
-                    fontSize: "1.0vw",
-                    borderTop: "none",
-                    borderLeft: "none",
-                    borderRight: "none",
-                    borderBottom: "1px solid var(--color-el-m)",
-                    color: "var(--color-bg-b12)",
-                    fontWeight: "bold",
-                    width: "80px",
-                    height: "30px",
-                    padding: "5px",
-                    textAlign: "center",
-                  }}
-                />
-              </div>
-              <div>
-                <input
-                  className="nv-input"
-                  type="text"
-                  placeholder=""
-                  style={{
-                    background: "var(--color-bg-b1)",
-                    borderRadius: "0px",
-                    fontSize: "1.3vw",
-                    borderTop: "none",
-                    borderLeft: "none",
-                    borderRight: "none",
-                    borderBottom: "1px solid var(--color-el-m)",
-                    color: "var(--color-bg-b12)",
-                    fontWeight: "bold",
-                    width: "80px",
-                    height: "60%",
-                    padding: "5px",
-                    textAlign: "center",
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div
-            className="optometry-natural-vizus"
-            style={{
-              width: "230px",
-              padding: "10px",
-              background: "var(--color-bg-b3)",
-              // border: "none",
-            }}
-          >
-            <p
-              style={{
-                color: "var(--color-bg-b12)",
-                marginBottom: "5px",
-              }}
-            >
-              NATURÁLNÍ VIZUS
-            </p>
-            <div
-              //NV container
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignContent: "center",
-                height: "80%",
-                width: "200px",
-                paddingLeft: "15px",
-              }}
-            >
-              <div
-                className="NV-PL-eye"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-evenly",
-                  alignContent: "center",
-                  height: "80%",
-                  gap: "10px",
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: "1.1vw",
-                    fontWeight: "bold",
-                    color: "var(--color-bg-b12)",
-                  }}
-                >
-                  P
-                </p>
-                <p
-                  style={{
-                    fontSize: "1.1vw",
-                    fontWeight: "bold",
-                    color: "var(--color-bg-b12)",
-                  }}
-                >
-                  L
-                </p>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-evenly",
-                  alignContent: "center",
-                  height: "80%",
-                  gap: "0px",
-                  textAlign: "center",
-                }}
-              >
-                <input
-                  className="nv-input"
-                  type="text"
-                  placeholder="Vizus P"
-                  style={{
-                    background: "var(--color-bg-b3)",
-                    fontSize: "1.0vw",
-                    border: "none",
-                    color: "var(--color-el-a)",
-                    fontWeight: "bold",
-                    width: "80px",
-                    height: "30px",
-                    padding: "5px",
-                    textAlign: "center",
-                  }}
-                />
-                <input
-                  className="nv-input"
-                  type="text"
-                  placeholder="Vizus L"
-                  style={{
-                    background: "var(--color-bg-b3)",
-                    fontSize: "1.0vw",
-                    border: "none",
-                    color: "var(--color-el-a)",
-                    fontWeight: "bold",
-                    width: "80px",
-                    height: "30px",
-                    padding: "5px",
-                    textAlign: "center",
-                  }}
-                />
-              </div>
-              <div>
-                <input
-                  className="nv-input"
-                  type="text"
-                  placeholder="VN-BINO"
-                  style={{
-                    background: "var(--color-bg-b3)",
-                    fontSize: "1.2vw",
-                    border: "none",
-                    color: "var(--color-el-e)",
-                    fontWeight: "bold",
-                    width: "90px",
-                    height: "80%",
-                    padding: "5px",
-                    textAlign: "center",
-                    transition: "all 0.3s ease",
-                  }}
-                />
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
-      <div className="right-container">
-        <h3>INFO</h3>
+      <div className="optometry-right-container">
+        <div className="optometry-right-container-head">
+          <h6>INFO</h6>
+        </div>
+        <div className="optometry-right-container-body">
+          {/* Anamnéza */}
+          {optometryItems[activeItem - 1]?.component.name ==
+            "OptometryAnamnesis" && (
+            <>
+              <p>V rámci anamnézy je nutné zjistit minulé zkušenosti, léky a požadavky klienta.</p>
+              <p>Důležité je zdravotní anamnéza jak osobní, tak rodinná, pracovní, sociální a volnočasová.</p>
+              <p>...</p>
+            </>
+          )}
+          
+          {/* Naturální VIZUS */}
+          {optometryItems[activeItem - 1]?.component.name ==
+            "OptometryNaturalVisus" && (
+            <>
+              <p>Zde zadej hodnotu naturálního vizu. Je to hodnota, kterou klient čte bez nasazené jakékoliv korekce do dálky.</p>
+              <p>Hodnotu zaznamenej nejdříve pro PRAVÉ oko a poté pro LEVÉ oko. Do kolonky BINO pak zadej vizus přečtený oběma očima.</p>
+              <p>...</p>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
