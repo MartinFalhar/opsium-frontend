@@ -1,5 +1,5 @@
 function AgendaContacts({ client }) {
-  console.log("AgendaContacts -user:", client);
+  console.log("AgendaContacts -user:", client.name);
   return (
     <div>
       <div className="info-box">

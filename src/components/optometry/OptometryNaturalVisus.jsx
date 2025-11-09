@@ -1,6 +1,7 @@
 import { useRef } from "react";
+import "./OptometryNaturalVisus.css";
 
-function OptometryNaturalVisus({ isActive, setActiveElement}) {
+function OptometryNaturalVisus({ isActive, setActiveElement, itemValues}) {
   const input1Ref = useRef(null);
   const input2Ref = useRef(null);
   const input3Ref = useRef(null);
@@ -17,7 +18,7 @@ function OptometryNaturalVisus({ isActive, setActiveElement}) {
   return (
     <>
       <div className={`optometry-item-head ${isActive ? "active" : null}`}>
-        <p>Naturální vizus</p>
+        <p>{itemValues.name}</p>
       </div>
 
       <div className={`optometry-item-body ${isActive ? "active" : null}`}>
@@ -36,9 +37,6 @@ function OptometryNaturalVisus({ isActive, setActiveElement}) {
         </div>
       </div>
 
-      <div className="optometry-item-footer">
-        <p>Decimal/logMAR/Fraction</p>
-      </div>
     </>
   );
 }

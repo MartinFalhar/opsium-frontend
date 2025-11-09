@@ -1,5 +1,5 @@
 function AgendaBenefits({ client }) {
-  console.log("AgendaBenefits -user:", client);
+  console.log("AgendaBenefits -user:", client.name);
   return (
     <div>
       <div className="info-box">

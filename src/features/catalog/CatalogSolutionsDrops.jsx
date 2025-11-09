@@ -1,5 +1,5 @@
 function CatalogSolutionsDrops({ client }) {
-  console.log("CatalogSolutionsDrops - user:", client);
+  console.log("CatalogSolutionsDrops - user:", client.name);
   return (
     <div>
       <div className="info-box">

@@ -1,5 +1,5 @@
 function AgendaSalesAction({ client }) {
-  console.log("AgendaSalesAction -user:", client);
+  console.log("AgendaSalesAction -user:", client.name);
   return (
     <div>
       <div className="info-box">

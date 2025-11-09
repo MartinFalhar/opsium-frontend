@@ -1,0 +1,86 @@
+.optometry-table-ark {
+  display: grid;
+  grid-template-columns: 20% repeat(3, 1fr);
+  gap: 2px;
+  max-width: 700px;
+  font-family: sans-serif;
+  background: var(--color-bg-b3);
+  align-items: center;
+  margin-top: 0.4vw;
+}
+
+/* Spojení posledních dvou buněk v druhém a třetím řádku */
+.optometry-table-ark .span-last {
+  grid-row: span 2;
+  height: 4.4vw;
+}
+
+/* Spojení všech buněk (kromě první) v posledním řádku */
+.optometry-table-ark .span-all {
+  grid-column: 2 / -1;
+}
+
+.optometry-table-ark p,
+.optometry-table-ark input {
+  height: 2.2vw; /* sjednocená výška */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  box-sizing: border-box;
+}
+.optometry-table-ark p {
+  font-size: clamp(var(--font-size-small), 0.9vw, 1vw);
+  background: var(--color-bg-b3);
+  text-align: center;
+  padding: 6px 4px;
+  font-weight: bold;
+  margin: 0;
+  color: var(--color-bg-b7);
+}
+
+.optometry-table-ark .desc {
+  font-size: clamp(var(--font-size-small), 1.2vw, 1.5vw);
+  color: var(--color-bg-b11);
+  width: 3vw
+}
+
+.optometry-table-ark .desc-table {
+    height: 1.1vw;
+    align-items: start;
+}
+
+.optometry-table-ark input {
+  font-size: clamp(var(--font-size-xsmall), 1vw, 1.1vw);
+  border: 1ps solid var(--color-bg-b3);
+  border-radius: 0px;
+  color: var(--color-bg-b9);
+  font-weight: bold;
+  width: 100%;
+  height: 2vw;
+  padding: 0.2vw;
+  text-align: center;
+  background: var(--color-bg-b3);
+}
+
+.optometry-table-ark.active
+{
+background: var(--color-bg-b1);    
+}
+
+.optometry-table-ark.active input {
+color: var(--color-bg-b12);
+background: var(--color-bg-b1);
+outline: none;
+}
+
+.optometry-table-ark.active input:focus {
+    background-color: var(--color-bg-b11);
+    color: var(--color-bg-b3);
+  /* box-shadow: 0 0 15px var(--color-el-e); */
+  border-bottom: 2px solid var(--color-el-m);
+}
+
+.optometry-table-ark.active p {
+    background: var(--color-bg-b1);
+};

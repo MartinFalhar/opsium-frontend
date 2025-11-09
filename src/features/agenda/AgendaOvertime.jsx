@@ -1,5 +1,5 @@
 function AgendaOvertime({ client }) {
-  console.log("AgendaOvertime -user:", client);
+  console.log("AgendaOvertime -user:", client.name);
   return (
     <div>
       <div className="info-box">

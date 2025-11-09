@@ -1,5 +1,5 @@
 function CatalogContactLens({ client }) {
-  console.log("CatalogContactLens - user:", client);
+  console.log("CatalogContactLens - user:", client.name);
   return (
     <div>
       <div className="info-box">
