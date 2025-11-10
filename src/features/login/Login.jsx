@@ -29,10 +29,19 @@ function Login() {
     { title: "Opsium", desc: "A digi-medicine for an eye-optics" },
     { title: "Optical Illusion", desc: "Mind-blowing images" },
     { title: "Eye Beauty", desc: "The iris synechia with the lens" },
-    { title: "Eye diagnostic", desc: "It was a hard day today!" },
-    { title: "Eye beauty", desc: "Autumn in the eye" },
-    { title: "Eye diagnostic", desc: "The stroma world of the cornea" },
-    { title: "Eye diagnostic", desc: "Fluorescein symphony" },
+    { title: "Eye Diagnostic", desc: "It was a hard day today!" },
+    { title: "Eye Beauty", desc: "Autumn in the eye" },
+    { title: "Eye Diagnostic", desc: "The stroma world of the cornea" },
+    { title: "Eye Diagnostic", desc: "Fluorescein symphony" },
+    { title: "Tear Layers Deficit", desc: "Like Jupiter and Earth" },
+    { title: "Lens World", desc: "The symphony of engravings" },
+    { title: "Contact Lens", desc: "Smooth but tear" },
+    { title: "Contact Lens", desc: "The color beauty from the near" },
+    { title: "Eye Beauty", desc: "The magic of the reflection" },
+    { title: "Lens World", desc: "Geographical layer disaster" },
+    { title: "Glasses Fate", desc: "The screw is always right!" },
+    { title: "Glasses Fate", desc: "Is one enough?" },
+    { title: "Lens Rainbow", desc: "Colorfull beauty in the pressure" },
   ];
 
   useEffect(() => {

@@ -17,14 +17,14 @@ function OptometryAnamnesis({
 
   return (
     <>
-      <div className={`optometry-item-head ${isActive ? "active" : null}`}>
+      <div
+        className={`optometry-table-anamnesis ${isActive ? "active" : null}`}
+      >
         <p>{itemValues.name}</p>
-      </div>
-      <div className="optometry-item-body">
         <textarea
           value={values.note}
-          className={`optometry-item-textarea ${isActive ? "active" : null}`}
-          placeholder={`isActive je  ${isActive ? "true" : "false"}`}
+          className="input-textarea"
+          placeholder={`Zde zadejte text...`}
           onChange={(e) => handleChange(e.target.value)}
         />
       </div>

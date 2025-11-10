@@ -1,127 +1,88 @@
-.optometry-item-head {
-  width: 100%;
-  height: 15%;
-}
-
-.optometry-item-body {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 65%;
-}
-.optometry-item-body .desc {
-  flex: 2vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  gap: 1.1vw;
-  margin-left: 1.1vw;
-}
-
-.optometry-item-body .desc h1 {
-  font-size: 1.4vw;
-  color: var(--color-bg-b11);
-  font-weight: bold;
-}
-
-.optometry-item-body .inputData {
-  flex: 35%;
+.optometry-table-natural {
+  display: grid;
+  grid-template-columns: 20% repeat(2, 1fr);
+  gap: 10px;
+  max-width: 700px;
+  font-family: sans-serif;
   background: var(--color-bg-b3);
-  margin: 0.2vw;
+  align-items: center;
+  margin-top: 0.4vw;
 }
 
-.optometry-item-body .inputData.active {
-  width: auto;
-  background: var(--color-bg-b1);
+
+/* Spojení posledních dvou buněk v druhém a třetím řádku */
+.optometry-table-natural .span-last {
+  grid-row: span 2;
+  height: 3.4vw;
 }
 
-.optometry-item-body .inputData input {
-  font-size: clamp(var(--font-size-regular), 1.4vw, 1.5vw);
-  /* border-top: none;
-  border-left: none;
-  border-right: none; */
-  border: transparent;
-  /* border: 1ps solid #fff; */
-  border-radius: 0px;
-  color: var(--color-bg-b12);
+/* Spojení všech buněk (kromě první) v posledním řádku */
+.optometry-table-natural .span-all {
+  grid-column: 2 / -1;
+}
+
+.optometry-table-natural p,
+.optometry-table-natural input {
+  height: 2.2vw; /* sjednocená výška */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  box-sizing: border-box;
+}
+.optometry-table-natural p {
+  font-size: clamp(var(--font-size-small), 0.9vw, 1vw);
+  background: var(--color-bg-b3);
+  text-align: center;
+  padding: 6px 4px;
   font-weight: bold;
-  width: 4vw;
-  height: 2vw;
+  margin: 0;
+  color: var(--color-bg-b7);
+}
+
+.optometry-table-natural .desc {
+  font-size: clamp(var(--font-size-small), 1.2vw, 1.5vw);
+  color: var(--color-bg-b11);
+  width: 3vw
+}
+
+.optometry-table-natural .desc-table {
+    height: 1.1vw;
+    align-items: start;
+}
+
+.optometry-table-natural.active
+{
+background: var(--color-bg-b1);    
+}
+
+.optometry-table-natural.active input {
+color: var(--color-bg-b12);
+background: var(--color-bg-b1);
+border-radius: 4px;
+outline: none;
+}
+
+.optometry-table-natural input {
+  font-size: clamp(var(--font-size-xsmall), 1vw, 1.1vw);
+  border: 1px solid var(--color-bg-b3);
+  border-radius: 0px;
+  color: var(--color-bg-b9);
+  font-weight: bold;
+  width: 100%;
+  height: 1.7vw;
   padding: 0.2vw;
   text-align: center;
   background: var(--color-bg-b3);
 }
 
-.optometry-item-body .inputData.active input {
-      background: var(--color-bg-b1);
+.optometry-table-natural.active input:focus {
+    background-color: var(--color-bg-b11);
+    color: var(--color-bg-b3);
+  /* box-shadow: 0 0 15px var(--color-el-e); */
+  border-bottom: 2px solid var(--color-el-m);
 }
 
-
-.optometry-item-body .inputData.active input:focus {
-  box-shadow: 0 0 15px var(--color-el-e);
-  border-bottom: 1px solid var(--color-el-j);
-  outline: none;
-}
-
-.optometry-item-footer {
-  width: 100%;
-}
-
-.optometry-item-footer p {
-  margin-top: 0.3vw;
-  text-align: right;
-  font-size: clamp(var(--font-size-xsmall), 0.8vw, var(--font-size-regular));
-}
-
-.optometry-item-textarea {
-  padding: 5px;
-  border: none;
-  /* border-radius: 5px; */
-  width: 100%;
-  height: 100%;
-  background: var(--color-bg-b3);
-  font-size: 1vw;
-  color: var(--color-bg-b12);
-  outline: none;
-  resize: none;
-}
-
-.optometry-item textarea.active {
-  background: var(--color-bg-b12);
-  color: var(--color-bg-b3);
-}
-
-.optometry-item h3 {
-  font-size: smaller;
-}
-
-.optometry-item-nv-input {
-  background: var(--color-bg-b1);
-  border-radius: 0px;
-  font-size: 1vw;
-  border-top: none;
-  border-left: none;
-  border-radius: none;
-  border-bottom: 1px solid var(--color-el-m);
-  color: var(--color-bg-b12);
-  font-weight: bold;
-  width: 80px;
-  height: 30px;
-  padding: 5px;
-  text-align: center;
-}
-
-.optometry-natural-vizus {
-  /* border: 1px solid var(--color-el-e); */
-  border: 1px solid var(--color-bg-b6);
-  background: var(--color-bg-b1);
-  padding: 8px;
-  border-radius: 8px;
-  margin-top: 16px;
-  margin-left: 16px;
-  width: 350px;
-  height: 150px;
-  min-width: 150px;
-}
+.optometry-table-natural.active p {
+    background: var(--color-bg-b1);
+};

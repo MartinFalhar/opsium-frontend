@@ -1,47 +1,100 @@
-// import { useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./OptometryRefractionARK.css";
 
-function OptometryRefractionARK({ isActive, setActiveElement, itemValues }) 
+function OptometryRefractionARK({ isActive, setActiveElement, itemValues, onChange }) {
+  const [values, setValues] = useState(itemValues);
 
-{
-  // const input1Ref = useRef(null);
-  // const input2Ref = useRef(null);
-  // const input3Ref = useRef(null);
-  // const handleKeyDown = (e) => {
-  //   if (e.key === "ArrowUp") {
-  //     input2Ref.current?.focus();
-  //     setActiveElement(0);
-  //   }
-  // };
+  // refs pro focus management (např. ArrowUp/ArrowDown)
+  const pSphRef = useRef(null);
+  const pCylRef = useRef(null);
+  const pAxRef = useRef(null);
+  const lSphRef = useRef(null);
+  const lCylRef = useRef(null);
+  const lAxRef = useRef(null);
+
+  // synchronizace se změnami z rodiče
+  useEffect(() => {
+    setValues(itemValues);
+  }, [itemValues]);
+
+  const handleChange = (key, value) => {
+    const newData = { ...values, [key]: value };
+    setValues(newData);
+    onChange?.(newData);
+  };
+
+  // příklad: přeskakování kurzoru šipkami
+  const handleKeyDown = (e, nextRef) => {
+    if (e.key === "ArrowRight" && nextRef?.current) {
+      nextRef.current.focus();
+    }
+  };
 
   return (
     <>
-      <div >
+      <div>
         <p>{itemValues.name}</p>
       </div>
 
-      <div className={`optometry-table-ark ${isActive ? "active" : null}`}>
+      <div className={`optometry-table-ark ${isActive ? "active" : ""}`}>
+        {/* hlavička */}
         <p className="desc-table"></p>
         <p className="desc-table">SPH</p>
         <p className="desc-table">CYL</p>
         <p className="desc-table">AX</p>
- 
 
+        {/* pravé oko */}
         <p className="desc">P</p>
-        <input className="inputData" type="text" />
-        <input className="inputData" type="text" />
-        <input className="inputData" type="text" />
+        <input
+          ref={pSphRef}
+          value={values.pSph || ""}
+          className="inputData"
+          type="text"
+          onChange={(e) => handleChange("pSph", e.target.value)}
+          onKeyDown={(e) => handleKeyDown(e, pCylRef)}
+        />
+        <input
+          ref={pCylRef}
+          value={values.pCyl || ""}
+          className="inputData"
+          type="text"
+          onChange={(e) => handleChange("pCyl", e.target.value)}
+          onKeyDown={(e) => handleKeyDown(e, pAxRef)}
+        />
+        <input
+          ref={pAxRef}
+          value={values.pAx || ""}
+          className="inputData"
+          type="text"
+          onChange={(e) => handleChange("pAx", e.target.value)}
+        />
 
-
+        {/* levé oko */}
         <p className="desc">L</p>
-        <input className="inputData" type="text" />
-        <input className="inputData" type="text" />
-        <input className="inputData" type="text" />
-
-        {/* <p>Pozn.</p>
-        <input type="text" className="inputData span-all" /> */}
+        <input
+          ref={lSphRef}
+          value={values.lSph || ""}
+          className="inputData"
+          type="text"
+          onChange={(e) => handleChange("lSph", e.target.value)}
+          onKeyDown={(e) => handleKeyDown(e, lCylRef)}
+        />
+        <input
+          ref={lCylRef}
+          value={values.lCyl || ""}
+          className="inputData"
+          type="text"
+          onChange={(e) => handleChange("lCyl", e.target.value)}
+          onKeyDown={(e) => handleKeyDown(e, lAxRef)}
+        />
+        <input
+          ref={lAxRef}
+          value={values.lAx || ""}
+          className="inputData"
+          type="text"
+          onChange={(e) => handleChange("lAx", e.target.value)}
+        />
       </div>
-
     </>
   );
 }

@@ -1,26 +1,50 @@
-// import { useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./OptometryRefraction.css";
 
-function OptometryRefraction({ isActive, setActiveElement, itemValues }) 
+function OptometryRefraction({ isActive, itemValues, onChange }) {
+  const [values, setValues] = useState(itemValues);
 
-{
-  // const input1Ref = useRef(null);
-  // const input2Ref = useRef(null);
-  // const input3Ref = useRef(null);
-  // const handleKeyDown = (e) => {
-  //   if (e.key === "ArrowUp") {
-  //     input2Ref.current?.focus();
-  //     setActiveElement(0);
-  //   }
-  // };
+  // Refs pro horní (P) a spodní (L) řádek
+  const pRefs = useRef([]);
+  const lRefs = useRef([]);
+
+  // Synchronizace se změnami z rodiče
+  useEffect(() => {
+    setValues(itemValues);
+  }, [itemValues]);
+
+  const handleChange = (key, value) => {
+    const newData = { ...values, [key]: value };
+    setValues(newData);
+    onChange?.(newData);
+  };
+
+  // Funkce pro přeskakování kurzoru
+  const handleKeyDown = (e, rowRefs, index) => {
+    const currentRow = rowRefs; // buď pRefs.current nebo lRefs.current
+    const colCount = currentRow.length;
+
+    if (e.key === "ArrowRight") {
+      if (index + 1 < colCount) currentRow[index + 1].focus();
+    } else if (e.key === "ArrowLeft") {
+      if (index - 1 >= 0) currentRow[index - 1].focus();
+    } else if (e.key === "ArrowDown" && currentRow === pRefs.current) {
+      // z horního řádku dolů
+      if (lRefs.current[index]) lRefs.current[index].focus();
+    } else if (e.key === "ArrowUp" && currentRow === lRefs.current) {
+      // ze spodního řádku nahoru
+      if (pRefs.current[index]) pRefs.current[index].focus();
+    }
+  };
 
   return (
     <>
-      <div >
+      <div>
         <p>{itemValues.name}</p>
       </div>
 
-      <div className={`optometry-table ${isActive ? "active" : null}`}>
+      <div className={`optometry-table ${isActive ? "active" : ""}`}>
+        {/* Hlavička */}
         <p className="desc-table"></p>
         <p className="desc-table">SPH</p>
         <p className="desc-table">CYL</p>
@@ -29,27 +53,34 @@ function OptometryRefraction({ isActive, setActiveElement, itemValues })
         <p className="desc-table">Vizus</p>
         <p className="desc-table">BINO</p>
 
+        {/* Pravé oko P */}
         <p className="desc">P</p>
-        <input className={`inputData ${isActive ? "active" : null}`} type="text" />
-        <input type="text" />
-        <input className="inputData" type="text" />
-        <input className="inputData" type="text" />
-        <input className="inputData" type="text" />
-        <input className="inputData span-last" type="text" />
+        {["pSph","pCyl","pAx","pAdd","pV","plV"].map((key, i) => (
+          <input
+            key={key}
+            ref={el => pRefs.current[i] = el}
+            value={values[key] || ""}
+            type="text"
+            className="inputData"
+            onChange={(e) => handleChange(key, e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e, pRefs.current, i)}
+          />
+        ))}
 
+        {/* Levé oko L */}
         <p className="desc">L</p>
-        <input className="inputData" type="text" />
-        <input className="inputData" type="text" />
-        <input className="inputData" type="text" />
-        <input className="inputData" type="text" />
-        <input className="inputData" type="text" />
-        {/* <input className="inputData span-last" type="text" /> */}
-
-        {/* <p>Pozn.</p>
-        <input type="text" className="inputData span-all" /> */}
+        {["lSph","lCyl","lAx","lAdd","lV"].map((key, i) => (
+          <input
+            key={key}
+            ref={el => lRefs.current[i] = el}
+            value={values[key] || ""}
+            type="text"
+            className="inputData"
+            onChange={(e) => handleChange(key, e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e, lRefs.current, i)}
+          />
+        ))}
       </div>
-
-
     </>
   );
 }
