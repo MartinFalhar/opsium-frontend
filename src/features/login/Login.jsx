@@ -22,7 +22,7 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [heroImgID, setHeroImgID] = useState(() =>
-    Math.floor(Math.random() * 6 + 1)
+    Math.floor(Math.random() * 15 + 1)
   );
 
   const imageHeroText = [
@@ -37,7 +37,7 @@ function Login() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const newId = Math.floor(Math.random() * 6 + 1);
+      const newId = Math.floor(Math.random() * 15 + 1);
       setHeroImgID(newId);
     }, 5000); // každých 5 sekund
     // heroImgID = Math.floor(Math.random() * 6 + 1);

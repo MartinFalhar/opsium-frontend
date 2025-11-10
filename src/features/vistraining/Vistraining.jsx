@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./Vistraining.css"; 
+import "./Vistraining.css";
 
 function Vistraining() {
   const navigate = useNavigate();
@@ -23,17 +23,15 @@ function Vistraining() {
       <div className="vistraining-settings">
         <h2>Visual Training Settings</h2>
 
+
         {historyFromChild.length > 0 ? (
           <div className="bar-chart-root" style={{ width, height }}>
             {historyFromChild.map((val, i) => {
               const normalized = (val - min) / range; // 0..1
-              const barHeight = Math.round(normalized * (height - 20)); 
+              const barHeight = Math.round(normalized * (height - 20));
               return (
                 <div key={i} className="bar-wrapper" title={`${i}: ${val}`}>
-                  <div
-                    className="bar"
-                    style={{ height: `${barHeight}px` }}
-                  />
+                  <div className="bar" style={{ height: `${barHeight}px` }} />
                   <div className="bar-label">{i}</div>
                 </div>
               );
