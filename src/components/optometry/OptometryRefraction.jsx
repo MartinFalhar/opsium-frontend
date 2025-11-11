@@ -55,10 +55,10 @@ function OptometryRefraction({ isActive, itemValues, onChange }) {
 
         {/* Pravé oko P */}
         <p className="desc">P</p>
-        {["pSph","pCyl","pAx","pAdd","pV","plV"].map((key, i) => (
+        {["pSph", "pCyl", "pAx", "pAdd", "pV"].map((key, i) => (
           <input
             key={key}
-            ref={el => pRefs.current[i] = el}
+            ref={(el) => (pRefs.current[i] = el)}
             value={values[key] || ""}
             type="text"
             className="inputData"
@@ -67,12 +67,20 @@ function OptometryRefraction({ isActive, itemValues, onChange }) {
           />
         ))}
 
+        {/* tahle buňka se rozlije přes dvě řádky */}
+        <input
+          className="inputData span-last"
+          value={values.plV || ""}
+          type="text"
+          onChange={(e) => handleChange("plV", e.target.value)}
+        />
+
         {/* Levé oko L */}
         <p className="desc">L</p>
-        {["lSph","lCyl","lAx","lAdd","lV"].map((key, i) => (
+        {["lSph", "lCyl", "lAx", "lAdd", "lV"].map((key, i) => (
           <input
             key={key}
-            ref={el => lRefs.current[i] = el}
+            ref={(el) => (lRefs.current[i] = el)}
             value={values[key] || ""}
             type="text"
             className="inputData"

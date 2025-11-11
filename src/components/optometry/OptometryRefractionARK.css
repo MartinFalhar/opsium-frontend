@@ -31,24 +31,23 @@
 .optometry-table-ark .desc {
   font-size: clamp(var(--font-size-small), 1.2vw, 1.5vw);
   color: var(--color-bg-b11);
-  width: 3vw
+  width: 3vw;
 }
 
 .optometry-table-ark .desc-table {
-    height: 1.1vw;
-    align-items: start;
+  height: 1.1vw;
+  align-items: start;
 }
 
-.optometry-table-ark.active
-{
-background: var(--color-bg-b1);    
+.optometry-table-ark.active {
+  background: var(--color-bg-b1);
 }
 
 .optometry-table-ark.active input {
-color: var(--color-bg-b12);
-background: var(--color-bg-b1);
-border-radius: 4px;
-outline: none;
+  color: var(--color-bg-b12);
+  background: var(--color-bg-b1);
+  border-radius: 4px;
+  outline: none;
 }
 
 .optometry-table-ark input {
@@ -65,12 +64,12 @@ outline: none;
 }
 
 .optometry-table-ark.active input:focus {
-    background-color: var(--color-bg-b11);
-    color: var(--color-bg-b3);
+  background-color: var(--color-bg-b11);
+  color: var(--color-bg-b3);
   /* box-shadow: 0 0 15px var(--color-el-e); */
   border-bottom: 2px solid var(--color-el-m);
 }
 
 .optometry-table-ark.active p {
-    background: var(--color-bg-b1);
-};
+  background: var(--color-bg-b1);
+}
