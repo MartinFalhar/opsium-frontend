@@ -5,7 +5,6 @@ import "./ClientOptometry.css";
 //IMPORT OPTOMETRY COMPONENT
 import OptometryAnamnesis from "../../components/optometry/OptometryAnamnesis";
 import OptometryNaturalVisus from "../../components/optometry/OptometryNaturalVisus";
-import OptometryRefraction from "../../components/optometry/OptometryRefraction";
 import OptometryRefractionARK from "../../components/optometry/OptometryRefractionARK";
 import OptometryRefractionFull from "../../components/optometry/OptometryRefractionFull";
 
@@ -13,6 +12,7 @@ function ClientOptometry() {
   const [optometryItems, setOptometryItems] = useState([
     {
       id: "1",
+      modul: "1",
       width: "w50",
       component: OptometryAnamnesis,
       values: {
@@ -22,6 +22,7 @@ function ClientOptometry() {
     },
     {
       id: "2",
+      modul: "2",
       width: "w25",
       component: OptometryNaturalVisus,
       values: {
@@ -35,6 +36,7 @@ function ClientOptometry() {
     },
     {
       id: "3",
+      modul: "3",
       width: "w25",
       component: OptometryRefractionARK,
       values: {
@@ -49,28 +51,8 @@ function ClientOptometry() {
       },
     },
     {
-      id: "4",
-      width: "w50",
-      component: OptometryRefraction,
-      values: {
-        name: "Vstupní refrakce - brýle na dálku",
-        pSph: "+4.50",
-        pCyl: "+4.50",
-        pAx: "180",
-        pAdd: "+2.50",
-        lSph: "-4.50",
-        lCyl: "-4.50",
-        lAx: "90",
-        lAdd: "+2.50",
-        pV: "1.25++",
-        lV: "1.6++",
-        plV: "2.0--",
-        style: 0,
-        note: "",
-      },
-    },
-    {
       id: "5",
+      modul: "3",
       width: "w75",
       component: OptometryRefractionFull,
       values: {
@@ -96,25 +78,26 @@ function ClientOptometry() {
     },
     {
       id: "6",
+      modul: "3",
       width: "w75",
       component: OptometryRefractionFull,
       values: {
         name: "Refrakce - pohodlná korekce vzhledem k vysokému CYL",
-        pSph: "-3,75",
-        pCyl: "-4,50",
-        pAx: "180",
-        pPrism: "2,5",
-        pBase: "90",
-        pAdd: "-3,25",
-        lSph: "+4,50",
-        lCyl: "90",
-        lAx: "122",
-        lPrism: "2,5",
-        lBase: "270",
-        lAdd: "+2,50",
-        pV: "0,63+",
-        lV: "0,8+",
-        plV: "1,25+",
+        pSph: -3.75,
+        pCyl: -4.5,
+        pAx: 180,
+        pPrism: 2.5,
+        pBase: 90,
+        pAdd: -3.25,
+        lSph: +4.5,
+        lCyl: 90,
+        lAx: 122,
+        lPrism: 2.5,
+        lBase: 270,
+        lAdd: +2.5,
+        pV: 0.633,
+        lV: 0.83,
+        plV: 1.253,
       },
     },
   ]);
@@ -122,21 +105,22 @@ function ClientOptometry() {
   const [activeItem, setActiveItem] = useState(null);
   const [activeElement, setActiveElement] = useState(null);
 
-
   const handleUpdateItem = (id, newValues) => {
-  setOptometryItems((prevItems) =>
-    prevItems.map((item) =>
-      item.id === id ? { ...item, values: newValues } : item
-    )
-  );
-};
+    setOptometryItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, values: newValues } : item
+      )
+    );
+  };
 
+  const handleSavetoDBF = () => {
+    const prepareExportData = [];
 
-const handleSavetoDBF = () => {
-console.log(optometryItems[0].values.note);
-
-
-}
+    optometryItems.map((modul) => {
+      console.log(`${JSON.stringify({ ...modul.values })}`);
+    });
+    console.log(optometryItems[0].values.note);
+  };
 
   // const [sph, setSph] = useState("");
   // const Component = menuComponent;
@@ -167,8 +151,9 @@ console.log(optometryItems[0].values.note);
           <button className="optometry-control-bar-button">BINO</button>
           <button className="optometry-control-bar-button">CLENS</button>
           <button className="optometry-control-bar-button">MEDIC</button>
-          <button type="submit"
-          onClick={handleSavetoDBF}>Uložit</button>
+          <button type="submit" onClick={handleSavetoDBF}>
+            Uložit
+          </button>
         </div>
         <div className="optometry-area">
           {/* OPTOMETRY ITEMS */}

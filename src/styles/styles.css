@@ -282,16 +282,6 @@ button {
   font-size: clamp(var(--font-size-small), 2.5vw, var(--font-size-regular));
 }
 
-input {
-  padding: 0px;
-  background-color: var(--color-bg-b11);
-  border: 1px solid var(--color-bg-b8);
-  border-radius: 10px;
-  font-size: var(--font-size-regular);
-  width: 100%;
-  max-width: 300px;
-  padding: 10px;
-}
 /* ----------- ICONS*/
 
 /* ----------- SUB-MAIN MENU CONTENT*/

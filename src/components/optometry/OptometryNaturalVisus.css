@@ -9,7 +9,6 @@
   margin-top: 0.4vw;
 }
 
-
 /* Spojení posledních dvou buněk v druhém a třetím řádku */
 .optometry-table-natural .span-last {
   grid-row: span 2;
@@ -30,6 +29,26 @@
   margin: 0;
   box-sizing: border-box;
 }
+
+.modul-name {
+  font-size: clamp(var(--font-size-small), 1vw, 0.9vw);
+  background: var(--color-bg-b3);
+  color: var(--color-bg-b11);
+  border: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.modul-name.active {
+  background: var(--color-bg-b1);
+}
+
+.modul-name:focus {
+  background: var(--color-bg-b1);
+  outline: none;
+}
+
 .optometry-table-natural p {
   font-size: clamp(var(--font-size-small), 0.9vw, 1vw);
   background: var(--color-bg-b3);
@@ -43,24 +62,23 @@
 .optometry-table-natural .desc {
   font-size: clamp(var(--font-size-small), 1.2vw, 1.5vw);
   color: var(--color-bg-b11);
-  width: 3vw
+  width: 3vw;
 }
 
 .optometry-table-natural .desc-table {
-    height: 1.1vw;
-    align-items: start;
+  height: 1.1vw;
+  align-items: start;
 }
 
-.optometry-table-natural.active
-{
-background: var(--color-bg-b1);    
+.optometry-table-natural.active {
+  background: var(--color-bg-b1);
 }
 
 .optometry-table-natural.active input {
-color: var(--color-bg-b12);
-background: var(--color-bg-b1);
-border-radius: 4px;
-outline: none;
+  color: var(--color-bg-b12);
+  background: var(--color-bg-b1);
+  border-radius: 4px;
+  outline: none;
 }
 
 .optometry-table-natural input {
@@ -77,12 +95,12 @@ outline: none;
 }
 
 .optometry-table-natural.active input:focus {
-    background-color: var(--color-bg-b11);
-    color: var(--color-bg-b3);
+  background-color: var(--color-bg-b11);
+  color: var(--color-bg-b3);
   /* box-shadow: 0 0 15px var(--color-el-e); */
   border-bottom: 2px solid var(--color-el-m);
 }
 
 .optometry-table-natural.active p {
-    background: var(--color-bg-b1);
-};
+  background: var(--color-bg-b1);
+}

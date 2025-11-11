@@ -12,10 +12,10 @@ function OptometryNaturalVisus({
   const input3Ref = useRef(null);
   const [values, setValues] = useState(itemValues);
 
-  const handleChange = (value) => {
-    const newData = { ...values, note: value };
+  const handleChange = (key, value) => {
+    const newData = { ...values, [key]: value };
     setValues(newData);
-    onChange?.(newData); // pošle změnu zpět do rodiče
+    onChange?.(newData);
   };
 
   const handleKeyDown = (e) => {
@@ -27,10 +27,12 @@ function OptometryNaturalVisus({
 
   return (
     <>
-      <div>
-        <p>{itemValues.name}</p>
-      </div>
-
+      <input
+        value={values.name}
+        className={`modul-name ${isActive ? "active" : null}`}
+        type="numeric"
+        onChange={(e) => handleChange("name", e.target.value)}
+      />
       <div className={`optometry-table-natural ${isActive ? "active" : null}`}>
         <p className="desc">P</p>
         <input
@@ -40,7 +42,7 @@ function OptometryNaturalVisus({
           onChange={(e) => handleChange(e.target.value)}
         />
         <input
-        value={values.plV}
+          value={values.plV}
           className="inputData span-last"
           type="text"
           onChange={(e) => handleChange(e.target.value)}
@@ -48,7 +50,7 @@ function OptometryNaturalVisus({
 
         <p className="desc">L</p>
         <input
-        value={values.lV}
+          value={values.lV}
           className="inputData"
           type="text"
           onChange={(e) => handleChange(e.target.value)}
