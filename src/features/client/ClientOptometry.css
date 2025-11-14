@@ -1,21 +1,9 @@
-.optometry-container input {
-  width: auto;
-  height: 15px;
-  border-radius: 3px;
-  font-size: small;
-}
-
-.optometry-natural-vizus input {
-  width: 50px;
-}
-
 .optometry-container {
   display: flex;
   height: 100%;
   width: 100%;
   background: var(--color-bg-b3);
 }
-
 .optometry-left-container {
   flex: 4;
   justify-content: start;
@@ -29,7 +17,19 @@
   height: calc(100vh - 100px); /* nebo jiná výška */
   overflow: hidden; /* rodič bez scrollu */
 }
-
+.optometry-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 0px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  flex: 1;
+  /* padding: 10px; */
+  box-sizing: border-box;
+  margin: 0px;
+}
 .optometry-right-container {
   background: var(--color-bg-b2);
   flex: 1;
@@ -41,17 +41,62 @@
   z-index: 1;
   padding: 15px;
 }
-
 .optometry-right-container-head {
   text-align: center;
   margin-bottom: 10px;
 }
-
-
-.optometry-right-container-body p{
+.optometry-right-container-body p {
   margin-bottom: 10px;
 }
 
+/* OPTOMETRY MODUL*/
+.optometry-modul {
+  border: 1px solid var(--color-bg-b6);
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 1%;
+  margin-left: 1%;
+  margin-right: 1%;
+  height: 8.5vw;
+  min-width: 150px;
+  background: var(--color-bg-b3);
+  color: var(--color-bg-b12);
+  margin-bottom: 5px;
+  width: 100%;
+}
+.optometry-modul.active {
+  padding: 10px;
+  border: 2px solid var(--color-el-e);
+  box-shadow: 0 0 10px var(--color-el-e);
+  border: 1px solid var(--color-bg-b6);
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 1%;
+  margin-left: 1%;
+  margin-right: 1%;
+  height: 8.5vw;
+  min-width: 150px;
+  background: var(--color-bg-b1);
+  color: var(--color-bg-b12);
+  margin-bottom: 5px;
+}
+.optometry-item.move {
+  border: 4px solid var(--color-el-m);
+}
+.optometry-area .w25 {
+  width: 23%;
+}
+.optometry-area .w50 {
+  width: 48%;
+}
+.optometry-area .w75 {
+  width: 73%;
+}
+.optometry-area .w100 {
+  width: 98%;
+}
+
+/* CONTROL BAR*/
 .optometry-control-bar {
   display: flex;
   justify-content: space-around;
@@ -63,7 +108,6 @@
   /* min-width: 150px; */
   background: var(--color-bg-b1);
 }
-
 .optometry-control-bar-button {
   position: relative;
   flex-direction: row;
@@ -83,88 +127,168 @@
   right: 2px;
 }
 
-.nv-input:focus {
-  outline: none;
-  box-shadow: 0 0 15px var(--color-el-f);
-  border-color: transparent;
-  border-bottom: 2px solid var(--color-el-m);
-  /* border: 1px solid var(--color-el-m); */
-  transition: all 0.2s ease;
-}
-
-.optometry-info-box {
-  border: 1px solid var(--color-el-e);
-  padding: 16px;
-  border-radius: 8px;
-  margin-top: 16px;
-  margin-left: 16px;
-  width: 150px;
-  height: 150px;
-  min-width: 150px;
-  background: var(--color-bg-b1);
-}
-
-.optometry-area {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  gap: 0px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: 100%;
-  flex: 1;
-  /* padding: 10px; */
-  box-sizing: border-box;
-  margin: 0px;
-}
-.optometry-item {
-  border: 1px solid var(--color-bg-b6);
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 1%;
-  margin-left: 1%;
-  margin-right: 1%;
-  height: 8.5vw;
-  min-width: 150px;
+/* MODUL */
+.modul {
+  display: grid;
+  grid-template-rows: 1fr 5fr;
+  gap: 4px;
   background: var(--color-bg-b3);
-  color: var(--color-bg-b12);
-  margin-bottom: 5px;
-  width: 100%;
+  align-items: stretch;
+  margin-top: 0.1vw;
+  height: 100%;
 }
-
-.optometry-item.active {
-  padding: 10px;
-  border: 2px solid var(--color-el-e);
-  box-shadow: 0 0 10px var(--color-el-e);
-  border: 1px solid var(--color-bg-b6);
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 1%;
-  margin-left: 1%;
-  margin-right: 1%;
-  height: 8.5vw;
-  min-width: 150px;
+.modul.active {
   background: var(--color-bg-b1);
+}
+
+/* MODUL GRID MANAGEMENT */
+.grid-natural-visus {
+  display: grid;
+  grid-template-columns: 20% repeat(2, 1fr);
+  gap: 0px;
+  align-items: center;
+  background: var(--color-bg-b3);
+}
+.grid-refraction-ark {
+  display: grid;
+  grid-template-columns: 20% repeat(3, 1fr);
+  gap: 2px;
+  background: var(--color-bg-b3);
+  align-items: center;
+}
+.grid-refraction-full {
+  display: grid;
+  grid-template-columns: 6% repeat(8, 1fr);
+  gap: 2px;
+  column-gap: 7px;  
+  background: var(--color-bg-b3);
+  align-items: center;  
+}
+
+.grid-natural-visus.active, .grid-refraction-ark.active, .grid-refraction-full.active {
+  background: var(--color-bg-b1);
+}
+
+
+
+
+
+
+.modul .span-last {
+  grid-row: span 2;
+  height: 3.4vw;
+}
+
+
+/* MODUL NAME */
+.modul .modul-name {
+  font-size: clamp(var(--font-size-small), 0.9vw, var(--font-size-large));
+  background: var(--color-bg-b3);
+  color: var(--color-bg-b9);
+  border: none;
+  margin: 0;
+  font-weight: 400;
+  text-align: left;
+  width: 80%;
+  height: 1.2vw;
+  outline: none;
+}
+.modul.active .modul-name.active {
   color: var(--color-bg-b12);
-  margin-bottom: 5px;
+  background: var(--color-bg-b1);
+  border: none;
 }
 
-.optometry-item.move {
- border: 4px solid var(--color-el-m);
-
+/* MODUL DESC + DESC TABLE*/
+.modul .desc {
+  font-size: clamp(var(--font-size-small), 1.2vw, 1.5vw);
+  color: var(--color-bg-b11);
+  width: 3vw;
+  background: transparent;
 }
-
-.optometry-area .w25 {
-  width: 23%;
-}
-.optometry-area .w50 {
-  width: 48%;
-}
-.optometry-area .w75 {
-  width: 73%;
-}
-.optometry-area .w100 {
-  width: 98%;
+.modul .desc-table {
+  height: 1.1vw;
+  align-items: start;
+  background: transparent;
 }
 
 
+/* MODUL TEXTAREA*/
+.modul textarea {
+  font-size: clamp(var(--font-size-xsmall), 1vw, 1.1vw);
+  border: 1px solid var(--color-bg-b3);
+  border-radius: 0px;
+  color: var(--color-bg-b11);
+  /* font-weight: bold; */
+  width: 100%;
+  height: 100%;
+  padding: 0.2vw;
+  text-align: left;
+  background: var(--color-bg-b3);
+  outline: none;
+  resize: none;
+  box-sizing: border-box;
+  overflow-y: none;
+}
+.modul.active textarea {
+  color: var(--color-bg-b12);
+  background: var(--color-bg-b1);
+  border-radius: 4px;
+  outline: none;
+}
+.modul.active textarea:focus {
+  background-color: var(--color-bg-b11);
+  color: var(--color-bg-b3);
+  /* box-shadow: 0 0 15px var(--color-el-e); */
+  border-bottom: 2px solid var(--color-el-m);
+}
+
+/* MODUL INPUT - P*/
+.modul p,
+input {
+  height: 2.2vw; /* sjednocená výška */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* MODUL INPUT*/
+.modul input {
+  font-size: clamp(var(--font-size-xsmall), 1vw, 1.1vw);
+  border: 1px solid var(--color-bg-b3);
+  border-radius: 0px;
+  color: var(--color-bg-b9);
+  font-weight: bold;
+  width: 100%;
+  height: 1.7vw;
+  padding: 0.2vw;
+  text-align: center;
+  background: var(--color-bg-b3);
+}
+
+.modul.active input {
+  color: var(--color-bg-b12);
+  background: var(--color-bg-b1);
+  border-radius: 4px;
+  outline: none;
+}
+
+.modul.active input:focus {
+  background-color: var(--color-bg-b11);
+  color: var(--color-bg-b3);
+  /* box-shadow: 0 0 15px var(--color-el-e); */
+  border-bottom: 2px solid var(--color-el-m);
+}
+
+/* MODUL P*/
+.modul p {
+  font-size: clamp(var(--font-size-small), 0.9vw, 1vw);
+  background: var(--color-bg-b3);
+  text-align: center;
+  padding: 6px 4px;
+  font-weight: bold;
+  margin: 0;
+  color: var(--color-bg-b7);
+}

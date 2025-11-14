@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import "./OptometryNaturalVisus.css";
+
 
 function OptometryNaturalVisus({
   isActive,
@@ -26,37 +26,37 @@ function OptometryNaturalVisus({
   };
 
   return (
-    <>
-      <input
-        value={values.name}
-        className={`modul-name ${isActive ? "active" : null}`}
-        type="numeric"
-        onChange={(e) => handleChange("name", e.target.value)}
-      />
-      <div className={`optometry-table-natural ${isActive ? "active" : null}`}>
-        <p className="desc">P</p>
+    
+      <div className={`modul ${isActive ? "active" : ""}`}>
         <input
-          value={values.pV}
-          className="inputData"
-          type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          value={values.name}
+          className={`modul-name ${isActive ? "active" : ""}`}
+          type="numeric"
+          onChange={(e) => handleChange("name", e.target.value)}
         />
-        <input
-          value={values.plV}
-          className="inputData span-last"
-          type="text"
-          onChange={(e) => handleChange(e.target.value)}
-        />
+        <div className={`grid-natural-visus ${isActive ? "active" : ""}`}>
+          <p className="desc">P</p>
+          <input
+            value={values.pV}
+            type="text"
+            onChange={(e) => handleChange("pV", e.target.value)}
+          />
+          <input
+            value={values.bV}
+            className="span-last"
+            type="text"
+            onChange={(e) => handleChange("bV", e.target.value)}
+          />
 
-        <p className="desc">L</p>
-        <input
-          value={values.lV}
-          className="inputData"
-          type="text"
-          onChange={(e) => handleChange(e.target.value)}
-        />
+          <p className="desc">L</p>
+          <input
+            value={values.lV}
+            type="text"
+            onChange={(e) => handleChange("lV", e.target.value)}
+          />
+        </div>
       </div>
-    </>
+    
   );
 }
 

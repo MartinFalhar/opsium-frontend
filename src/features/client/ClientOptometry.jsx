@@ -12,12 +12,12 @@ function ClientOptometry() {
   const [optometryItems, setOptometryItems] = useState([
     {
       id: "1",
-      modul: "1",
+      modul: "1", 
       width: "w50",
       component: OptometryAnamnesis,
       values: {
         name: "Anamnéza",
-        note: "Požadavek na plnou korekci",
+        text: "Požadavek na plnou korekci",
       },
     },
     {
@@ -29,9 +29,9 @@ function ClientOptometry() {
         name: "Naturální vizus",
         pV: "1.25",
         lV: "1.25+",
-        plV: "2.0++",
+        bV: "2.0++",
         style: 0,
-        note: "",
+        text: "",
       },
     },
     {
@@ -41,13 +41,13 @@ function ClientOptometry() {
       component: OptometryRefractionARK,
       values: {
         name: "OBJEKTIVNÍ refrakce",
-        pSph: "-1.23",
-        pCyl: "-1.79",
-        pAx: "179",
-        lSph: "+6.85",
-        lCyl: "-1.47",
-        lAx: "123",
-        note: "",
+        pS: "-1.23",
+        pC: "-1.79",
+        pA: "179",
+        lS: "+6.85",
+        lC: "-1.47",
+        lA: "123",
+        text: "",
       },
     },
     {
@@ -57,23 +57,23 @@ function ClientOptometry() {
       component: OptometryRefractionFull,
       values: {
         name: "Refrakce - plný zápis",
-        pSph: "-3,75",
-        pCyl: "-4,50",
-        pAx: "180",
-        pPrism: "2,5",
-        pBase: "90",
+        pS: "-3,75",
+        pC: "-4,50",
+        pA: "180",
+        pP: "2,5",
+        pB: "90",
         pAdd: "-3,25",
-        lSph: "+4,50",
-        lCyl: "90",
-        lAx: "122",
-        lPrism: "2,5",
-        lBase: "270",
+        lS: "+4,50",
+        lC: "90",
+        lA: "122",
+        lP: "2,5",
+        lB: "270",
         lAdd: "+2,50",
         pV: "0,63+",
         lV: "0,8+",
-        plV: "1,25+",
+        bV: "1,25+",
         style: 0,
-        note: "",
+        text: "",
       },
     },
     {
@@ -83,21 +83,22 @@ function ClientOptometry() {
       component: OptometryRefractionFull,
       values: {
         name: "Refrakce - pohodlná korekce vzhledem k vysokému CYL",
-        pSph: -3.75,
-        pCyl: -4.5,
-        pAx: 180,
-        pPrism: 2.5,
-        pBase: 90,
+        pS: -3.75,
+        pC: -4.5,
+        pA: 180,
+        pP: 2.5,
+        pB: 90,
         pAdd: -3.25,
-        lSph: +4.5,
-        lCyl: 90,
-        lAx: 122,
-        lPrism: 2.5,
-        lBase: 270,
+        lS: +4.5,
+        lC: 90,
+        lA: 122,
+        lP: 2.5,
+        lB: 270,
         lAdd: +2.5,
         pV: 0.633,
         lV: 0.83,
-        plV: 1.253,
+        bV: 1.253,
+        text: "",
       },
     },
   ]);
@@ -113,14 +114,48 @@ function ClientOptometry() {
     );
   };
 
-  const handleSavetoDBF = () => {
-    const prepareExportData = [];
+  // const handleSavetoDBF = () => {
+  //   const prepareExportData = [];
 
-    optometryItems.map((modul) => {
-      console.log(`${JSON.stringify({ ...modul.values })}`);
+  //   optometryItems.map((modul) => {
+  //     console.log(`${JSON.stringify({ ...modul.values })}`);
+  //   });
+
+  // };
+
+  const handleSavetoDBF = () => {
+  const exportObject = {};
+
+  optometryItems.forEach((modul) => {
+    const key = `${modul.id}-${modul.modul}`;
+
+    const processedValues = {};
+
+    Object.entries(modul.values).forEach(([k, v]) => {
+      if (v === "" || v === null || v === undefined) {
+        // processedValues[k] = v; 
+        return;
+      }
+
+      // Nahrazení čárky tečkou
+      const normalized = typeof v === "string" ? v.replace(",", ".") : v;
+
+      // Je číslo?
+      const num = Number(normalized);
+
+      if (!isNaN(num)) {
+        processedValues[k] = Math.round(num * 100); // uložení jako INT ×100
+      } else {
+        processedValues[k] = v; // text se ukládá normálně
+      }
     });
-    console.log(optometryItems[0].values.note);
-  };
+
+    exportObject[key] = processedValues;
+  });
+
+  console.log(exportObject);
+  return exportObject;
+};
 
   // const [sph, setSph] = useState("");
   // const Component = menuComponent;
@@ -163,7 +198,7 @@ function ClientOptometry() {
               <div
                 key={item.id}
                 id={item.id}
-                className={`optometry-item ${item.width} ${
+                className={`optometry-modul ${item.width} ${
                   activeItem === item.id ? "active" : ""
                 } ${
                   activeElement == 0 && activeItem === item.id ? "move" : ""

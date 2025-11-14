@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./OptometryRefractionFull.css";
+// import "./OptometryRefractionFull.css";
 
 function OptometryRefractionFull({
   isActive,
@@ -26,12 +26,15 @@ function OptometryRefractionFull({
   // };
 
   return (
-    <>
-      <div>
-        <p>{itemValues.name}</p>
-      </div>
+    <div className={`modul ${isActive ? "active" : ""}`}>
+      <input
+        value={values.name}
+        className={`modul-name ${isActive ? "active" : ""}`}
+        type="numeric"
+        onChange={(e) => handleChange("name", e.target.value)}
+      />
 
-      <div className={`optometry-table-full ${isActive ? "active" : null}`}>
+      <div className={`grid-refraction-full ${isActive ? "active" : null}`}>
         <p className="desc-table"></p>
         <p className="desc-table">SPH</p>
         <p className="desc-table">CYL</p>
@@ -44,99 +47,85 @@ function OptometryRefractionFull({
 
         <p className="desc">P</p>
         <input
-          value={values.pSph}
-          className="inputData"
+          value={values.pS}
           type="text"
-          onChange={(e) => handleChange("pSph", e.target.value)}
+          onChange={(e) => handleChange("pS", e.target.value)}
         />
         <input
-          value={values.pCyl}
-          className="inputData"
+          value={values.pC}
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("pC", e.target.value)}
         />
         <input
-          value={values.pAx}
-          className="inputData"
+          value={values.pA}
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("pA", e.target.value)}
         />
         <input
-          value={values.pPrism}
-          className="inputData"
+          value={values.pP}
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("pP", e.target.value)}
         />
         <input
-          value={values.pBase}
-          className="inputData"
+          value={values.pB}
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("pB", e.target.value)}
         />
         <input
           value={values.pAdd}
-          className="inputData"
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("pAdd", e.target.value)}
         />
         <input
           value={values.pV}
-          className="inputData"
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("pV", e.target.value)}
         />
         <input
-          value={values.plV}
-          className="inputData span-last"
+          value={values.bV}
+          className="span-last"
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("bV", e.target.value)}
         />
 
         <p className="desc">L</p>
         <input
-          value={values.lSph}
-          className="inputData"
+          value={values.lS}
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("lS", e.target.value)}
         />
         <input
-          value={values.lCyl}
-          className="inputData"
+          value={values.lC}
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("lC", e.target.value)}
         />
         <input
-        value={values.lAx}
-          className="inputData"
+          value={values.lA}
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("lA", e.target.value)}
         />
         <input
-          value={values.lPrism}
-          className="inputData"
+          value={values.lP}
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("lP", e.target.value)}
         />
         <input
-        value={values.lBase}
-          className="inputData"
+          value={values.lB}
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("lB", e.target.value)}
         />
         <input
           value={values.lAdd}
-          className="inputData"
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("lAdd", e.target.value)}
         />
         <input
           value={values.lV}
-          className="inputData"
           type="text"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("lV", e.target.value)}
         />
       </div>
-    </>
+    </div>
   );
 }
 

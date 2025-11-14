@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import "./OptometryRefractionARK.css";
+// import "./OptometryRefractionARKz.css";
 
 function OptometryRefractionARK({ isActive, setActiveElement, itemValues, onChange }) {
   const [values, setValues] = useState(itemValues);
@@ -31,12 +31,15 @@ function OptometryRefractionARK({ isActive, setActiveElement, itemValues, onChan
   };
 
   return (
-    <>
-      <div>
-        <p>{itemValues.name}</p>
-      </div>
+    <div className={`modul ${isActive ? "active" : ""}`}>
+        <input
+          value={values.name}
+          className={`modul-name ${isActive ? "active" : ""}`}
+          type="numeric"
+          onChange={(e) => handleChange("name", e.target.value)}
+        />
 
-      <div className={`optometry-table-ark ${isActive ? "active" : ""}`}>
+      <div className={`grid-refraction-ark ${isActive ? "active" : ""}`}>
         {/* hlavička */}
         <p className="desc-table"></p>
         <p className="desc-table">SPH</p>
@@ -47,55 +50,50 @@ function OptometryRefractionARK({ isActive, setActiveElement, itemValues, onChan
         <p className="desc">P</p>
         <input
           ref={pSphRef}
-          value={values.pSph || ""}
-          className="inputData"
+          value={values.pS || ""}
           type="text"
-          onChange={(e) => handleChange("pSph", e.target.value)}
+          onChange={(e) => handleChange("pS", e.target.value)}
           onKeyDown={(e) => handleKeyDown(e, pCylRef)}
         />
         <input
           ref={pCylRef}
-          value={values.pCyl || ""}
-          className="inputData"
+          value={values.pC || ""}
           type="text"
-          onChange={(e) => handleChange("pCyl", e.target.value)}
+          onChange={(e) => handleChange("pC", e.target.value)}
           onKeyDown={(e) => handleKeyDown(e, pAxRef)}
         />
         <input
           ref={pAxRef}
-          value={values.pAx || ""}
-          className="inputData"
+          value={values.pA || ""}
           type="text"
-          onChange={(e) => handleChange("pAx", e.target.value)}
+          onChange={(e) => handleChange("pA", e.target.value)}
         />
 
         {/* levé oko */}
         <p className="desc">L</p>
         <input
           ref={lSphRef}
-          value={values.lSph || ""}
-          className="inputData"
+          value={values.lS || ""}
           type="text"
-          onChange={(e) => handleChange("lSph", e.target.value)}
+          onChange={(e) => handleChange("lS", e.target.value)}
           onKeyDown={(e) => handleKeyDown(e, lCylRef)}
         />
         <input
           ref={lCylRef}
-          value={values.lCyl || ""}
-          className="inputData"
+          value={values.lC || ""}
           type="text"
-          onChange={(e) => handleChange("lCyl", e.target.value)}
+          onChange={(e) => handleChange("lC", e.target.value)}
           onKeyDown={(e) => handleKeyDown(e, lAxRef)}
         />
         <input
           ref={lAxRef}
-          value={values.lAx || ""}
-          className="inputData"
+          value={values.lA || ""}
           type="text"
-          onChange={(e) => handleChange("lAx", e.target.value)}
+          onChange={(e) => handleChange("lA", e.target.value)}
         />
       </div>
-    </>
+      </div>
+    
   );
 }
 

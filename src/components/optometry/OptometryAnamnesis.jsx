@@ -1,5 +1,4 @@
 import { useState } from "react";
-import "./OptometryAnamnesis.css";
 
 function OptometryAnamnesis({
   isActive,
@@ -9,23 +8,25 @@ function OptometryAnamnesis({
 }) {
   const [values, setValues] = useState(itemValues);
 
-  const handleChange = (value) => {
-    const newData = { ...values, note: value };
+  const handleChange = (key, value) => {
+    const newData = { ...values, [key]: value };
     setValues(newData);
-    onChange?.(newData); // pošle změnu zpět do rodiče
+    onChange?.(newData);
   };
 
   return (
     <>
-      <div
-        className={`optometry-table-anamnesis ${isActive ? "active" : null}`}
-      >
-        <p>{itemValues.name}</p>
+      <div className={`modul ${isActive ? "active" : ""}`}>
+        <input
+          value={values.name}
+          className={`modul-name ${isActive ? "active" : ""}`}
+          type="numeric"
+          onChange={(e) => handleChange("name", e.target.value)}
+        />
         <textarea
           value={values.note}
-          className="input-textarea"
           placeholder={`Zde zadejte text...`}
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleChange("text", e.target.value)}
         />
       </div>
     </>
