@@ -1,5 +1,5 @@
 // import { useState } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./ClientOptometry.css";
 
 //IMPORT OPTOMETRY COMPONENT
@@ -12,7 +12,7 @@ function ClientOptometry() {
   const [optometryItems, setOptometryItems] = useState([
     {
       id: "1",
-      modul: "1", 
+      modul: "1",
       width: "w50",
       component: OptometryAnamnesis,
       values: {
@@ -105,6 +105,19 @@ function ClientOptometry() {
 
   const [activeItem, setActiveItem] = useState(null);
   const [activeElement, setActiveElement] = useState(null);
+  const [optometryRecordName, setOptometryRecordName] = useState(null);
+  const [date, setDate] = useState(new Date());
+
+  // Formát dne a datumu v češtině
+  const formattedDate = date.toLocaleDateString("cs-CZ", {
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+  });
+
+  useEffect(() => {
+    setOptometryRecordName(`Rx ${formattedDate}`);
+  }, []);
 
   const handleUpdateItem = (id, newValues) => {
     setOptometryItems((prevItems) =>
@@ -124,38 +137,39 @@ function ClientOptometry() {
   // };
 
   const handleSavetoDBF = () => {
-  const exportObject = {};
+    const exportObject = {};
 
-  optometryItems.forEach((modul) => {
-    const key = `${modul.id}-${modul.modul}`;
+    optometryItems.forEach((modul) => {
+      const key = `${modul.id}-${modul.modul}`;
 
-    const processedValues = {};
+      const processedValues = {};
 
-    Object.entries(modul.values).forEach(([k, v]) => {
-      if (v === "" || v === null || v === undefined) {
-        // processedValues[k] = v; 
-        return;
-      }
+      Object.entries(modul.values).forEach(([k, v]) => {
+        if (v === "" || v === null || v === undefined) {
+          //je-li prázdná hodnota, neukládá se nic
+          // processedValues[k] = v;
+          return;
+        }
 
-      // Nahrazení čárky tečkou
-      const normalized = typeof v === "string" ? v.replace(",", ".") : v;
+        // Nahrazení čárky tečkou
+        const normalized = typeof v === "string" ? v.replace(",", ".") : v;
 
-      // Je číslo?
-      const num = Number(normalized);
+        // Je číslo?
+        const num = Number(normalized);
 
-      if (!isNaN(num)) {
-        processedValues[k] = Math.round(num * 100); // uložení jako INT ×100
-      } else {
-        processedValues[k] = v; // text se ukládá normálně
-      }
+        if (!isNaN(num)) {
+          processedValues[k] = Math.round(num * 100); // uložení jako INT ×100
+        } else {
+          processedValues[k] = v; // text se ukládá normálně
+        }
+      });
+
+      exportObject[key] = processedValues;
     });
 
-    exportObject[key] = processedValues;
-  });
-
-  console.log(exportObject);
-  return exportObject;
-};
+    console.log(exportObject);
+    return exportObject;
+  };
 
   // const [sph, setSph] = useState("");
   // const Component = menuComponent;
@@ -180,15 +194,48 @@ function ClientOptometry() {
     <div className="optometry-container">
       <div className="optometry-left-container">
         {/* Horni MENU */}
-        <div className="optometry-control-bar">
-          <button className="optometry-control-bar-button">Vizus</button>
-          <button className="optometry-control-bar-button">ASTG</button>
-          <button className="optometry-control-bar-button">BINO</button>
-          <button className="optometry-control-bar-button">CLENS</button>
-          <button className="optometry-control-bar-button">MEDIC</button>
-          <button type="submit" onClick={handleSavetoDBF}>
-            Uložit
-          </button>
+        <div className="optometry-modul-container">
+          <div className="optometry-modul-panel">
+            <button className="menu-btn">DIOP</button>
+            <button className="menu-btn">ASTG</button>
+            <button className="menu-btn">FUNC</button>
+            <button className="menu-btn">BINO</button>
+            <button className="menu-btn">CLENS</button>
+            <button className="menu-btn">MEDIC</button>
+          </div>
+          <div className="optometry-modul-panel">
+            <button className="menu-btn">Rx</button>
+            <button className="menu-btn">Clens</button>
+            <button className="menu-btn">Bino</button>
+            <button className="menu-btn settings">...</button>
+          </div>
+          <div className="optometry-modul-panel">
+            <input
+              type="text"
+              value={optometryRecordName}
+              onChange={(e) => setSearchInStore(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearchInStore(searchInStore);
+                }
+              }}
+              placeholder={`Název vyšetření`}
+            />
+            <button
+              className="menu-btn-save"
+              type="submit"
+              onClick={handleSavetoDBF}
+            >
+              Uložit
+            </button>
+            <button
+              className="menu-btn-export"
+              type="submit"
+              onClick={handleSavetoDBF}
+            >
+              Export
+            </button>
+          </div>
         </div>
         <div className="optometry-area">
           {/* OPTOMETRY ITEMS */}

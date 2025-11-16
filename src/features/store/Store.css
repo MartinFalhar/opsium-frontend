@@ -9,14 +9,13 @@
   /* align-items: left; */
 }
 
-
 .store-list-container {
   flex: 1;
-  flex-wrap: wrap;           
+  flex-wrap: wrap;
   align-content: flex-start;
-  gap: 10px;                
-  overflow-y: auto;        
-  overflow-x: hidden;     
+  gap: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 10px;
   box-sizing: border-box;
 }

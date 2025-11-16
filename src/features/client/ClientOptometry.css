@@ -97,34 +97,34 @@
 }
 
 /* CONTROL BAR*/
-.optometry-control-bar {
+.optometry-modul-container {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  border: 1px solid var(--color-el-e);
+  /* border-bottom: 1px solid var(--color-el-e); */
+  /* border: 1px solid var(--color-el-e); */
   border-radius: 0px;
-  /* width: 98%; */
   height: 50px;
-  /* min-width: 150px; */
-  background: var(--color-bg-b1);
+  /* background: var(--color-grd-g13); */
+  background: var(--color-bg-b3);
+  /* z-index: 10; */
 }
-.optometry-control-bar-button {
-  position: relative;
-  flex-direction: row;
-  width: 10%;
-  height: 100%;
-  background: var(--color-bg-b1);
-  color: var(--color-bg-b11);
-  font-size: small;
-  gap: 10px;
-  /* border: 1px solid var(--color-bg-b2); */
-  border-radius: 0px;
+
+.optometry-modul-panel {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 2.8vw;
+  /* background: var(--color-bg-b1); */
 }
-.optometry-control-bar-button::after {
-  content: F1;
-  position: absolute;
-  top: 2px;
-  right: 2px;
+
+.optometry-modul-panel input {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  padding-left: 8px;
+  border: none;
+  height: clamp(1vw, 2vw, 3vw);
+  outline: none;
 }
 
 /* MODUL */
@@ -160,25 +160,21 @@
   display: grid;
   grid-template-columns: 6% repeat(8, 1fr);
   gap: 2px;
-  column-gap: 7px;  
+  column-gap: 7px;
   background: var(--color-bg-b3);
-  align-items: center;  
+  align-items: center;
 }
 
-.grid-natural-visus.active, .grid-refraction-ark.active, .grid-refraction-full.active {
+.grid-natural-visus.active,
+.grid-refraction-ark.active,
+.grid-refraction-full.active {
   background: var(--color-bg-b1);
 }
-
-
-
-
-
 
 .modul .span-last {
   grid-row: span 2;
   height: 3.4vw;
 }
-
 
 /* MODUL NAME */
 .modul .modul-name {
@@ -211,7 +207,6 @@
   align-items: start;
   background: transparent;
 }
-
 
 /* MODUL TEXTAREA*/
 .modul textarea {

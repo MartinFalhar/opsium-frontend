@@ -282,6 +282,75 @@ button {
   font-size: clamp(var(--font-size-small), 2.5vw, var(--font-size-regular));
 }
 
+.menu-btn {
+  position: relative;
+  font-size: small;
+  background-color: #282c34;
+  color: var(--color-bg-b9);
+  border: 1px solid #444;
+  border-radius: 0px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: clamp(2vw, 4vw, 6vw);
+  height: clamp(1vw, 2vw, 3vw);
+  background: var(--color-bg-b1);
+}
+
+.menu-btn:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.menu-btn:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.menu-btn:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.menu-btn.settings {
+  width: clamp(1vw, 2vw, 3vw);
+}
+
+.menu-btn::after {
+  content: ".";
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: x-small;
+}
+
+.menu-btn.active {
+  background: var(--color-grd-g2);
+  color: var(--color-bg-b1);
+  font-weight: bold;
+}
+
+.menu-btn:hover {
+  background: var(--color-bg-b2);
+}
+
+.menu-btn-save {
+  width: clamp(2vw, 4vw, 6vw);
+  height: clamp(1vw, 2vw, 3vw);
+  border-radius: 0px;
+  border: none;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.menu-btn-export {
+  width: clamp(2vw, 4vw, 6vw);
+  height: clamp(1vw, 2vw, 3vw);
+  border-radius: 8px;
+  border: none;
+  margin-left: 6px;
+}
+
 /* ----------- ICONS*/
 
 /* ----------- SUB-MAIN MENU CONTENT*/
@@ -329,7 +398,7 @@ button {
   justify-content: flex-start;
   gap: 10px;
   padding-left: 50px;
-  margin-top: 3px;
+  height: 50px;
 }
 
 /* ----------- SECONDARY MENU */

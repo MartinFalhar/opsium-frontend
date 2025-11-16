@@ -32,16 +32,16 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
 
       {pages.map((p, i) =>
         p === "..." ? (
-          <span key={i} className="pagination-ellipsis">…</span>
+          <span key={i} className="pagination-ellipsis">
+            …
+          </span>
         ) : (
           <button
             key={i}
             className={`pagination-btn ${p === currentPage ? "active" : ""}`}
             onClick={() => handlePageClick(p)}
             style={{
-                width: p > 1000 ? "55px":(
-                    p > 100 ? "45px" : "35px"
-                ),
+              width: p > 1000 ? "55px" : p > 100 ? "45px" : "35px",
             }}
           >
             {p}
