@@ -9,8 +9,16 @@ body {
   height: 100%;
   flex-direction: column;
   background: var(--color-bg-b3);
-
   background: var(--color-bg-b3);
+}
+
+.superadmin-dashboard-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: row;
+  /* justify-content: center; */
+  align-items: start;
 }
 
 .content-container {
@@ -62,4 +70,3 @@ body {
 .open-button:hover {
   background-color: #0056b3;
 }
-

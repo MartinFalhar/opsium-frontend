@@ -55,7 +55,6 @@ function SuperadminAdminPanel() {
       email: values.email,
       password: values.password,
       rights: 10,
-
     };
 
     try {

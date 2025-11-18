@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import "./Admin.css";
 import Modal from "../../components/modal/Modal.jsx";
 import { useUser } from "../../context/UserContext.jsx";
@@ -32,7 +32,7 @@ function AdminAccounts() {
       const res = await fetch(`${API_URL}/admin/users_list`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ organization: user.organization }),
+        body: JSON.stringify({ organization: user.id_organizations }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -59,7 +59,6 @@ function AdminAccounts() {
       //zde je USER organization z CONTEXTu, což je organization ADMINA, který uživatele vytváří
       organization: user.organization,
       rights: 1,
-      
     };
     try {
       const res = await fetch(`${API_URL}/admin/create_user`, {
@@ -94,15 +93,24 @@ function AdminAccounts() {
         />
       </div>
       <div className="clients-list-container">
-        
-        <h1>Nalezeno {users.length} uživatel{users.length  == 0 ? "ů" : (users.length === 1 ? "" : (users.length in [2,3,4] ? "é" : "ů"))}</h1>
+        <h1>
+          Nalezeno {users.length} uživatel
+          {users.length == 0
+            ? "ů"
+            : users.length === 1
+            ? ""
+            : users.length in [2, 3, 4]
+            ? "é"
+            : "ů"}
+        </h1>
 
-        {users?.length > 0 && (users?.map((client) => (
-          <div key={client.id} className="client-item" onClick={() => null}>
-            <h1>{`${client.name} ${client.surname} (${client.rights})`}</h1>
-            <p>{`Email: ${client.email} // ID Organizace: ${client.organization}`}</p>
-          </div>
-        )))}
+        {users?.length > 0 &&
+          users?.map((client) => (
+            <div key={client.id} className="client-item" onClick={() => null}>
+              <h1>{`${client.name} ${client.surname} (${client.rights})`}</h1>
+              <p>{`Email: ${client.email} // ID Organizace: ${client.organization}`}</p>
+            </div>
+          ))}
       </div>
       <div>
         {showModal && (

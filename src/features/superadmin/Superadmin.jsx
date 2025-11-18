@@ -16,7 +16,6 @@ import menuIcon from "../../styles/svg/mirror-line.svg";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Superadmin() {
-
   //předává data přihlášeného uživatele
   const { user } = useUser();
 
@@ -30,7 +29,7 @@ function Superadmin() {
     },
     {
       id: "2",
-      label: "SUP-ADMIN panel",
+      label: "ADMIN panel",
       rights: 0,
       component: SuperadminAdminPanel,
       icon: "eye",
@@ -49,20 +48,6 @@ function Superadmin() {
       component: SuperadminPassword,
       icon: "eye",
     },
-    {
-      id: "5",
-      label: "Správa uživatelů",
-      rights: 0,
-      component: SuperadminSubUser,
-      icon: "eye",
-    },
-    {
-      id: "6",
-      label: "ODHLÁSIT SE",
-      rights: 0,
-      component: SuperadminLogout,
-      icon: "eye",
-    },
   ];
 
   //nastavuje komponentu z menu
@@ -74,8 +59,6 @@ function Superadmin() {
   //zachycení kliku na tlačítko menu
   const [activeButton, setActiveButton] = useState(null);
 
-
-
   //handling kliků na tlačítka menu
   const handleClick = (button) => {
     setActiveButton(button.id);
@@ -83,7 +66,6 @@ function Superadmin() {
   };
 
   useEffect(() => {
-
     handleClick(buttons[0]);
   }, []);
 
@@ -106,9 +88,6 @@ function Superadmin() {
             <button
               key={button.id}
               id={button.id}
-              style={{
-                width: "200px",
-              }}
               className={`button-secondary-menu ${
                 activeButton === button.id ? "active" : ""
               } ${button.icon}`}
@@ -125,7 +104,7 @@ function Superadmin() {
       <div className="right-container">
         <h1>INFO</h1>
         <p>Jste přihlášen jako SuperAdmin.</p>
-        <pre>Organization:{user.organization}</pre>
+        <pre>Organization:{user.id_organizations}</pre>
       </div>
     </div>
   );
