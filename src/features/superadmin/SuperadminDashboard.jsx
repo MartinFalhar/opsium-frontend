@@ -27,7 +27,7 @@ function SuperadminDashboard({ userData }) {
   }, []);
 
   return (
-    <div className="superadmin-dashboard-container">
+    <div className="dashboard-container">
       <div className="info-box">
         <h2>Počet admin účtů:</h2>
         <h1>{opsiumInfo.countAdmin}</h1>

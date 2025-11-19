@@ -12,8 +12,9 @@ body {
   background: var(--color-bg-b3);
 }
 
-.superadmin-dashboard-container {
+.dashboard-container {
   display: flex;
+  flex-wrap: wrap;
   width: 100%;
   height: 100%;
   flex-direction: row;
