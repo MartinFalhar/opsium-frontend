@@ -31,7 +31,7 @@ function AdminMembers() {
         const res = await fetch(`${API_URL}/admin/members_list`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ organization: user.id }),
+          body: JSON.stringify({ organization: user?.id_organizations }),
         });
         const data = await res.json();
 
@@ -87,9 +87,9 @@ function AdminMembers() {
   };
 
   return (
-    <div className="superadmin-content-container ">
-      <div className="button-group">
-        <button onClick={() => setShowModal(true)}>New MEMBER</button>
+    <div className="admin-content-container ">
+      <div className="header-button-group">
+        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>Nový člen</button>
       </div>
       <div className="search-container">
         <input
@@ -116,7 +116,7 @@ function AdminMembers() {
           members?.map((member) => (
             <div key={member.id} className="client-item" onClick={() => null}>
               <h1>{`${member.name} ${member.surname}`}</h1>
-              <p>{`Nick: ${member.nick} // ID parent: ${member.id_admin}`}</p>
+              <p>{`Nick: ${member.nick} #${member.pin} | ID Organizace: ${member.id_organizations}`}</p>
             </div>
           ))}
       </div>

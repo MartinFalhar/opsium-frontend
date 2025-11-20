@@ -76,9 +76,9 @@ function SuperadminAdminPanel() {
   };
 
   return (
-    <div className="superadmin-content-container ">
-      <div className="button-group">
-        <button onClick={() => setShowModal(true)}>New ADMIN</button>
+    <div className="admin-content-container ">
+      <div className="header-button-group">
+        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>Nový admin</button>
       </div>
       <div className="search-container">
         <input
@@ -94,7 +94,7 @@ function SuperadminAdminPanel() {
         {users.map((client) => (
           <div key={client.id} className="client-item" onClick={() => null}>
             <h1>{`${client.name} ${client.surname} (${client.rights})`}</h1>
-            <p>{`Email: ${client.email} // ID Organizace: ${client.organization}`}</p>
+            <p>{`Email: ${client.email} || ID Organizace: ${client.id_organizations}`}</p>
           </div>
         ))}
       </div>

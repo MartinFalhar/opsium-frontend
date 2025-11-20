@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useInsertionEffect } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function SuperadminDashboard({ userData }) {
+function SuperadminDashboard( ) {
   const [opsiumInfo, setOpsiumInfo] = useState({});
   const [error, setError] = useState(null);
 
@@ -19,7 +18,7 @@ function SuperadminDashboard({ userData }) {
       if (res.ok) {
         setOpsiumInfo(info);
       } else {
-        setError(data.message);
+        setError(info.message);
         console.error("Error loading users:", error);
       }
     };
@@ -27,26 +26,46 @@ function SuperadminDashboard({ userData }) {
   }, []);
 
   return (
-    <div className="dashboard-container">
+    <div className="admin-dashboard-container">
       <div className="info-box">
-        <h2>Počet admin účtů:</h2>
-        <h1>{opsiumInfo.countAdmin}</h1>
+        <div className="info-box-header">
+          <h2>Adminů</h2>
+        </div>
+        <div className="info-box-content">
+          <h5>{opsiumInfo.countAdmin}</h5>
+        </div>
       </div>
       <div className="info-box">
-        <h3>Počet všech účtů:</h3>
-        <h1>{opsiumInfo.countTotal}</h1>
+        <div className="info-box-header">
+          <h3>Účtů</h3>
+        </div>
+        <div className="info-box-content">
+          <h5>{opsiumInfo.countTotal}</h5>
+        </div>
       </div>
       <div className="info-box">
-        <h4>Počet poboček:</h4>
-        <h1>{opsiumInfo.countTotalBranches}</h1>
+        <div className="info-box-header">
+          <h4>Poboček</h4>
+        </div>
+        <div className="info-box-content">
+          <h5>{opsiumInfo.countTotalBranches}</h5>
+        </div>
       </div>
       <div className="info-box">
-        <h5>Počet členů:</h5>
-        <h1>{opsiumInfo.countTotalMembers}</h1>
+        <div className="info-box-header">
+          <h5>Členů</h5>
+        </div>
+        <div className="info-box-content">
+          <h5>{opsiumInfo.countTotalMembers}</h5>
+        </div>
       </div>
       <div className="info-box">
-        <h6>Počet klientů:</h6>
-        <h1>{opsiumInfo.countTotalClients}</h1>
+        <div className="info-box-header">
+          <h6>Klientů</h6>
+        </div>
+        <div className="info-box-content">
+          <h5>{opsiumInfo.countTotalClients}</h5>
+        </div>
       </div>
     </div>
   );

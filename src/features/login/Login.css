@@ -12,7 +12,7 @@
 
 @keyframes spin {
   0% {
-    --rotate: 0deg;
+    --rotate: 0deg; 
   }
   100% {
     --rotate: 360deg;
@@ -144,6 +144,7 @@ body {
   padding: 0 20px;
   margin: 10px 0;
   font-size: clamp(var(--font-size-small), 1vw, var(--font-size-large));
+  overflow: none;
 }
 
 .hero-text {

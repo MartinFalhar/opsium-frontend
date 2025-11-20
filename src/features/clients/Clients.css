@@ -39,6 +39,7 @@ body {
 .clients-list-container {
   padding-left: 50px;
   padding-right: 50px;
+  margin-top: 10px;
 }
 
 .client-item {

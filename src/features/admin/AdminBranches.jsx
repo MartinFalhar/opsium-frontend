@@ -9,16 +9,13 @@ function AdminBranches() {
   const { user } = useUser();
   const fields = [
     { varName: "name", label: "Jméno", input: "text", required: true },
-    { varName: "surname", label: "Příjmení", input: "text", required: true },
-    { varName: "email", label: "Email", input: "email", required: true },
-    { varName: "password", label: "Heslo", input: "password", required: true },
-    {
-      varName: "passwordCheck",
-      label: "Znovu heslo",
-      input: "password",
-      required: true,
-    },
+    { varName: "street", label: "Ulice", input: "text", required: true },
+    { varName: "city", label: "Město", input: "text", required: true },
+    { varName: "postal_code", label: "PSČ", input: "text", required: true },
   ];
+
+
+
 
   const [searchClient, setSearchClient] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -29,10 +26,10 @@ function AdminBranches() {
   //načtení uživatelů z DB
   useEffect(() => {
     const loadUsers = async () => {
-      const res = await fetch(`${API_URL}/admin/users_list`, {
+      const res = await fetch(`${API_URL}/admin/branches_list`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ organization: user.organization }),
+        body: JSON.stringify({ organization: user.id_organizations }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -51,21 +48,21 @@ function AdminBranches() {
       return;
     }
 
-    const newUser = {
+    const newBranche = {
       name: values.name,
-      surname: values.surname,
-      email: values.email,
-      password: values.password,
+      street: values.street,
+      city: values.city,
+      post_code: values.post_code,
+      
       //zde je USER organization z CONTEXTu, což je organization ADMINA, který uživatele vytváří
-      organization: user.organization,
-      rights: 1,
+      organization: user.id_organizations,  
       
     };
     try {
-      const res = await fetch(`${API_URL}/admin/create_user`, {
+      const res = await fetch(`${API_URL}/admin/createBranche`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newUser),
+        body: JSON.stringify(newBranche),
       });
 
       if (res.ok) {
@@ -81,8 +78,8 @@ function AdminBranches() {
 
   return (
     <div className="superadmin-content-container ">
-      <div className="button-group">
-        <button onClick={() => setShowModal(true)}>New USER</button>
+      <div className="header-button-group">
+        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>Nová pobočka</button>
       </div>
       <div className="search-container">
         <input
@@ -99,8 +96,8 @@ function AdminBranches() {
 
         {users?.length > 0 && (users?.map((client) => (
           <div key={client.id} className="client-item" onClick={() => null}>
-            <h1>{`${client.name} ${client.surname} (${client.rights})`}</h1>
-            <p>{`Email: ${client.email} // ID Organizace: ${client.organization}`}</p>
+            <h1>{`${client.name}, ${client.street}, ${client.postal_code} ${client.city}`}</h1>
+            <p>{`Email: ${client.email} | Telefon: ${client.phone} | Otevírací doba: ${client.open_hours} | ID Organizace: ${client.id_organizations}`}</p>
           </div>
         )))}
       </div>

@@ -57,7 +57,7 @@ function AdminAccounts() {
       email: values.email,
       password: values.password,
       //zde je USER organization z CONTEXTu, což je organization ADMINA, který uživatele vytváří
-      organization: user.organization,
+      id_organizations: user.id_organizations,
       rights: 1,
     };
     try {
@@ -79,9 +79,9 @@ function AdminAccounts() {
   };
 
   return (
-    <div className="superadmin-content-container ">
-      <div className="button-group">
-        <button onClick={() => setShowModal(true)}>New USER</button>
+    <div className="admin-content-container ">
+      <div className="header-button-group">
+        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>Nový účet</button>
       </div>
       <div className="search-container">
         <input
@@ -108,7 +108,7 @@ function AdminAccounts() {
           users?.map((client) => (
             <div key={client.id} className="client-item" onClick={() => null}>
               <h1>{`${client.name} ${client.surname} (${client.rights})`}</h1>
-              <p>{`Email: ${client.email} // ID Organizace: ${client.organization}`}</p>
+              <p>{`Email: ${client.email} | ID Organizace: ${client.id_organizations}`}</p>
             </div>
           ))}
       </div>

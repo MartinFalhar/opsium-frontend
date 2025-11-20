@@ -33,16 +33,16 @@ function Admin() {
     },
     {
       id: "3",
-      label: "Členové",
+      label: "Pobočky",
       rights: 0,
-      component: AdminMembers,
+      component: AdminBranches,
       icon: "eye",
     },
     {
       id: "4",
-      label: "Pobočky",
+      label: "Členové",
       rights: 0,
-      component: AdminBranches,
+      component: AdminMembers,
       icon: "eye",
     },
 
