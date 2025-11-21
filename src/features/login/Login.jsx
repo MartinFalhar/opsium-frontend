@@ -15,7 +15,8 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { setUser, setMembers } = useUser();
+
+  const { setUser, setMembers, setBranch } = useUser();
   const [heroImg, setHeroImg] = useState(null);
 
   const [imageSrc, setImageSrc] = useState(null);
@@ -149,6 +150,7 @@ function Login() {
         await setUser(data);
         //Pokud je vše v pořádku, stáhnu si
         //seznam členů pro daný USER-ACCOUNT
+        await setBranch(data.id_branch);
         await loadMembers(data.id);
         // Zkontrolujeme, jestli se uložil do localStorage
         console.log(

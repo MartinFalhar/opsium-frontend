@@ -132,10 +132,10 @@ function MainHeader() {
                 onMouseLeave={() => setHoveredItemId(null)}
               >
                 <p>
-                  <strong>{`${client.degree_front} ${client.name} ${client.surname} ${client.degree_post}`}</strong>{" "}
+                  <strong>{`${client.degree_before} ${client.name} ${client.surname}, ${client.degree_after}`}</strong>{" "}
                 </p>
 
-                <p>{`${client.street}, ${client.city} (${client.id}/${client.id_user})`}</p>
+                <p>{`${client.street}, ${client.city} (${client.id}/${client.id_organizations})`}</p>
                 {/* <p>
                   {activeItemId === client.id
                     ? `nar.: ${new Date(client.birth_date).toLocaleDateString(

@@ -54,8 +54,9 @@
   border-radius: 5px;
   display: flex;
   flex-direction: column;
-  align-items: left;
-  padding: 10px;
+  align-items: flex-start;
+  padding-top: 5px;
+  padding-left: 9px;
   color: white;
   border: 0.5px solid var(--color-bg-b6);
   background: var(--color-bg-b1);
@@ -63,6 +64,7 @@
 }
 
 .header-client-item p {
+  font-size: clamp(var(--font-size-small), 0.9vw, var(--font-size-regular));
   color: var(--color-bg-b10);
 }
 

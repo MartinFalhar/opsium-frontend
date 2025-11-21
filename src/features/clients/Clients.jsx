@@ -13,7 +13,7 @@ function Clients() {
 
   const fields = [
     {
-      varName: "degree_front",
+      varName: "degree_before",
       label: "Titul před",
       input: "text",
       required: false,
@@ -21,7 +21,7 @@ function Clients() {
     { varName: "name", label: "Jméno", input: "text", required: true },
     { varName: "surname", label: "Příjmení", input: "text", required: true },
     {
-      varName: "degree_post",
+      varName: "degree_after",
       label: "Titul za",
       input: "text",
       required: false,
@@ -53,7 +53,7 @@ function Clients() {
         const res = await fetch(`${API_URL}/client/clients`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: user.id }),
+          body: JSON.stringify({ id_organizations: user.id_organizations }),
         });
         const data = await res.json();
         if (res.ok) {
@@ -73,12 +73,12 @@ function Clients() {
 
   const handleSubmit = async (values) => {
     const newClient = {
-      degree_front: values.degree_front,
+      degree_before: values.degree_before,
       name: values.name,
       surname: values.surname,
-      degree_post: values.degree_post,
+      degree_after: values.degree_after,
       birth_date: values.birth_date,
-      id_user: user.id,
+      id_organizations: user.id_organizations,
     };
     console.log("New client to add:", newClient);
 
@@ -127,7 +127,7 @@ function Clients() {
               onClick={() => addClient(client)}
             >
               <h1>
-                {`${client.degree_front} ${client.name} ${client.surname} ${client.degree_post}`}{" "}
+                {`${client.degree_before} ${client.name} ${client.surname}, ${client.degree_after}`}{" "}
               </h1>
               <p>{`${client.street} ${client.city} ${client.post_code}`}</p>
             </div>

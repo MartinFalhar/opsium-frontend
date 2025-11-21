@@ -1,5 +1,7 @@
 // import { useState } from "react";
 import { useEffect, useState } from "react";
+import { useUser } from "../../context/UserContext";
+
 import "./ClientOptometry.css";
 
 //IMPORT OPTOMETRY COMPONENT
@@ -9,6 +11,8 @@ import OptometryRefractionARK from "../../components/optometry/OptometryRefracti
 import OptometryRefractionFull from "../../components/optometry/OptometryRefractionFull";
 
 function ClientOptometry() {
+
+  const { user, headerClients, members} = useUser();
   const [optometryItems, setOptometryItems] = useState([
     {
       id: "1",
@@ -124,7 +128,7 @@ function ClientOptometry() {
       prevItems.map((item) =>
         item.id === id ? { ...item, values: newValues } : item
       )
-    );
+    ); 
   };
 
   // const handleSavetoDBF = () => {
@@ -168,7 +172,10 @@ function ClientOptometry() {
     });
 
     console.log(exportObject);
-    return exportObject;
+    console.log(user.id);
+    console.log(user.id_organizations);
+    console.log(user.id_branch);
+    // return exportObject;
   };
 
   // const [sph, setSph] = useState("");

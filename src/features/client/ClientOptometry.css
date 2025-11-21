@@ -121,6 +121,8 @@
 .optometry-modul-panel input {
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
   padding-left: 8px;
   border: none;
   height: clamp(1vw, 2vw, 3vw);
@@ -143,7 +145,7 @@
 
 /* MODUL GRID MANAGEMENT */
 .grid-natural-visus {
-  display: grid;
+  display: grid; 
   grid-template-columns: 20% repeat(2, 1fr);
   gap: 0px;
   align-items: center;
