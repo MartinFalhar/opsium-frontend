@@ -1,4 +1,4 @@
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
@@ -16,7 +16,7 @@ function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const { setUser, setMembers, setBranch } = useUser();
+  const { setUser, setMembers } = useUser();
   const [heroImg, setHeroImg] = useState(null);
 
   const [imageSrc, setImageSrc] = useState(null);
@@ -121,10 +121,91 @@ function Login() {
         const dataMember = await res.json();
 
         if (res.ok) {
+          console.log("Members loaded:", dataMember);
           setMembers(dataMember);
         } else {
           setError(dataMember.message);
           console.error("Error loading users:", error);
+        }
+      } catch (err) {
+        console.error("Chyba při načítání:", err);
+        setError("Chyba při načítání dat.");
+      } finally {
+        // vypneme loader
+        setIsLoading(false);
+      }
+    };
+
+    const loadOrganizationInfo = async (id_organizations) => {
+      try {
+        const res = await fetch(`${API_URL}/admin/organizationInfo`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id_organizations: id_organizations }),
+        });
+        const dataOrganization = await res.json();
+
+        if (res.ok) {
+          console.log("Organization info loaded:", dataOrganization);
+          setUser((prev) => {
+            const next = {
+              ...(prev || {}), // prev může být null/undefined
+              organization_name: dataOrganization?.name ?? "",
+              organization_street: dataOrganization?.street ?? "",
+              organization_city: dataOrganization?.city ?? "",
+              organization_ico: dataOrganization?.ico ?? "",
+              organization_dic: dataOrganization?.dic ?? "",
+              organization_postal_code: dataOrganization?.postal_code ?? "",
+              organization_country: dataOrganization?.country ?? "",
+              organization_phone: dataOrganization?.phone ?? "",
+              organization_email: dataOrganization?.email ?? "",
+            };
+            return next;
+          });
+        } else {
+          setError(dataOrganization.message);
+          console.error("Error loading organization info:", error);
+        }
+      } catch (err) {
+        console.error("Chyba při načítání:", err);
+        setError("Chyba při načítání dat.");
+      } finally {
+        // vypneme loader
+        setIsLoading(false);
+      }
+    };
+
+    const loadBranchInfo = async (id_user) => {
+      try {
+        const res = await fetch(`${API_URL}/admin/branchInfo`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id_user: id_user }),
+        });
+        const dataBranch = await res.json();
+
+
+        if (res.ok) {
+          console.log("Branch info loaded:", dataBranch);
+          setUser((prev) => {
+            const next = {
+              ...(prev || {}), // prev může být null/undefined
+              branch_id: dataBranch?.id ?? 0,
+              branch_name: dataBranch?.name ?? "HULK",
+              branch_street: dataBranch?.street ?? "",
+              branch_city: dataBranch?.city ?? "",
+              branch_ico: dataBranch?.ico ?? "",
+              branch_dic: dataBranch?.dic ?? "",
+              branch_postal_code: dataBranch?.postal_code ?? "",
+              branch_country: dataBranch?.country ?? "",
+              branch_phone: dataBranch?.phone ?? "",
+              branch_email: dataBranch?.email ?? "",
+            };
+            return next;
+          });
+        } else {
+          setError(dataBranch.message);
+          console.error("Error loading branch info:", error);
         }
       } catch (err) {
         console.error("Chyba při načítání:", err);
@@ -142,25 +223,35 @@ function Login() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      const user = await res.json();
       if (res.ok) {
         // localStorage.setItem("token", data.token);
         // nebo cookie, podle implementace
-
-        await setUser(data);
+        await setUser(user);
+        console.log(`Login successful, user data:", ${user}`);
         //Pokud je vše v pořádku, stáhnu si
         //seznam členů pro daný USER-ACCOUNT
-        await setBranch(data.id_branch);
-        await loadMembers(data.id);
+
+        //******** */
+        // await loadBranch(data.id_organizations);
+        //******** */
+
+        await loadMembers(user.id);
+
+        await loadOrganizationInfo(user.id_organizations);
+        
+        await loadBranchInfo(user.id);
+
+
         // Zkontrolujeme, jestli se uložil do localStorage
         console.log(
           "Co je v localStorage po přihlášení USER:",
           JSON.parse(localStorage.getItem("user"))
         );
 
-        navigate("/clients"); // přesměrování na domovskou stránku s právy
+        navigate("/dashboard"); // přesměrování na domovskou stránku s právy
       } else {
-        setError(data.message);
+        setError(user.message);
       }
     } catch (err) {
       console.error("Fetch error:", err);
@@ -186,8 +277,12 @@ function Login() {
             placeholder="Heslo"
           />
           <PuffLoaderSpinnerDark active={isLoading} />
-          {isLoading && <p className="p-dbf-info">Chvíli strpení, aktivuji databázi..</p>}
-          {isLoading && <p className="p-dbf-info">Může to trvat více jak 30 sekund. :-)</p>}
+          {isLoading && (
+            <p className="p-dbf-info">Chvíli strpení, aktivuji databázi..</p>
+          )}
+          {isLoading && (
+            <p className="p-dbf-info">Může to trvat více jak 30 sekund. :-)</p>
+          )}
 
           {!isLoading && (
             <button type="submit" style={{ marginTop: "30px" }}>

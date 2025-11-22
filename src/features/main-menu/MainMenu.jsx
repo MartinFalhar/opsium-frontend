@@ -17,6 +17,13 @@ const login_button = {
 
 const buttons = [
   {
+    id: "dashboard",
+    label: "Přehled",
+    rights: 1,
+    path: "/dashboard",
+    icon: "dashboard",
+  },
+  {
     id: "clients",
     label: "Klienti",
     rights: 1,

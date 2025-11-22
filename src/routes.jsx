@@ -10,8 +10,8 @@ import Client from "./features/client/Client";
 import Vistraining from "./features/vistraining/Vistraining";
 import VistrainingLayout from "./layouts/VistrainingLayout";
 
+import Dashboard from "./features/dashboard/Dashboard";
 import Clients from "./features/clients/Clients";
-
 import Shop from "./features/shop/Shop";
 import Assistant from "./features/assistant/Assistant";
 import Store from "./features/store/Store";
@@ -41,6 +41,7 @@ export default function RoutesConfig() {
         <Route path="/" element={<HomePage />} />
         <Route path="/logout" element={<Logout />} />
 
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/clients" element={<Clients />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/assistant" element={<Assistant />} />

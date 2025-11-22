@@ -78,7 +78,7 @@ function AdminBranches() {
   return (
     <div className="superadmin-content-container ">
       <div className="header-button-group">
-        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>Nová pobočka</button>
+        {/* <button className="admin-menu-btn" onClick={() => setShowModal(true)}>Nová pobočka</button> */}
       </div>
       <div className="search-container">
         <input

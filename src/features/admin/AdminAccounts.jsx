@@ -18,6 +18,15 @@ function AdminAccounts() {
       input: "password",
       required: true,
     },
+    {
+      varName: "branch_name",
+      label: "Název nové pobočky, která se bude tímto účtem spravovat",
+      input: "text",
+      required: true,
+    },
+    { varName: "street", label: "Ulice", input: "text", required: true },
+    { varName: "city", label: "Město", input: "text", required: true },
+    { varName: "postal_code", label: "PSČ", input: "text", required: true },
   ];
 
   const [searchClient, setSearchClient] = useState("");
@@ -59,6 +68,10 @@ function AdminAccounts() {
       //zde je USER organization z CONTEXTu, což je organization ADMINA, který uživatele vytváří
       id_organizations: user.id_organizations,
       rights: 1,
+      branch_name: values.branch_name,
+      street: values.street,
+      city: values.city,
+      postal_code: values.postal_code,
     };
     try {
       const res = await fetch(`${API_URL}/admin/create_user`, {
@@ -81,7 +94,9 @@ function AdminAccounts() {
   return (
     <div className="admin-content-container ">
       <div className="header-button-group">
-        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>Nový účet</button>
+        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>
+          Nový účet
+        </button>
       </div>
       <div className="search-container">
         <input

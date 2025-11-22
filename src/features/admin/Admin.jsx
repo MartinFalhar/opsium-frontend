@@ -6,6 +6,7 @@ import "./Admin.css";
 
 
 import AdminDashboard from "./AdminDashboard";
+import AdminOrganization from "./AdminOrganization";
 import AdminAccounts from "./AdminAccounts";
 import AdminMembers from "./AdminMembers";
 import AdminBranches from "./AdminBranches";
@@ -26,20 +27,27 @@ function Admin() {
     },
     {
       id: "2",
+      label: "Organizace",
+      rights: 0,
+      component: AdminOrganization,
+      icon: "clients",
+    },
+    {
+      id: "3",
       label: "Účty",
       rights: 0,
       component: AdminAccounts,
       icon: "eye",
     },
     {
-      id: "3",
+      id: "4",
       label: "Pobočky",
       rights: 0,
       component: AdminBranches,
       icon: "eye",
     },
     {
-      id: "4",
+      id: "5",
       label: "Členové",
       rights: 0,
       component: AdminMembers,
@@ -111,6 +119,7 @@ function Admin() {
       </div>
       <div className="right-container">
         <h1>INFO</h1>
+        
       </div>
     </div>
   );

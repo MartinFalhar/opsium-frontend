@@ -8,7 +8,7 @@ function SuperadminDashboard( ) {
 
   useEffect(() => {
     const getOpsiumInfo = async () => {
-      const res = await fetch(`${API_URL}/admin/opsiumInfo`, {
+      const res = await fetch(`${API_URL}/admin/superadminInfo`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
