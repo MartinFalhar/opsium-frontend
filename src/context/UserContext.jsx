@@ -6,6 +6,10 @@ export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [headerClients, setHeaderClients] = useState([]);
   const [members, setMembers] = useState([]);
+  const [activeId, setActiveId] = useState({
+    id_member: null,
+    id_client: null,
+  });
 
   // Načtení uživatele z localStorage při startu aplikace
   useEffect(() => {
@@ -33,6 +37,8 @@ export function UserProvider({ children }) {
         setHeaderClients,
         members,
         setMembers,
+        activeId,
+        setActiveId,
       }}
     >
       {children}

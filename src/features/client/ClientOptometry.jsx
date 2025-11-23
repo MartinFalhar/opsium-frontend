@@ -11,8 +11,7 @@ import OptometryRefractionARK from "../../components/optometry/OptometryRefracti
 import OptometryRefractionFull from "../../components/optometry/OptometryRefractionFull";
 
 function ClientOptometry() {
-
-  const { user, headerClients, members} = useUser();
+  const { user, headerClients, activeId } = useUser();
   const [optometryItems, setOptometryItems] = useState([
     {
       id: "1",
@@ -109,7 +108,7 @@ function ClientOptometry() {
 
   const [activeItem, setActiveItem] = useState(null);
   const [activeElement, setActiveElement] = useState(null);
-  const [optometryRecordName, setOptometryRecordName] = useState(null);
+  const [optometryRecordName, setOptometryRecordName] = useState("");
   const [date, setDate] = useState(new Date());
 
   // Formát dne a datumu v češtině
@@ -128,7 +127,7 @@ function ClientOptometry() {
       prevItems.map((item) =>
         item.id === id ? { ...item, values: newValues } : item
       )
-    ); 
+    );
   };
 
   // const handleSavetoDBF = () => {
@@ -172,9 +171,9 @@ function ClientOptometry() {
     });
 
     console.log(exportObject);
-    console.log(user.id);
-    console.log(user.id_organizations);
-    console.log(user.id_branch);
+    console.log(`ID CLIENT ${activeId.id_client}`);
+    console.log(`ID BRANCH ${user.branch_id}`);
+    console.log(`ID MEMEBER ${activeId.id_member}`);
     // return exportObject;
   };
 
@@ -219,11 +218,12 @@ function ClientOptometry() {
           <div className="optometry-modul-panel">
             <input
               type="text"
-              value={optometryRecordName}
-              onChange={(e) => setSearchInStore(e.target.value)}
+              value={optometryRecordName ?? ""}
+              onChange={(e) => setOptometryRecordName(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  handleSearchInStore(searchInStore);
+                  e.preventDefault();
+                  handleSavetoDBF();
                 }
               }}
               placeholder={`Název vyšetření`}

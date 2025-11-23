@@ -50,10 +50,10 @@ function Clients() {
   useEffect(() => {
     const loadClients = async () => {
       try {
-        const res = await fetch(`${API_URL}/client/clients`, {
+        const res = await fetch(`${API_URL}/client/clients_list`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id_organizations: user.id_organizations }),
+          body: JSON.stringify({ id_branch: user.branch_id }),
         });
         const data = await res.json();
         if (res.ok) {
@@ -67,7 +67,6 @@ function Clients() {
         setError("Nepodařilo se načíst klienty.");
       }
     };
-    console.log(user.id);
     loadClients();
   }, []);
 
@@ -120,18 +119,19 @@ function Clients() {
         </div>
         <div className="clients-list-container">
           <h1>Nalezeno {clients.length} klientů</h1>
-          {clients.length > 0 && clients.map((client) => (
-            <div
-              key={client.id}
-              className="client-item"
-              onClick={() => addClient(client)}
-            >
-              <h1>
-                {`${client.degree_before} ${client.name} ${client.surname}, ${client.degree_after}`}{" "}
-              </h1>
-              <p>{`${client.street} ${client.city} ${client.post_code}`}</p>
-            </div>
-          ))}
+          {clients.length > 0 &&
+            clients.map((client) => (
+              <div
+                key={client.id}
+                className="client-item"
+                onClick={() => addClient(client)}
+              >
+                <h1>
+                  {`${client.degree_before} ${client.name} ${client.surname}, ${client.degree_after}`}{" "}
+                </h1>
+                <p>{`${client.street} ${client.city} ${client.post_code} DB ID: ${client.id}`}</p>
+              </div>
+            ))}
         </div>
       </div>{" "}
       <div>

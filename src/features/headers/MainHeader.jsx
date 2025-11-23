@@ -18,12 +18,36 @@ function MainHeader() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { members, headerClients, setHeaderClients } = useUser();
+  const { members, headerClients, setHeaderClients, setActiveId } = useUser();
 
   const handleClientLayout = (clientID) => {
-    navigate(`/client/${clientID}`);
+    // set active client id in global context (DB id)
+
+    setActiveId((prev) => ({
+      ...prev,
+      id_client: 123,
+    }));
+
     setActiveItemId(clientID);
+    navigate(`/client/${clientID}`);
   };
+
+  // synchronizuje klienta v URL s aktivním klientem v headeru
+  useEffect(() => {
+    if (!location || !location.pathname) return;
+    const match = location.pathname.match(/\/client\/(.+)$/);
+    if (match) {
+      const idFromUrl = match[1];
+      // prefer number when possible
+      const parsed = isNaN(Number(idFromUrl)) ? idFromUrl : Number(idFromUrl);
+      setActiveItemId(parsed);
+
+      setActiveId((prev) => ({
+        ...prev,
+        id_client: parsed,
+      }));
+    }
+  }, [location.pathname, headerClients]);
 
   useEffect(() => {
     setActiveMember(members[0]);
@@ -63,7 +87,14 @@ function MainHeader() {
   };
 
   const handleMemberSelect = (member) => {
+    setActiveId((prev) => ({
+      ...prev,
+      id_member: member.id,
+    }));
+
     setActiveMember(member);
+    console.log;
+    `Selected member ID: ${member.id}`;
     setShowMemberModal(false);
   };
 
@@ -108,7 +139,9 @@ function MainHeader() {
 
       {headerClients.length === 0 && (
         <p className="p-empty-info">
-          {`${headerClients.length === 0 ? "< Pracovní pole je prázdné >" : ""}`}
+          {`${
+            headerClients.length === 0 ? "< Pracovní pole je prázdné >" : ""
+          }`}
         </p>
       )}
 
