@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 
 function OptometryNaturalVisus({
@@ -11,6 +11,11 @@ function OptometryNaturalVisus({
   const input2Ref = useRef(null);
   const input3Ref = useRef(null);
   const [values, setValues] = useState(itemValues);
+
+  useEffect(() => {
+    setValues(itemValues);
+  }, [itemValues]);
+
 
   const handleChange = (key, value) => {
     const newData = { ...values, [key]: value };

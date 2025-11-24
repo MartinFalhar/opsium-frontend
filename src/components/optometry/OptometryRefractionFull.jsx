@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // import "./OptometryRefractionFull.css";
 
 function OptometryRefractionFull({
@@ -8,6 +8,10 @@ function OptometryRefractionFull({
   onChange,
 }) {
   const [values, setValues] = useState(itemValues);
+
+    useEffect(() => {
+      setValues(itemValues);
+    }, [itemValues]);
 
   const handleChange = (key, value) => {
     const newData = { ...values, [key]: value };

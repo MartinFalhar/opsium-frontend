@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function OptometryAnamnesis({
   isActive,
@@ -7,6 +7,10 @@ function OptometryAnamnesis({
   onChange,
 }) {
   const [values, setValues] = useState(itemValues);
+
+  useEffect(() => {
+    setValues(itemValues);
+  }, [itemValues]);
 
   const handleChange = (key, value) => {
     const newData = { ...values, [key]: value };
@@ -24,7 +28,7 @@ function OptometryAnamnesis({
           onChange={(e) => handleChange("name", e.target.value)}
         />
         <textarea
-          value={values.note}
+          value={values.text}
           placeholder={`Zde zadejte text...`}
           onChange={(e) => handleChange("text", e.target.value)}
         />
