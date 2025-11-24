@@ -50,7 +50,14 @@ function MainHeader() {
   }, [location.pathname, headerClients]);
 
   useEffect(() => {
+    //při mountu nastaví prvního membera jako aktivního
+    //včetně jeho ID do globálního stavu
+    if (members.length === 0) return;
     setActiveMember(members[0]);
+    setActiveId((prev) => ({
+      ...prev,
+      id_member: members[0].id,
+    }));
     console.log("Members:", members);
     // Nastaví interval na 1 minutu (60 000 ms)
     const interval = setInterval(() => {

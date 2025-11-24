@@ -16,7 +16,7 @@ function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const { setUser, setMembers } = useUser();
+  const { setUser, setMembers, setActiveId } = useUser();
   const [heroImg, setHeroImg] = useState(null);
 
   const [imageSrc, setImageSrc] = useState(null);
@@ -122,6 +122,10 @@ function Login() {
 
         if (res.ok) {
           console.log("Members loaded:", dataMember);
+              setActiveId((prev) => ({
+      ...prev,
+      id_member: dataMember[0].id,
+    }));
           setMembers(dataMember);
         } else {
           setError(dataMember.message);

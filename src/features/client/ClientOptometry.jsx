@@ -1,17 +1,22 @@
 // import { useState } from "react";
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/UserContext";
-
+import PuffLoaderSpinnerDark from "../../components/loader/PuffLoaderSpinnerDark.jsx";
 import "./ClientOptometry.css";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 //IMPORT OPTOMETRY COMPONENT
 import OptometryAnamnesis from "../../components/optometry/OptometryAnamnesis";
 import OptometryNaturalVisus from "../../components/optometry/OptometryNaturalVisus";
 import OptometryRefractionARK from "../../components/optometry/OptometryRefractionARK";
 import OptometryRefractionFull from "../../components/optometry/OptometryRefractionFull";
+import { data } from "react-router-dom";
 
 function ClientOptometry() {
   const { user, headerClients, activeId } = useUser();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const [optometryItems, setOptometryItems] = useState([
     {
       id: "1",
@@ -130,53 +135,64 @@ function ClientOptometry() {
     );
   };
 
-  // const handleSavetoDBF = () => {
-  //   const prepareExportData = [];
-
-  //   optometryItems.map((modul) => {
-  //     console.log(`${JSON.stringify({ ...modul.values })}`);
-  //   });
-
-  // };
-
-  const handleSavetoDBF = () => {
+  const handleSavetoDBF = async () => {
+    setIsLoading(true);
     const exportObject = {};
-
+    //vytvoření objektu pro export z naměřených hodnot
     optometryItems.forEach((modul) => {
       const key = `${modul.id}-${modul.modul}`;
-
       const processedValues = {};
-
       Object.entries(modul.values).forEach(([k, v]) => {
         if (v === "" || v === null || v === undefined) {
           //je-li prázdná hodnota, neukládá se nic
           // processedValues[k] = v;
           return;
         }
-
         // Nahrazení čárky tečkou
         const normalized = typeof v === "string" ? v.replace(",", ".") : v;
-
         // Je číslo?
         const num = Number(normalized);
-
         if (!isNaN(num)) {
           processedValues[k] = Math.round(num * 100); // uložení jako INT ×100
         } else {
           processedValues[k] = v; // text se ukládá normálně
         }
       });
-
       exportObject[key] = processedValues;
     });
 
-    console.log(exportObject);
     console.log(`ID CLIENT ${activeId.id_client}`);
     console.log(`ID BRANCH ${user.branch_id}`);
     console.log(`ID MEMEBER ${activeId.id_member}`);
-    // return exportObject;
-  };
+    console.log(exportObject);
 
+    const newExamDataSet = {
+      id_clients: activeId.id_client,
+      id_branches: user.branch_id,
+      id_members: activeId.id_member,
+      data: exportObject,
+    };
+    try {
+      const res = await fetch(`${API_URL}/client/save_examination`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newExamDataSet),
+      });
+      console.log("Response from save_examination:", res);
+      const data = await res.json();
+      console.log("Data from save_examination:", data);
+      if (res.ok) {
+        console.log("Examination saved successfully.");
+      } else {
+        setError("Chyba při ukládání vyšetření.");
+      }
+    } catch (err) {
+      console.error("Chyba při načítání:", err);
+      setError("Chyba při načítání dat.");
+    } finally {
+      setIsLoading(false); // 👈 vypneme loader
+    }
+  };
   // const [sph, setSph] = useState("");
   // const Component = menuComponent;
   // const [itemsComponent, setItemsComponent] = useState([]);
@@ -273,6 +289,7 @@ function ClientOptometry() {
       <div className="optometry-right-container">
         <div className="optometry-right-container-head">
           <h6>INFO</h6>
+          <PuffLoaderSpinnerDark active={isLoading} />
         </div>
         <div className="optometry-right-container-body">
           {/* Anamnéza */}
