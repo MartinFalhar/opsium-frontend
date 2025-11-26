@@ -1,10 +1,12 @@
-// import { useState } from "react";
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/UserContext";
-import PuffLoaderSpinnerDark from "../../components/loader/PuffLoaderSpinnerDark.jsx";
+import { data } from "react-router-dom";
+import { useRef } from "react";
 import "./ClientOptometry.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+import PuffLoaderSpinnerDark from "../../components/loader/PuffLoaderSpinnerDark.jsx";
 
 //IMPORT OPTOMETRY COMPONENT
 import OptometryAnamnesis from "../../components/optometry/OptometryAnamnesis";
@@ -12,15 +14,15 @@ import OptometryNaturalVisus from "../../components/optometry/OptometryNaturalVi
 import OptometryRefractionARK from "../../components/optometry/OptometryRefractionARK";
 import OptometryRefractionFull from "../../components/optometry/OptometryRefractionFull";
 import RestoreOptometryItems from "../../components/optometry/RestoreOptometryItems.jsx";
-
-import { data } from "react-router-dom";
-import { useRef } from "react";
+import ConvertOptometryItems from "../../components/optometry/ConvertOptometryItems.jsx";
+import SaveOptometryItemsToDB from "../../components/optometry/SaveOptometryItemsToDB.jsx";
 
 function ClientOptometry() {
   const { user, headerClients, activeId } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [saveIsActive, setSaveIsActive] = useState(false);
+  const [saveIsActive, setSaveIsActive] = useState(true);
+  
 
   const [optometryItems, setOptometryItems] = useState([
     {
@@ -121,81 +123,70 @@ function ClientOptometry() {
   const [optometryRecordName, setOptometryRecordName] = useState("");
   const [date, setDate] = useState(new Date());
 
-  //DEBOUNCE effect 
-  let localSaveTimeout;
+  const localSaveTimeoutRef = useRef(null);
+  const changeOccuredRef = useRef(false);
 
-function saveToLocalStorage(data, clientId) {
-  // zrušíme předchozí naplánované uložení
-  clearTimeout(localSaveTimeout);
+  //DEBOUNCE effect
 
-  // naplánujeme nové uložení za 1 sekundu
-  localSaveTimeout = setTimeout(() => {
-    localStorage.setItem(clientId, JSON.stringify(data));
-    console.log("Uloženo do localStorage:", data);
-  }, 1000);
-}
+  function saveToLocalStorage(data, clientId) {
+    // zrušíme předchozí naplánované uložení
+    clearTimeout(localSaveTimeoutRef.current);
+    // naplánujeme nové uložení za 1 sekundu
+    localSaveTimeoutRef.current = setTimeout(() => {
+      changeOccuredRef.current = true;
+      const exportObject = ConvertOptometryItems(optometryItems);
+      localStorage.setItem(clientId, JSON.stringify(exportObject));
+      console.log("Uloženo do localStorage:", exportObject);
+    }, 1000);
+  }
 
-useEffect(() => {
-  if (!activeId?.id_client) return;
-
-  // připravíme data k uložení
-  const dataToSave = {
-    name: optometryRecordName,
-    data: optometryItems
-  };
-
-  saveToLocalStorage(dataToSave, activeId.id_client);
-}, [optometryItems, optometryRecordName, activeId]);
-
-
-useEffect(() => {
-  const interval = setInterval(() => {
+  //při každé změně optometryItems, optometryRecordName nebo activeId uložíme do localStorage
+  //activeID je zde podruhé kvůli případu změny klienta
+  useEffect(() => {
     if (!activeId?.id_client) return;
+    // připravíme data k uložení
+    const dataToSave = {
+      name: optometryRecordName,
+      data: optometryItems,
+    };
 
-    const saved = localStorage.getItem(activeId.id_client);
-    if (!saved) return;
+    saveToLocalStorage(dataToSave, activeId.id_client);
+  }, [optometryItems, optometryRecordName, activeId]);
 
-    const parsed = JSON.parse(saved);
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (!activeId?.id_client) return;
+       if (!changeOccuredRef.current) return;
+      changeOccuredRef.current = false;
 
-    // odešleme do DB
-    fetch(`${API_URL}/client/save_examination`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+      console.log(`${activeId.id_client} - autosave to DB triggered`);
+
+      const getSavedFromLocalStorage = localStorage.getItem(activeId.id_client);
+      console.log("getSavedFromLocalStorage:", getSavedFromLocalStorage);
+
+      if (!getSavedFromLocalStorage) return;
+      console.log(
+        "60sec autosave - nalezeno uložené vyšetření v localStorage:",
+        getSavedFromLocalStorage
+      );
+
+      const newExamDataSet = {
         id_clients: activeId.id_client,
         id_branches: user.branch_id,
         id_members: activeId.id_member,
-        name: parsed.name,
-        data: parsed.data
-      }),
-    })
-      .then(res => res.json())
-      .then(data => console.log("Uloženo do DB:", data))
-      .catch(err => console.error("Chyba při ukládání do DB:", err));
-  }, 60000); // každých 60 sekund
+        name: optometryRecordName,
+        data: getSavedFromLocalStorage,
+      };
+      try {
+        await SaveOptometryItemsToDB(newExamDataSet);
+      } catch (err) {
+        setError(err.message);
+      }
+    }, 10000); // každých 60 sekund
 
-  return () => clearInterval(interval);
-}, [activeId, user.branch_id, user.id]);
+    return () => clearInterval(interval);
+  }, [activeId]);
 
-useEffect(() => {
-  if (!activeId?.id_client) return;
-
-  const saved = localStorage.getItem(activeId.id_client);
-  if (!saved) return;
-
-  const parsed = JSON.parse(saved);
-  setOptometryRecordName(parsed.name);
-
-  // obnovíme stav modulů
-  const restoredItems = RestoreOptometryItems(parsed.data, optometryItems);
-  setOptometryItems(restoredItems);
-}, [activeId]);
-
-
-//mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
-//mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
-//mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
-//mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
 
   // Formát dne a datumu v češtině
   const formattedDate = date.toLocaleDateString("cs-CZ", {
@@ -203,11 +194,12 @@ useEffect(() => {
     month: "numeric",
     year: "numeric",
   });
-
+  // Nastavení výchozího názvu vyšetření při načtení komponenty
   useEffect(() => {
     setOptometryRecordName(`Rx ${formattedDate}`);
   }, []);
 
+  // Aktualizace modulu v optometryItems
   const handleUpdateItem = (id, newValues) => {
     setOptometryItems((prevItems) =>
       prevItems.map((item) =>
@@ -217,32 +209,7 @@ useEffect(() => {
   };
 
   const handleSavetoDBF = async () => {
-    setIsLoading(true);
-    const exportObject = {};
-    //vytvoření objektu pro export z naměřených hodnot
-    optometryItems.forEach((modul) => {
-      //modul.id = pořadové číslo v optometryItems
-      //modul.modul = určuje typ modulu (1=Anamnéza, 2=Vizus, 3=Refrakce, ...)
-      const key = `${modul.id}-${modul.modul}`;
-      const processedValues = {};
-      Object.entries(modul.values).forEach(([k, v]) => {
-        if (v === "" || v === null || v === undefined) {
-          //je-li prázdná hodnota, neukládá se nic
-          // processedValues[k] = v;
-          return;
-        }
-        // Nahrazení čárky tečkou
-        const normalized = typeof v === "string" ? v.replace(",", ".") : v;
-        // Je číslo?
-        const num = Number(normalized);
-        if (!isNaN(num)) {
-          processedValues[k] = Math.round(num * 100); // uložení jako INT ×100
-        } else {
-          processedValues[k] = v; // text se ukládá normálně
-        }
-      });
-      exportObject[key] = processedValues;
-    });
+    const exportObject = ConvertOptometryItems(optometryItems);
 
     console.log(`ID CLIENT ${activeId.id_client}`);
     console.log(`ID BRANCH ${user.branch_id}`);
@@ -257,30 +224,15 @@ useEffect(() => {
       name: optometryRecordName,
       data: exportObject,
     };
-    console.log(newExamDataSet.data.name);
+    console.log(newExamDataSet.data);
 
     if (saveIsActive) {
       try {
-        const res = await fetch(`${API_URL}/client/save_examination`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newExamDataSet),
-        });
-        console.log("Response from save_examination:", res);
-        const data = await res.json();
-        console.log("Data from save_examination:", data);
-        if (res.ok) {
-          console.log("Examination saved successfully.");
-        } else {
-          setError("Chyba při ukládání vyšetření.");
-        }
+        await SaveOptometryItemsToDB(newExamDataSet);
+        console.log("Uloženo do DB");
       } catch (err) {
-        console.error("Chyba při načítání:", err);
-        setError("Chyba při načítání dat.");
-      } finally {
-        setIsLoading(false); // 👈 vypneme loader
+        setError(err.message);
       }
-      //konec handleSavetoDBF
     } else {
       console.log("Uložení do localStorage místo DB");
       localStorage.setItem(
@@ -289,6 +241,7 @@ useEffect(() => {
       );
       console.log("Data uložena do localStorage.");
     }
+
     setIsLoading(false); // 👈 vypneme loader
   };
 
@@ -296,37 +249,13 @@ useEffect(() => {
   const saveRef = useRef();
   saveRef.current = handleSavetoDBF;
 
-  //AUTOSAVE funkce - volání handleSavetoDBF každých 60 sekund
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     saveRef.current(); // volá vždy aktuální handleSavetoDBF!
-  //   }, 10000);
+  useEffect(() => {
+    return () => {
+      console.log("Autosave při opuštění stránky...");
+      saveRef.current();
+    };
+  }, []);
 
-  //   const saved = localStorage.getItem(activeId.id_client);
-  //   if (!saved) return;
-  //   console.log("Nalezeno uložené vyšetření v localStorage:", JSON.parse(saved).data);
-  //   const parsed = JSON.parse(saved).data;
-  //   const restoredItems = RestoreOptometryItems(parsed, optometryItems);
-    
-  //   setOptometryRecordName(JSON.parse(saved).name);
-  //   console.log("Načten název z localStorage:", JSON.parse(saved).name);
-
-  //   setOptometryItems(restoredItems);
-  //   console.log("Načtena data z localStorage:", restoredItems);
-
-  //   return () => clearInterval(interval);
-  // }, []);
-
-  // useEffect(() => {
-  //   return () => {
-  //     console.log("Autosave při opuštění stránky...");
-  //     saveRef.current();
-  //   };
-  // }, []);
-
-  // const [sph, setSph] = useState("");
-  // const Component = menuComponent;
-  // const [itemsComponent, setItemsComponent] = useState([]);
 
   // useEffect (()=> {
   //   optometryItems.map(()=> {
@@ -335,13 +264,11 @@ useEffect(() => {
   //   })
   // }, [optometryItems]);
 
-  // useEffect (() => {
-  //   if (activeElement == 0) {
-  //     console.log(`Son says good night.`)
-
-  //   }
-
-  // }, [activeElement])
+  useEffect(() => {
+    if (activeElement == 0) {
+      console.log(`Son says good night.`);
+    }
+  }, [activeElement]);
 
   return (
     <div className="optometry-container">
