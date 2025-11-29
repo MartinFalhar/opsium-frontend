@@ -149,7 +149,6 @@ body {
   overflow: hidden;
 }
 
-
 input {
   height: 40px;
   border-radius: 8px;
@@ -404,13 +403,12 @@ button {
   margin-left: 16px;
   width: 300px;
   height: 150px;
-    background: var(--color-grd-g6);
+  background: var(--color-grd-g6);
 }
 
-.info-box-2  p {
+.info-box-2 p {
   font-size: clamp(var(--font-size-small), 0.75vw, 0.8vw);
 }
-
 
 /* ----------- SUB-MAIN MENU CONTENT*/
 .container {
@@ -583,6 +581,43 @@ button {
   background-image: url("../../src/styles/svg/lab.svg");
   font-size: 0.5rem;
 }
+/* ---- TERTIARY MENU ---- */
+.button-tertiary-menu {
+  display: flex;
+  align-items: center;
+  width: 200px;
+  height: 40px;
+  background: var(--color-bg-b1);
+  color: var(--color-bg-b11);
+  font-weight: 400;
+  border-radius: 0px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 13px rgba(0, 0, 0, 0.3);
+  font-size: var(--font-size-main-menu);
+  text-align: left;
+  padding-left: 20px;
+  margin-top: 0px;
+  letter-spacing: 0.8px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.button-tertiary-menu.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.button-tertiary-menu:hover {
+  background: var(--color-bg-b2);
+  color: var(--color-bg-b11);
+}
+.button-tertiary-menu.active {
+  background: var(--color-bg-b9);
+  color: var(--color-bg-b1);
+  font-weight: bold;
+}
 
 /* ---- MODÁL ---- */
 .modal-overlay {
@@ -632,7 +667,6 @@ button {
   gap: 0px;
 }
 
-
 .content-container {
   display: flex;
   padding: 100px;
@@ -645,7 +679,7 @@ button {
   align-items: center;
   background: var(--color-grd-g13);
   width: 100%;
- height: 50px;
+  height: 50px;
   padding-left: 50px;
 }
 
@@ -660,7 +694,7 @@ button {
   cursor: pointer;
   transition: all 0.2s ease;
   width: clamp(2vw, 5vw, 6vw);
-  height: clamp(1vw, 2vw, 3vw);  
+  height: clamp(1vw, 2vw, 3vw);
   margin-top: 5px;
 }
 

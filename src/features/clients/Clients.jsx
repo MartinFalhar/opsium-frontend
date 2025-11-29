@@ -8,9 +8,6 @@ import { useUser } from "../../context/UserContext";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Clients() {
-  const { user, setHeaderClients } = useUser();
-  const [error, setError] = useState(null);
-
   const fields = [
     {
       varName: "degree_before",
@@ -34,8 +31,9 @@ function Clients() {
     },
   ];
 
+  const { user, setHeaderClients } = useUser();
+  const [error, setError] = useState(null);
   const [searchClient, setSearchClient] = useState("");
-
   const [clients, setClients] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
@@ -43,7 +41,14 @@ function Clients() {
     setHeaderClients((prev) => {
       const exists = prev.some((client) => client.id === newClient.id);
       if (exists) return prev;
-      return [...prev, newClient];
+      return [
+        ...prev,
+        {
+          ...newClient,
+          activeSecondaryButton: null,
+          activeTertiaryButton: null,
+        },
+      ];
     });
   };
 

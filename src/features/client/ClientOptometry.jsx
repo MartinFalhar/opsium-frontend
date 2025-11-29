@@ -18,12 +18,6 @@ import ConvertOptometryItems from "../../components/optometry/ConvertOptometryIt
 import SaveOptometryItemsToDB from "../../components/optometry/SaveOptometryItemsToDB.jsx";
 
 function ClientOptometry() {
-  const { user, headerClients, activeId } = useUser();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [saveIsActive, setSaveIsActive] = useState(true);
-  
-
   const [optometryItems, setOptometryItems] = useState([
     {
       id: "1",
@@ -118,6 +112,10 @@ function ClientOptometry() {
     },
   ]);
 
+  const { user, headerClients, activeId } = useUser();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const [activeItem, setActiveItem] = useState(null);
   const [activeElement, setActiveElement] = useState(null);
   const [optometryRecordName, setOptometryRecordName] = useState("");
@@ -155,8 +153,14 @@ function ClientOptometry() {
 
   useEffect(() => {
     const interval = setInterval(async () => {
+      console.log(headerClients.find((c) => c.id === activeId.id_client)?.notSavedDetected);
       if (!activeId?.id_client) return;
-       if (!changeOccuredRef.current) return;
+      if (!changeOccuredRef.current) return;
+      if (
+        headerClients.find((c) => c.id === activeId.id_client)
+          ?.notSavedDetected === true
+      )
+        return;
       changeOccuredRef.current = false;
 
       console.log(`${activeId.id_client} - autosave to DB triggered`);
@@ -182,11 +186,10 @@ function ClientOptometry() {
       } catch (err) {
         setError(err.message);
       }
-    }, 10000); // každých 60 sekund
+    }, 5000); // každých 60 sekund
 
     return () => clearInterval(interval);
   }, [activeId]);
-
 
   // Formát dne a datumu v češtině
   const formattedDate = date.toLocaleDateString("cs-CZ", {
@@ -226,21 +229,22 @@ function ClientOptometry() {
     };
     console.log(newExamDataSet.data);
 
-    if (saveIsActive) {
-      try {
-        await SaveOptometryItemsToDB(newExamDataSet);
-        console.log("Uloženo do DB");
-      } catch (err) {
-        setError(err.message);
-      }
-    } else {
-      console.log("Uložení do localStorage místo DB");
-      localStorage.setItem(
-        newExamDataSet.id_clients,
-        JSON.stringify(newExamDataSet)
-      );
-      console.log("Data uložena do localStorage.");
+    headerClients.find((c) => c.id === activeId.id_client ?
+    c.notSavedDetected = false : null);
+
+    try {
+      await SaveOptometryItemsToDB(newExamDataSet);
+      console.log("Uloženo do DB");
+    } catch (err) {
+      setError(err.message);
     }
+
+    console.log("Uložení do localStorage místo DB");
+    localStorage.setItem(
+      newExamDataSet.id_clients,
+      JSON.stringify(newExamDataSet)
+    );
+    console.log("Data uložena do localStorage.");
 
     setIsLoading(false); // 👈 vypneme loader
   };
@@ -255,7 +259,6 @@ function ClientOptometry() {
       saveRef.current();
     };
   }, []);
-
 
   // useEffect (()=> {
   //   optometryItems.map(()=> {

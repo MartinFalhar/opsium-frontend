@@ -11,6 +11,7 @@ export function UserProvider({ children }) {
     id_client: null,
   });
 
+
   // Načtení uživatele z localStorage při startu aplikace
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -39,6 +40,7 @@ export function UserProvider({ children }) {
         setMembers,
         activeId,
         setActiveId,
+
       }}
     >
       {children}

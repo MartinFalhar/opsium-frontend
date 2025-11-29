@@ -21,11 +21,11 @@ function MainHeader() {
   const { members, headerClients, setHeaderClients, setActiveId } = useUser();
 
   const handleClientLayout = (clientID) => {
-    // set active client id in global context (DB id)
-
+    //v globálním stavu zaznamená aktivního klienta
     setActiveId((prev) => ({
       ...prev,
-      id_client: 123,
+      id_client: clientID,
+      id_member: activeMember ? activeMember.id : prev.id_member,
     }));
 
     setActiveItemId(clientID);
@@ -42,6 +42,7 @@ function MainHeader() {
       const parsed = isNaN(Number(idFromUrl)) ? idFromUrl : Number(idFromUrl);
       setActiveItemId(parsed);
 
+      //musí být PREV, protože se eviduje ještě id_member
       setActiveId((prev) => ({
         ...prev,
         id_client: parsed,
@@ -69,7 +70,7 @@ function MainHeader() {
 
     // Vyčištění při odpojení komponenty
     return () => clearInterval(interval);
-  }, []);
+  }, [members]);
 
   // Formát dne a datumu v češtině
   const formattedDate = time.toLocaleDateString("cs-CZ", {

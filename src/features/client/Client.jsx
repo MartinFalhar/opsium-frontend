@@ -13,16 +13,24 @@ import ClientLab from "./ClientLab";
 import LoadExamsFromDB from "../../components/optometry/LoadExamFromDB";
 
 function Client() {
+  //definice sekundárního MENU
   const clientMenu = [
     {
-      id: "1",
+      id: 1,
       label: "Přehled",
       rights: 0,
       component: ClientDashboard,
       icon: "dashboard",
     },
     {
-      id: "2",
+      id: 2,
+      label: "Optometrie",
+      rights: 0,
+      component: ClientOptometry,
+      icon: "optometry",
+    },
+    {
+      id: 3,
       label: "Objednávky",
       onClick: () => console.log("Invoices clicked"),
       rights: 0,
@@ -30,14 +38,7 @@ function Client() {
       icon: "invoices",
     },
     {
-      id: "3",
-      label: "Optometrie",
-      rights: 0,
-      component: ClientOptometry,
-      icon: "optometry",
-    },
-    {
-      id: "4",
+      id: 4,
       label: "Trénink",
       rights: 0,
       component: ClientVisTraining,
@@ -52,12 +53,18 @@ function Client() {
     },
   ];
 
-  //bere ID parametr z URL
+  //bere ID parametr z URL adresy
   const { id } = useParams();
+
   const [menuComponent, setMenuComponent] = useState(null);
-  const [activeButton, setActiveButton] = useState(null);
-  const { user, activeId, headerClients } = useUser();
+  const [activeSecondaryButton, setActiveSecondaryButton] = useState(null);
+  const [activeTertiaryButton, setActiveTertiaryButton] = useState(null);
+  const { user, activeId, headerClients, setHeaderClients } = useUser();
   const [examMenuList, setExamMenuList] = useState([]);
+  const [loadingExams, setLoadingExams] = useState(true);
+  const [notSavedDetected, setNotSavedDetected] = useState(false);
+  const [showExams, setShowExams] = useState(false);
+
   const navigate = useNavigate();
 
   // Načti klienta z headerClients, ID načtené skrz useParams je
@@ -65,35 +72,109 @@ function Client() {
   const client = headerClients?.find((c) => c?.id === parseInt(id));
 
   useEffect(() => {
-    // Pokud nemáme headerClients nebo klienta, přesměrujeme na CLIENTS
+    // Pokud nemáme headerClients nebo klienta, přesměrujeme na CLIENTS - nastává po smazání klienta z HEADER zóny
     if (!headerClients?.length || !client) {
       navigate("/clients");
       return;
     }
+    console.log(
+      `START CLIENT.activeSecondaryButton`,
+      client.activeSecondaryButton
+    );
+
     // Nastavíme výchozí sekundárního MENU jen pokud máme platná data
-    setMenuComponent(() => clientMenu[0].component);
-    setActiveButton(clientMenu[0].id);
-  }, [headerClients, client, id, navigate]);
+    console.log(`START activeSecondaryButton PAGE LOAD`, activeSecondaryButton);
+
+    if (client.activeSecondaryButton === null) {
+      setMenuComponent(() => clientMenu[0].component);
+      setActiveSecondaryButton(clientMenu[0].id);
+      setHeaderClients((prev) =>
+        prev.map((c) =>
+          c.id === client.id ? { ...c, activeSecondaryButton: 1 } : c
+        )
+      );
+    } else {
+      setMenuComponent(
+        () => clientMenu[client.activeSecondaryButton - 1].component
+      );
+      setActiveSecondaryButton(clientMenu[client.activeSecondaryButton - 1].id);
+    }
+  }, [id, navigate]);
 
   useEffect(() => {
     const loadExams = async () => {
       if (!activeId.id_client || !user.branch_id) return;
 
+      setLoadingExams(true);
+
       try {
+        //načte seznam examů (name) pro daného klienta a pobočku
         const data = await LoadExamsFromDB(activeId.id_client, user.branch_id);
-        setExamMenuList(data);
+        // najdeme klienta jen jednou
+        const client = headerClients?.find((c) => c.id === activeId.id_client);
+        let finalList = [...data];
+        //pokud je to prvotní načtení, přidá na začátek položku (neuloženo)
+
+        // pokud klient ještě NEMÁ activeTertiaryButton nastavený
+        if (client && client.activeTertiaryButton === null || client.notSavedDetected) {
+          finalList = [{ name: "(neuloženo)" }, ...finalList];
+          // nastavíme globální stav – ale to NESMÍ spouštět celý effect znovu
+          setHeaderClients((prev) =>
+            prev.map((c) =>
+              c.id === client.id ? { ...c, activeTertiaryButton: client.activeTertiaryButton === null ? 0 : c.activeTertiaryButton, notSavedDetected: true } : c
+            )
+          );
+        }
+
+        // přidání id/key
+        finalList = finalList.map((exam, index) => ({
+          ...exam,
+          id: index,
+          key: index,
+        }));
+        setExamMenuList(finalList);
+        setTimeout(() => setShowExams(true), 50);
+        console.log("Loaded examMenuList:", JSON.stringify(examMenuList));
       } catch (err) {
         console.error("Chyba při načítání examMenuList:", err);
+      } finally {
+        setLoadingExams(false);
       }
     };
 
-    loadExams();
-  }, [activeId.id_client, user.branch_id]);
+    if (client.activeSecondaryButton === 2) {
+      loadExams();
+    }
+  }, [activeId.id_client, user.branch_id, client.activeSecondaryButton]);
 
   //obsluha sekundárního MENU
   const handleClick = (button) => {
-    setActiveButton(button.id);
+    setActiveSecondaryButton(button.id);
+
     setMenuComponent(() => button.component);
+
+    const client = headerClients?.find((c) => c.id === activeId.id_client);
+
+    setHeaderClients((prev) =>
+      prev.map((c) =>
+        c.id === client.id ? { ...c, activeSecondaryButton: button.id } : c
+      )
+    );
+    console.log(`client.activeSecondaryButton`, client.activeSecondaryButton);
+  };
+
+  //obsluha terciárního MENU - seznam examů
+  const handleClickExamList = (examId) => {
+    setActiveTertiaryButton(examId.id);
+
+    const client = headerClients?.find((c) => c.id === activeId.id_client);
+    setHeaderClients((prev) =>
+      prev.map((c) =>
+        c.id === client.id ? { ...c, activeTertiaryButton: examId.id } : c
+      )
+    );
+
+    console.log("Clicked examId:", examId.id);
   };
 
   const Component = menuComponent;
@@ -122,19 +203,34 @@ function Client() {
               <button
                 key={button.id}
                 id={button.id}
-                style={{
-                  width: "200px",
-                }}
                 className={`button-secondary-menu ${
-                  activeButton === button.id ? "active" : ""
+                  activeSecondaryButton === button.id ? "active" : ""
                 } ${button.icon}`}
                 onClick={() => handleClick(button)}
               >
                 {button.label}
               </button>
-              {button.id === "3" && examMenuList?.length > 0
-                ? examMenuList.map((exam) => (
-                    <button key={exam.id}>{exam.name}</button>
+              {button.id === activeSecondaryButton &&
+              activeSecondaryButton === 2 &&
+              !loadingExams &&
+              examMenuList.length > 0
+                ? examMenuList.map((exam, index) => (
+                    <button
+                    style={{ transitionDelay: `${index * 0.05}s` }}
+                      key={exam.id}
+                      id={exam.id}
+                      className={`button-tertiary-menu ${showExams ? "show" : ""} ${
+                        headerClients?.find((c) => c.id === activeId.id_client)
+                          ?.activeTertiaryButton === exam.id
+                          ? "active"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        handleClickExamList(exam);
+                      }}
+                    >
+                      {exam.name}
+                    </button>
                   ))
                 : null}
             </>
