@@ -145,7 +145,7 @@ function Client() {
     if (client.activeSecondaryButton === 2) {
       loadExams();
     }
-  }, [activeId.id_client, user.branch_id, client.activeSecondaryButton]);
+  }, [activeId.id_client, user.branch_id, client.activeSecondaryButton, client.notSavedDetected]);
 
   //obsluha sekundárního MENU
   const handleClick = (button) => {

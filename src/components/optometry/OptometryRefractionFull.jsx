@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 // import "./OptometryRefractionFull.css";
 
 function OptometryRefractionFull({
@@ -9,15 +9,24 @@ function OptometryRefractionFull({
 }) {
   const [values, setValues] = useState(itemValues);
 
-    useEffect(() => {
-      setValues(itemValues);
-    }, [itemValues]);
+  //PROPS poslané z rodiče, změny posílá zpět rodiči
+  useEffect(() => {
+    setValues(itemValues);
+  }, [itemValues]);
 
+  //zachtycení změn v jednotlivých polích - globální handler
   const handleChange = (key, value) => {
     const newData = { ...values, [key]: value };
     setValues(newData);
     onChange?.(newData); // pošle změnu zpět do rodiče
   };
+
+  const pSRef = useRef(null);
+  const pCRef = useRef(null);
+  const pARef = useRef(null);
+  const lSRef = useRef(null);
+  const lCRef = useRef(null);
+  const lARef = useRef(null);
 
   // const input1Ref = useRef(null);
   // const input2Ref = useRef(null);

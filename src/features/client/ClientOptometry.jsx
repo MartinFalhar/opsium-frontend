@@ -112,7 +112,7 @@ function ClientOptometry() {
     },
   ]);
 
-  const { user, headerClients, activeId } = useUser();
+  const { user, headerClients, activeId, setHeaderClients } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -153,7 +153,9 @@ function ClientOptometry() {
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      console.log(headerClients.find((c) => c.id === activeId.id_client)?.notSavedDetected);
+      console.log(
+        headerClients.find((c) => c.id === activeId.id_client)?.notSavedDetected
+      );
       if (!activeId?.id_client) return;
       if (!changeOccuredRef.current) return;
       if (
@@ -199,7 +201,7 @@ function ClientOptometry() {
   });
   // Nastavení výchozího názvu vyšetření při načtení komponenty
   useEffect(() => {
-    setOptometryRecordName(`Rx ${formattedDate}`);
+    setOptometryRecordName(`${formattedDate} RX`);
   }, []);
 
   // Aktualizace modulu v optometryItems
@@ -229,8 +231,14 @@ function ClientOptometry() {
     };
     console.log(newExamDataSet.data);
 
-    headerClients.find((c) => c.id === activeId.id_client ?
-    c.notSavedDetected = false : null);
+    // Update headerClients 'notSavedDetected' flag using setHeaderClients
+    if (typeof setHeaderClients === "function") {
+      setHeaderClients((prev) =>
+        prev.map((c) =>
+          c.id === activeId.id_client ? { ...c, notSavedDetected: false } : c
+        )
+      );
+    }
 
     try {
       await SaveOptometryItemsToDB(newExamDataSet);
@@ -287,12 +295,20 @@ function ClientOptometry() {
             <button className="menu-btn">MEDIC</button>
           </div>
           <div className="optometry-modul-panel">
-            <button className="menu-btn">Rx</button>
-            <button className="menu-btn">Clens</button>
-            <button className="menu-btn">Bino</button>
+            <button className="menu-btn">RX</button>
+            <button className="menu-btn">KČ</button>
+            <button className="menu-btn">BINO</button>
             <button className="menu-btn settings">...</button>
           </div>
           <div className="optometry-modul-panel">
+            <button
+              className="menu-btn-export"
+              type="submit"
+              onClick={handleSavetoDBF}
+              style={{marginRight:"5px"}}
+            >
+              Nový
+            </button>
             <input
               type="text"
               value={optometryRecordName ?? ""}
@@ -311,6 +327,13 @@ function ClientOptometry() {
               onClick={handleSavetoDBF}
             >
               Uložit
+            </button>
+            <button
+              className="menu-btn-export"
+              type="submit"
+              onClick={handleSavetoDBF}
+            >
+              Smazat
             </button>
             <button
               className="menu-btn-export"

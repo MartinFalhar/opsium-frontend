@@ -302,7 +302,7 @@ button {
   padding: 4px 10px;
   cursor: pointer;
   transition: all 0.2s ease;
-  width: clamp(2vw, 4vw, 6vw);
+  width: clamp(2vw, 3vw, 6vw);
   height: clamp(1vw, 2vw, 3vw);
   background: var(--color-bg-b1);
 }

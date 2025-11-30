@@ -1,10 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 // import "./OptometryRefractionARKz.css";
 
-function OptometryRefractionARK({ isActive, setActiveElement, itemValues, onChange }) {
+function OptometryRefractionARK({
+  isActive,
+  setActiveElement,
+  itemValues,
+  onChange,
+}) {
   const [values, setValues] = useState(itemValues);
 
-    useEffect(() => {
+  useEffect(() => {
     setValues(itemValues);
   }, [itemValues]);
 
@@ -28,20 +33,33 @@ function OptometryRefractionARK({ isActive, setActiveElement, itemValues, onChan
   };
 
   // příklad: přeskakování kurzoru šipkami
-  const handleKeyDown = (e, nextRef) => {
+  const handleKeyDown = (e, nextRef, key) => {
     if (e.key === "ArrowRight" && nextRef?.current) {
       nextRef.current.focus();
+    }
+    if (e.ctrlKey && e.key === "ArrowUp") {
+      e.preventDefault();
+
+      setValues((prev) => {
+        const current = parseFloat(prev[key]) || 0;
+        const next = Math.round((current + 0.25) * 100) / 100; // bezpečné zaokrouhlení
+        const updated = { ...prev, [key]: String(next) };
+        onChange?.(updated);
+        return updated;
+      });
+
+      return;
     }
   };
 
   return (
     <div className={`modul ${isActive ? "active" : ""}`}>
-        <input
-          value={values.name}
-          className={`modul-name ${isActive ? "active" : ""}`}
-          type="numeric"
-          onChange={(e) => handleChange("name", e.target.value)}
-        />
+      <input
+        value={values.name}
+        className={`modul-name ${isActive ? "active" : ""}`}
+        type="text"
+        onChange={(e) => handleChange("name", e.target.value)}
+      />
 
       <div className={`grid-refraction-ark ${isActive ? "active" : ""}`}>
         {/* hlavička */}
@@ -52,12 +70,19 @@ function OptometryRefractionARK({ isActive, setActiveElement, itemValues, onChan
 
         {/* pravé oko */}
         <p className="desc">P</p>
+        {/* <input
+          ref={pSphRef}
+          value={values.pS || ""}
+          type="numeric"
+          onChange={(e) => handleChange("pS", e.target.value)}
+          onKeyDown={(e) => handleKeyDown(e, pCylRef)}
+        /> */}
         <input
           ref={pSphRef}
           value={values.pS || ""}
           type="text"
           onChange={(e) => handleChange("pS", e.target.value)}
-          onKeyDown={(e) => handleKeyDown(e, pCylRef)}
+          onKeyDown={(e) => handleKeyDown(e, pCylRef, "pS")}
         />
         <input
           ref={pCylRef}
@@ -96,8 +121,7 @@ function OptometryRefractionARK({ isActive, setActiveElement, itemValues, onChan
           onChange={(e) => handleChange("lA", e.target.value)}
         />
       </div>
-      </div>
-    
+    </div>
   );
 }
 
