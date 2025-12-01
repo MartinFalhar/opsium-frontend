@@ -151,8 +151,14 @@ function ClientOptometry() {
     saveToLocalStorage(dataToSave, activeId.id_client);
   }, [optometryItems, optometryRecordName, activeId]);
 
+  //ukládání do DBF pokud je příznak notSavedDetected FALSE
+  //ukládá se co 60 sekund
   useEffect(() => {
     const interval = setInterval(async () => {
+      //vypisuje stav notSavedDetected aktivní položky menu; pokud je
+      //stále TRUE, znamená to, že záznam ještě nebyl nidky uložen
+      //a ukládá se pouze do localStorage. Až když se uloží klientem
+      //začne pravidelní 60 sekundové ukládání do DBF
       console.log(
         headerClients.find((c) => c.id === activeId.id_client)?.notSavedDetected
       );
@@ -188,7 +194,7 @@ function ClientOptometry() {
       } catch (err) {
         setError(err.message);
       }
-    }, 5000); // každých 60 sekund
+    }, 10000); // každých 60 sekund
 
     return () => clearInterval(interval);
   }, [activeId]);
@@ -199,12 +205,13 @@ function ClientOptometry() {
     month: "numeric",
     year: "numeric",
   });
+
   // Nastavení výchozího názvu vyšetření při načtení komponenty
   useEffect(() => {
     setOptometryRecordName(`${formattedDate} RX`);
   }, []);
 
-  // Aktualizace modulu v optometryItems
+  // Aktualizace zadaných hodnot v modulu v optometryItems
   const handleUpdateItem = (id, newValues) => {
     setOptometryItems((prevItems) =>
       prevItems.map((item) =>
@@ -214,6 +221,7 @@ function ClientOptometry() {
   };
 
   const handleSavetoDBF = async () => {
+    setIsLoading(true); // 👈 zapneme loader
     const exportObject = ConvertOptometryItems(optometryItems);
 
     console.log(`ID CLIENT ${activeId.id_client}`);
@@ -305,7 +313,7 @@ function ClientOptometry() {
               className="menu-btn-export"
               type="submit"
               onClick={handleSavetoDBF}
-              style={{marginRight:"5px"}}
+              style={{ marginRight: "5px" }}
             >
               Nový
             </button>
