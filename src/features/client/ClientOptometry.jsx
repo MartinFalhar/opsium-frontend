@@ -16,8 +16,9 @@ import OptometryRefractionFull from "../../components/optometry/OptometryRefract
 import RestoreOptometryItems from "../../components/optometry/RestoreOptometryItems.jsx";
 import ConvertOptometryItems from "../../components/optometry/ConvertOptometryItems.jsx";
 import SaveOptometryItemsToDB from "../../components/optometry/SaveOptometryItemsToDB.jsx";
+import LoadExaminationFromDB from "../../components/optometry/LoadExaminationFromDB.jsx";
 
-function ClientOptometry() {
+function ClientOptometry({ client }) {
   const [optometryItems, setOptometryItems] = useState([
     {
       id: "1",
@@ -199,6 +200,21 @@ function ClientOptometry() {
     return () => clearInterval(interval);
   }, [activeId]);
 
+  //pokud se kliklo na tertiární menu v CLIENT, tak změň název
+  //pod kterým se ukládá vyšetření do DB
+  useEffect(() => {
+    const loadExamination = async () => {
+      const examination = await LoadExaminationFromDB(
+        client.id,
+        user.branch_id,
+        client.examName
+      );
+      console.log(JSON.stringify(examination));
+    };
+    loadExamination();
+    setOptometryRecordName(client.examName);
+  }, [client.activeTertiaryButton]);
+
   // Formát dne a datumu v češtině
   const formattedDate = date.toLocaleDateString("cs-CZ", {
     day: "numeric",
@@ -264,6 +280,8 @@ function ClientOptometry() {
 
     setIsLoading(false); // 👈 vypneme loader
   };
+
+  const LoadExamFromDB = async () => {};
 
   //Kvůli AUTOSAVE funkci
   const saveRef = useRef();

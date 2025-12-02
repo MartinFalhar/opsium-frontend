@@ -10,7 +10,7 @@ import ClientInvoices from "./ClientInvoices";
 import ClientVisTraining from "./ClientVisTraining";
 import ClientOptometry from "./ClientOptometry";
 import ClientLab from "./ClientLab";
-import LoadExamsFromDB from "../../components/optometry/LoadExamFromDB";
+import LoadExamsListFromDB from "../../components/optometry/LoadExamsListFromDB";
 
 function Client() {
   //definice sekundárního MENU
@@ -109,19 +109,34 @@ function Client() {
 
       try {
         //načte seznam examů (name) pro daného klienta a pobočku
-        const data = await LoadExamsFromDB(activeId.id_client, user.branch_id);
+        const data = await LoadExamsListFromDB(
+          activeId.id_client,
+          user.branch_id
+        );
         // najdeme klienta jen jednou
         const client = headerClients?.find((c) => c.id === activeId.id_client);
         let finalList = [...data];
         //pokud je to prvotní načtení, přidá na začátek položku (neuloženo)
 
         // pokud klient ještě NEMÁ activeTertiaryButton nastavený
-        if (client && client.activeTertiaryButton === null || client.notSavedDetected) {
+        if (
+          (client && client.activeTertiaryButton === null) ||
+          client.notSavedDetected
+        ) {
           finalList = [{ name: "(neuloženo)" }, ...finalList];
           // nastavíme globální stav – ale to NESMÍ spouštět celý effect znovu
           setHeaderClients((prev) =>
             prev.map((c) =>
-              c.id === client.id ? { ...c, activeTertiaryButton: client.activeTertiaryButton === null ? 0 : c.activeTertiaryButton, notSavedDetected: true } : c
+              c.id === client.id
+                ? {
+                    ...c,
+                    activeTertiaryButton:
+                      client.activeTertiaryButton === null
+                        ? 0
+                        : c.activeTertiaryButton,
+                    notSavedDetected: true,
+                  }
+                : c
             )
           );
         }
@@ -145,7 +160,12 @@ function Client() {
     if (client.activeSecondaryButton === 2) {
       loadExams();
     }
-  }, [activeId.id_client, user.branch_id, client.activeSecondaryButton, client.notSavedDetected]);
+  }, [
+    activeId.id_client,
+    user.branch_id,
+    client.activeSecondaryButton,
+    client.notSavedDetected,
+  ]);
 
   //obsluha sekundárního MENU
   const handleClick = (button) => {
@@ -165,16 +185,16 @@ function Client() {
 
   //obsluha terciárního MENU - seznam examů
   const handleClickExamList = (examId) => {
-    setActiveTertiaryButton(examId.id);
-
+    // setActiveTertiaryButton(examId.id);
+    //do aktivn9ho CLIENTa uložím do jeho vlastností polohu tertiárního menu
     const client = headerClients?.find((c) => c.id === activeId.id_client);
     setHeaderClients((prev) =>
       prev.map((c) =>
-        c.id === client.id ? { ...c, activeTertiaryButton: examId.id } : c
+        c.id === client.id
+          ? { ...c, activeTertiaryButton: examId.id, examName: examId.name }
+          : c
       )
     );
-
-    console.log("Clicked examId:", examId.id);
   };
 
   const Component = menuComponent;
@@ -199,9 +219,8 @@ function Client() {
 
         {clientMenu.map((button) => {
           return (
-            <>
+            <div key={button.id}>
               <button
-                key={button.id}
                 id={button.id}
                 className={`button-secondary-menu ${
                   activeSecondaryButton === button.id ? "active" : ""
@@ -216,10 +235,12 @@ function Client() {
               examMenuList.length > 0
                 ? examMenuList.map((exam, index) => (
                     <button
-                    style={{ transitionDelay: `${index * 0.05}s` }}
+                      style={{ transitionDelay: `${index * 0.05}s` }}
                       key={exam.id}
                       id={exam.id}
-                      className={`button-tertiary-menu ${showExams ? "show" : ""} ${
+                      className={`button-tertiary-menu ${
+                        showExams ? "show" : ""
+                      } ${
                         headerClients?.find((c) => c.id === activeId.id_client)
                           ?.activeTertiaryButton === exam.id
                           ? "active"
@@ -233,11 +254,12 @@ function Client() {
                     </button>
                   ))
                 : null}
-            </>
+            </div>
           );
         })}
       </div>
       <div className="left-container">
+        {console.log(`XXXCLIENT ${JSON.stringify(client)}`)}
         {Component ? <Component client={client} /> : null}
       </div>
     </div>
