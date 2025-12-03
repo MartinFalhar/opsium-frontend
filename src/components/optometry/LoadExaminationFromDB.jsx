@@ -25,7 +25,7 @@ async function LoadExaminationFromDB(id_client, id_branch, id_name) {
       throw new Error(data?.message || "Chyba při načítání do DB");
     }
 
-    return data;
+    return { ...data };
   } catch (err) {
     console.error("Chyba při načítání:", err);
     throw new Error("Nepodařilo se připojit k serveru.");

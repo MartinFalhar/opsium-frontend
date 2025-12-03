@@ -259,7 +259,7 @@ function Client() {
         })}
       </div>
       <div className="left-container">
-        {console.log(`XXXCLIENT ${JSON.stringify(client)}`)}
+        {/* {console.log(`XXXCLIENT ${JSON.stringify(client)}`)} */}
         {Component ? <Component client={client} /> : null}
       </div>
     </div>

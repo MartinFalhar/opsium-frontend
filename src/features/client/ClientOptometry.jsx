@@ -9,109 +9,17 @@ const API_URL = import.meta.env.VITE_API_URL;
 import PuffLoaderSpinnerDark from "../../components/loader/PuffLoaderSpinnerDark.jsx";
 
 //IMPORT OPTOMETRY COMPONENT
-import OptometryAnamnesis from "../../components/optometry/OptometryAnamnesis";
-import OptometryNaturalVisus from "../../components/optometry/OptometryNaturalVisus";
-import OptometryRefractionARK from "../../components/optometry/OptometryRefractionARK";
-import OptometryRefractionFull from "../../components/optometry/OptometryRefractionFull";
+
 import RestoreOptometryItems from "../../components/optometry/RestoreOptometryItems.jsx";
 import ConvertOptometryItems from "../../components/optometry/ConvertOptometryItems.jsx";
 import SaveOptometryItemsToDB from "../../components/optometry/SaveOptometryItemsToDB.jsx";
 import LoadExaminationFromDB from "../../components/optometry/LoadExaminationFromDB.jsx";
+import ModulesDB from "../../components/optometry/ModulesDB.jsx";
+import restoreOptometryItems from "../../components/optometry/RestoreOptometryItems.jsx";
 
 function ClientOptometry({ client }) {
-  const [optometryItems, setOptometryItems] = useState([
-    {
-      id: "1",
-      modul: "1",
-      width: "w50",
-      component: OptometryAnamnesis,
-      values: {
-        name: "Anamnéza",
-        text: "Požadavek na plnou korekci",
-      },
-    },
-    {
-      id: "2",
-      modul: "2",
-      width: "w25",
-      component: OptometryNaturalVisus,
-      values: {
-        name: "Naturální vizus",
-        pV: "1.25",
-        lV: "1.25+",
-        bV: "2.0++",
-        style: 0,
-        text: "",
-      },
-    },
-    {
-      id: "3",
-      modul: "3",
-      width: "w25",
-      component: OptometryRefractionARK,
-      values: {
-        name: "OBJEKTIVNÍ refrakce",
-        pS: "-1.23",
-        pC: "-1.79",
-        pA: "179",
-        lS: "+6.85",
-        lC: "-1.47",
-        lA: "123",
-        text: "",
-      },
-    },
-    {
-      id: "4",
-      modul: "3",
-      width: "w75",
-      component: OptometryRefractionFull,
-      values: {
-        name: "Refrakce - plný zápis",
-        pS: "-3,75",
-        pC: "-4,50",
-        pA: "180",
-        pP: "2,5",
-        pB: "90",
-        pAdd: "-3,25",
-        lS: "+4,50",
-        lC: "90",
-        lA: "122",
-        lP: "2,5",
-        lB: "270",
-        lAdd: "+2,50",
-        pV: "0,63+",
-        lV: "0,8+",
-        bV: "1,25+",
-        style: 0,
-        text: "",
-      },
-    },
-    {
-      id: "5",
-      modul: "3",
-      width: "w75",
-      component: OptometryRefractionFull,
-      values: {
-        name: "Refrakce - pohodlná korekce vzhledem k vysokému CYL",
-        pS: -3.75,
-        pC: -4.5,
-        pA: 180,
-        pP: 2.5,
-        pB: 90,
-        pAdd: -3.25,
-        lS: +4.5,
-        lC: 90,
-        lA: 122,
-        lP: 2.5,
-        lB: 270,
-        lAdd: +2.5,
-        pV: 0.633,
-        lV: 0.83,
-        bV: 1.253,
-        text: "",
-      },
-    },
-  ]);
+  const optometryModules = ModulesDB();
+  const [optometryItems, setOptometryItems] = useState(optometryModules);
 
   const { user, headerClients, activeId, setHeaderClients } = useUser();
   const [isLoading, setIsLoading] = useState(false);
@@ -125,8 +33,56 @@ function ClientOptometry({ client }) {
   const localSaveTimeoutRef = useRef(null);
   const changeOccuredRef = useRef(false);
 
-  //DEBOUNCE effect
+  const handleSavetoDBF = async () => {
+    setIsLoading(true); // 👈 zapneme loader
+    const exportObject = ConvertOptometryItems(optometryItems);
 
+    console.log(`ID CLIENT ${activeId.id_client}`);
+    console.log(`ID BRANCH ${user.branch_id}`);
+    console.log(`ID MEMBER ${activeId.id_member}`);
+    console.log(`Name ${optometryRecordName}`);
+    console.log(exportObject);
+
+    const newExamDataSet = {
+      id_clients: activeId.id_client,
+      id_branches: user.branch_id,
+      id_members: activeId.id_member,
+      name: optometryRecordName,
+      data: exportObject,
+    };
+    console.log(newExamDataSet.data);
+
+    // Update headerClients 'notSavedDetected' flag using setHeaderClients
+    if (typeof setHeaderClients === "function") {
+      setHeaderClients((prev) =>
+        prev.map((c) =>
+          c.id === activeId.id_client ? { ...c, notSavedDetected: false } : c
+        )
+      );
+    }
+
+    try {
+      await SaveOptometryItemsToDB(newExamDataSet);
+      console.log("Uloženo do DB");
+    } catch (err) {
+      setError(err.message);
+    }
+
+    console.log("Uložení do localStorage místo DB");
+    localStorage.setItem(
+      newExamDataSet.id_clients,
+      JSON.stringify(newExamDataSet)
+    );
+    console.log("Data uložena do localStorage.");
+
+    setIsLoading(false); // 👈 vypneme loader
+  };
+
+  //Kvůli AUTOSAVE funkci
+  const saveRef = useRef();
+  saveRef.current = handleSavetoDBF;
+
+  //DEBOUNCE effect
   function saveToLocalStorage(data, clientId) {
     // zrušíme předchozí naplánované uložení
     clearTimeout(localSaveTimeoutRef.current);
@@ -201,18 +157,34 @@ function ClientOptometry({ client }) {
   }, [activeId]);
 
   //pokud se kliklo na tertiární menu v CLIENT, tak změň název
-  //pod kterým se ukládá vyšetření do DB
+  //pod kterým se ukládá vyšetření do DB a načti nové měření
   useEffect(() => {
     const loadExamination = async () => {
-      const examination = await LoadExaminationFromDB(
-        client.id,
-        user.branch_id,
-        client.examName
-      );
-      console.log(JSON.stringify(examination));
+      //uloží aktuální data vyšetření
+      if (saveRef.current) {
+        await saveRef.current();
+      }
+
+      //načte nové data
+      if (client.examName != "(neuloženo)") {
+        const examination = await LoadExaminationFromDB(
+          client.id,
+          user.branch_id,
+          client.examName
+        );
+
+        const restoredItems = restoreOptometryItems(
+          examination.data,
+          optometryModules
+        );
+
+        //nahrání do aplikace
+        setOptometryItems(restoredItems);
+        setOptometryRecordName(client.examName);
+      }
     };
+
     loadExamination();
-    setOptometryRecordName(client.examName);
   }, [client.activeTertiaryButton]);
 
   // Formát dne a datumu v češtině
@@ -235,57 +207,6 @@ function ClientOptometry({ client }) {
       )
     );
   };
-
-  const handleSavetoDBF = async () => {
-    setIsLoading(true); // 👈 zapneme loader
-    const exportObject = ConvertOptometryItems(optometryItems);
-
-    console.log(`ID CLIENT ${activeId.id_client}`);
-    console.log(`ID BRANCH ${user.branch_id}`);
-    console.log(`ID MEMBER ${activeId.id_member}`);
-    console.log(`Name ${optometryRecordName}`);
-    console.log(exportObject);
-
-    const newExamDataSet = {
-      id_clients: activeId.id_client,
-      id_branches: user.branch_id,
-      id_members: activeId.id_member,
-      name: optometryRecordName,
-      data: exportObject,
-    };
-    console.log(newExamDataSet.data);
-
-    // Update headerClients 'notSavedDetected' flag using setHeaderClients
-    if (typeof setHeaderClients === "function") {
-      setHeaderClients((prev) =>
-        prev.map((c) =>
-          c.id === activeId.id_client ? { ...c, notSavedDetected: false } : c
-        )
-      );
-    }
-
-    try {
-      await SaveOptometryItemsToDB(newExamDataSet);
-      console.log("Uloženo do DB");
-    } catch (err) {
-      setError(err.message);
-    }
-
-    console.log("Uložení do localStorage místo DB");
-    localStorage.setItem(
-      newExamDataSet.id_clients,
-      JSON.stringify(newExamDataSet)
-    );
-    console.log("Data uložena do localStorage.");
-
-    setIsLoading(false); // 👈 vypneme loader
-  };
-
-  const LoadExamFromDB = async () => {};
-
-  //Kvůli AUTOSAVE funkci
-  const saveRef = useRef();
-  saveRef.current = handleSavetoDBF;
 
   useEffect(() => {
     return () => {
