@@ -4,7 +4,7 @@ import "./OptotypMenu.css";
 const optotypList = [
   {
     id: "m1",
-    label: "Vizus",
+    label: "Vizus", 
     sub: [
       {
         name: "Jeden řádek",

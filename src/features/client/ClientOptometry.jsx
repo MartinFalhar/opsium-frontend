@@ -11,21 +11,27 @@ import LoadExaminationFromDB from "../../components/optometry/LoadExaminationFro
 
 import PuffLoaderSpinnerDark from "../../components/loader/PuffLoaderSpinnerDark.jsx";
 import useAutosave from "./useAutosave";
+import OptometryInfo from "../../components/optometry/OptometryInfo.jsx";
+
+import closeIcon from "../../styles/svg/close.svg";
+import copyIcon from "../../styles/svg/copy.svg";
 
 // import jsPDF from "jspdf"; // pokud používáš export do PDF
 
 import "./ClientOptometry.css";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function ClientOptometry({ client }) {
   const optometryModules = ModulesDB();
   const [optometryItems, setOptometryItems] = useState(optometryModules);
 
-  const { user, headerClients, activeId, setHeaderClients } = useUser();
+  const { user, headerClients, activeId, setHeaderClients, memory, setMemory } = useUser();
 
   const [activeItem, setActiveItem] = useState(null);
   const [activeElement, setActiveElement] = useState(null);
   const [optometryRecordName, setOptometryRecordName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [hoveredItemId, setHoveredItemId] = useState(null);
   const [error, setError] = useState("");
 
   const dateRef = useRef(new Date());
@@ -113,7 +119,7 @@ function ClientOptometry({ client }) {
           );
         } else {
           // fallback: zavolat endpoint přes fetch (příklad)
-          await fetch(`${process.env.VITE_API_URL}/optometry/delete`, {
+          await fetch(`${API_URL}/client/delete`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -155,7 +161,8 @@ function ClientOptometry({ client }) {
   // Export (PDF + tisk)
   const handleExport = () => {
     try {
-      const doc = new jsPDF();
+      // const doc = new jsPDF();
+      const doc = "";
       doc.setFontSize(12);
       doc.text(`Záznam vyšetření — ${optometryRecordName}`, 10, 10);
 
@@ -230,6 +237,29 @@ function ClientOptometry({ client }) {
     }
   };
 
+  const handleDeleteItem = (e, id) => {
+    e.stopPropagation(); // zabrání kliknutí aktivovat celý modul
+
+    setOptometryItems((prev) => prev.filter((item) => item.id !== id));
+
+    // označí změnu pro autosave
+    if (typeof setHeaderClients === "function" && activeId?.id_client) {
+      setHeaderClients((prev) =>
+        prev.map((c) =>
+          c.id === activeId.id_client ? { ...c, notSavedDetected: true } : c
+        )
+      );
+    }
+  };
+
+  const handleCopyItem = (e, id) => {
+    e.stopPropagation(); // zabrání kliknutí aktivovat celý modul
+
+    setMemory((prev) => ({...prev, "dpt":id}));
+    console.log(memory);
+
+  };
+
   return (
     <div className="optometry-container">
       <div className="optometry-left-container">
@@ -295,6 +325,8 @@ function ClientOptometry({ client }) {
                   activeElement === 0 && activeItem === item.id ? "move" : ""
                 }`}
                 onClick={() => setActiveItem(item.id)}
+                onMouseEnter={() => setHoveredItemId(item.id)}
+                onMouseLeave={() => setHoveredItemId(null)}
               >
                 <Component
                   isActive={activeItem === item.id}
@@ -302,6 +334,26 @@ function ClientOptometry({ client }) {
                   itemValues={item.values}
                   onChange={(newValues) => handleUpdateItem(item.id, newValues)}
                 />
+                {/* Zobrazeni ikon */}
+                {hoveredItemId === item.id && (
+                  <>
+                    <div className="deleteSign">
+                      <img
+                        src={closeIcon}
+                        alt="Close"
+                        onClick={(e) => handleDeleteItem(e, item.id)}
+                      />
+                    </div>
+                    <div className="copySign">
+                      <img
+                        src={copyIcon}
+                        alt="Copy"
+                        height= "20px"
+                        onClick={(e) => handleCopyItem(e, item.id)}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             );
           })}
@@ -313,7 +365,9 @@ function ClientOptometry({ client }) {
           <h6>INFO</h6>
           <PuffLoaderSpinnerDark active={isLoading} />
         </div>
-
+          <div>
+            <OptometryInfo optometryItems={optometryItems} activeItem={activeItem}/>
+          </div>
         <div className="optometry-right-container-body">
           {optometryItems[activeItem - 1]?.component.name ===
             "OptometryAnamnesis" && (
