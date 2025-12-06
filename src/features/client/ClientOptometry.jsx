@@ -29,7 +29,7 @@ function ClientOptometry({ client }) {
     useUser();
 
   const [activeItem, setActiveItem] = useState(null);
-  const [activeElement, setActiveElement] = useState(null);
+  const [activeModul, setActiveModul] = useState(null);
   const [optometryRecordName, setOptometryRecordName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hoveredItemId, setHoveredItemId] = useState(null);
@@ -313,16 +313,14 @@ function ClientOptometry({ client }) {
                 id={item.id}
                 className={`optometry-modul ${item.width} ${
                   activeItem === item.id ? "active" : ""
-                } ${
-                  activeElement === 0 && activeItem === item.id ? "move" : ""
-                }`}
+                } ${activeModul === 0 && activeItem === item.id ? "move" : ""}`}
                 onClick={() => setActiveItem(item.id)}
                 onMouseEnter={() => setHoveredItemId(item.id)}
                 onMouseLeave={() => setHoveredItemId(null)}
               >
                 <Component
                   isActive={activeItem === item.id}
-                  setActiveElement={setActiveElement}
+                  setActiveModul={setActiveModul}
                   itemValues={item.values}
                   onChange={(newValues) => handleUpdateItem(item.id, newValues)}
                 />

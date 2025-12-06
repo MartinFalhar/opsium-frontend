@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 // import "./OptometryRefractionARKz.css";
+import copyIcon from "../../styles/svg/copy.svg";
 
 function OptometryRefractionARK({
   isActive,
-  setActiveElement,
+  setActiveModul,
   itemValues,
   onChange,
 }) {
@@ -33,6 +34,11 @@ function OptometryRefractionARK({
     if (e.key === "ArrowRight" && nextRef?.current) {
       nextRef.current.focus();
     }
+
+    if (e.key === "ArrowUp") {
+      setActiveModul();
+    }
+
     if (e.ctrlKey && e.key === "ArrowUp") {
       e.preventDefault();
 

@@ -145,7 +145,7 @@
 
 /* MODUL GRID MANAGEMENT */
 .grid-natural-visus {
-  display: grid; 
+  display: grid;
   grid-template-columns: 20% repeat(2, 1fr);
   gap: 0px;
   align-items: center;
@@ -205,7 +205,6 @@
   padding: 0;
   margin: 0;
 }
-
 
 .grid-natural-visus.active,
 .grid-refraction-ark.active,
@@ -352,5 +351,4 @@ input {
   cursor: pointer;
   color: var(--color-bg-b11);
   z-index: 10;
-  
 }
