@@ -32,63 +32,68 @@ export default function useAutosave({
   const isSavingRef = useRef(false);
 
   // Bezpečná funkce pro uložení do DB (ruční / interní)
-  const saveNow = useCallback(async () => {
-    if (!clientId) return;
-    if (typeof convertFn !== "function") return;
-    if (typeof saveToDBFn !== "function") return;
+  const saveNow = useCallback(
+    async (overrideData = null) => {
+      const finalData = overrideData ?? data;
+      const exportObject = convertFn(finalData);
+      if (!clientId) return;
+      if (typeof convertFn !== "function") return;
+      if (typeof saveToDBFn !== "function") return;
 
-    // Pokud už probíhá uložení, vyčkej
-    if (isSavingRef.current) return;
-    isSavingRef.current = true;
+      // Pokud už probíhá uložení, vyčkej
+      if (isSavingRef.current) return;
+      isSavingRef.current = true;
 
-    try {
-      const exportObject = convertFn(data);
-
-      const payload = {
-        id_clients: clientId,
-        id_branches: branchId,
-        id_members: memberId,
-        name,
-        data: exportObject,
-      };
-
-      await saveToDBFn(payload);
-
-      // uložit i do localStorage jako backup
       try {
-        localStorage.setItem(clientId, JSON.stringify(exportObject));
-      } catch (e) {
-        // ignore localStorage errors
-        console.warn("localStorage save failed", e);
-      }
+        // const exportObject = convertFn(data);
 
-      // reset change flag
-      changeOccuredRef.current = false;
+        const payload = {
+          id_clients: clientId,
+          id_branches: branchId,
+          id_members: memberId,
+          name,
+          data: exportObject,
+        };
 
-      // aktualizuj headerClients (notSavedDetected -> false)
-      if (typeof setHeaderClients === "function") {
-        setHeaderClients((prev) =>
-          prev.map((c) =>
-            c.id === clientId ? { ...c, notSavedDetected: false } : c
-          )
-        );
+        await saveToDBFn(payload);
+
+        // uložit i do localStorage jako backup
+        try {
+          localStorage.setItem(clientId, JSON.stringify(exportObject));
+        } catch (e) {
+          // ignore localStorage errors
+          console.warn("localStorage save failed", e);
+        }
+
+        // reset change flag
+        changeOccuredRef.current = false;
+
+        // aktualizuj headerClients (notSavedDetected -> false)
+        if (typeof setHeaderClients === "function") {
+          setHeaderClients((prev) =>
+            prev.map((c) =>
+              c.id === clientId ? { ...c, notSavedDetected: false } : c
+            )
+          );
+        }
+      } catch (err) {
+        console.error("saveNow failed", err);
+        throw err;
+      } finally {
+        isSavingRef.current = false;
       }
-    } catch (err) {
-      console.error("saveNow failed", err);
-      throw err;
-    } finally {
-      isSavingRef.current = false;
-    }
-  }, [
-    clientId,
-    branchId,
-    memberId,
-    name,
-    data,
-    convertFn,
-    saveToDBFn,
-    setHeaderClients,
-  ]);
+    },
+    [
+      clientId,
+      branchId,
+      memberId,
+      name,
+      data,
+      convertFn,
+      saveToDBFn,
+      setHeaderClients,
+    ]
+  );
 
   // Debounce localStorage save — zapis do localStorage po pauze
   useEffect(() => {

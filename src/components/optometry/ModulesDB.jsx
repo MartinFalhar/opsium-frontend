@@ -2,6 +2,9 @@ import OptometryAnamnesis from "../../components/optometry/OptometryAnamnesis";
 import OptometryNaturalVisus from "../../components/optometry/OptometryNaturalVisus";
 import OptometryRefractionARK from "../../components/optometry/OptometryRefractionARK";
 import OptometryRefractionFull from "../../components/optometry/OptometryRefractionFull";
+import OptometryIOT from "./OptometryIOT";
+import OptometryNearPointAccom from "./OptometryNearPointAccom";
+import OptometryNearPointConv from "./OptometryNearPointConv";
 
 function ModulesDB() {
   return [
@@ -72,6 +75,22 @@ function ModulesDB() {
       },
     },
     {
+      id: 7,
+      modul: 5,
+      width: "w25",
+      component: OptometryNearPointConv,
+      values: {
+        name: "Blízký bod konvegence",
+        //blur
+        b: 9,
+        //recovery
+        r: 15,
+        text: "",
+      },
+    },
+
+
+    {
       id: 5,
       modul: 3,
       width: "w75",
@@ -93,6 +112,46 @@ function ModulesDB() {
         pV: 0.633,
         lV: 0.83,
         bV: 1.253,
+        text: "",
+      },
+    },
+        {
+      id: 8,
+      modul: 5,
+      width: "w25",
+      component: OptometryNearPointAccom,
+      values: {
+        name: "Blízký bod akomodace",
+        //p-BLUR
+        pB: 9,
+        //p-Recovery
+        pR: 15,
+        //l-BLUR
+        lB: 12,
+        //l-Recovery
+        lR: 25,
+        bB: 12,
+        bR: 25,
+        text: "",
+      },
+    },
+    {
+      id: 6,
+      modul: 4,
+      width: "w50",
+      component: OptometryIOT,
+      values: {
+        name: "Nitrooční tlak",
+        pIOT: 16.5,
+        pCOR: -0.1,
+        pCCT: 553,
+        pAN: 28,
+        pAT: 35,
+        lIOT: 18.5,
+        lCOR: -0.3,
+        lCCT: 585,
+        lAN: 26,
+        lAT: 15,
         text: "",
       },
     },

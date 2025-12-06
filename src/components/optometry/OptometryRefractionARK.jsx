@@ -9,10 +9,6 @@ function OptometryRefractionARK({
 }) {
   const [values, setValues] = useState(itemValues);
 
-  useEffect(() => {
-    setValues(itemValues);
-  }, [itemValues]);
-
   // refs pro focus management (např. ArrowUp/ArrowDown)
   const pSphRef = useRef(null);
   const pCylRef = useRef(null);

@@ -123,7 +123,8 @@ function Client() {
           (client && client.activeTertiaryButton === null) ||
           client.notSavedDetected
         ) {
-          finalList = [{ name: "(neuloženo)" }, ...finalList];
+          //vypnutá funkce nastavující "neuloženo"
+          // finalList = [{ name: "(neuloženo)" }, ...finalList];
           // nastavíme globální stav – ale to NESMÍ spouštět celý effect znovu
           setHeaderClients((prev) =>
             prev.map((c) =>

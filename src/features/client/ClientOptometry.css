@@ -166,10 +166,53 @@
   background: var(--color-bg-b3);
   align-items: center;
 }
+.grid-iot {
+  display: grid;
+  grid-template-columns: 6% repeat(5, 1fr);
+  gap: 2px;
+  column-gap: 7px;
+  background: var(--color-bg-b3);
+  align-items: center;
+}
+.grid-near-point-conv {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  column-gap: 7px;
+  background: var(--color-bg-b3);
+  align-items: center;
+}
+.grid-near-point-accom {
+  display: grid;
+  grid-template-columns: 20% repeat(2, 1fr);
+  gap: 0px;
+  column-gap: 7px;
+  background: var(--color-bg-b3);
+  align-items: center;
+  padding: 0;
+  margin: 0;
+}
+.grid-near-point-accom p {
+  height: 0.5vw !important;
+  font-size: 12px !important;
+  padding: 0;
+  margin: 0;
+}
+
+.grid-near-point-accom input {
+  height: 1vw !important;
+  font-size: 15px !important;
+  padding: 0;
+  margin: 0;
+}
+
 
 .grid-natural-visus.active,
 .grid-refraction-ark.active,
-.grid-refraction-full.active {
+.grid-refraction-full.active,
+.grid-iot.active,
+.grid-near-point-conv.active,
+.grid-near-point-accom.active {
   background: var(--color-bg-b1);
 }
 
@@ -299,6 +342,7 @@ input {
   top: 10px;
   right: 5px;
   cursor: pointer;
+  z-index: 20;
 }
 
 .copySign {
@@ -307,5 +351,6 @@ input {
   right: 5px;
   cursor: pointer;
   color: var(--color-bg-b11);
- 
+  z-index: 10;
+  
 }

@@ -25,7 +25,8 @@ function ClientOptometry({ client }) {
   const optometryModules = ModulesDB();
   const [optometryItems, setOptometryItems] = useState(optometryModules);
 
-  const { user, headerClients, activeId, setHeaderClients, memory, setMemory } = useUser();
+  const { user, headerClients, activeId, setHeaderClients, memory, setMemory } =
+    useUser();
 
   const [activeItem, setActiveItem] = useState(null);
   const [activeElement, setActiveElement] = useState(null);
@@ -239,25 +240,16 @@ function ClientOptometry({ client }) {
 
   const handleDeleteItem = (e, id) => {
     e.stopPropagation(); // zabrání kliknutí aktivovat celý modul
-
-    setOptometryItems((prev) => prev.filter((item) => item.id !== id));
-
-    // označí změnu pro autosave
-    if (typeof setHeaderClients === "function" && activeId?.id_client) {
-      setHeaderClients((prev) =>
-        prev.map((c) =>
-          c.id === activeId.id_client ? { ...c, notSavedDetected: true } : c
-        )
-      );
-    }
+    setOptometryItems((prev) => {
+      const updated = prev.filter((item) => item.id !== id);
+      saveNow(updated);
+      return updated;
+    });
   };
 
   const handleCopyItem = (e, id) => {
     e.stopPropagation(); // zabrání kliknutí aktivovat celý modul
-
-    setMemory((prev) => ({...prev, "dpt":id}));
-    console.log(memory);
-
+    setMemory((prev) => ({ ...prev, dpt: id }));
   };
 
   return (
@@ -348,7 +340,7 @@ function ClientOptometry({ client }) {
                       <img
                         src={copyIcon}
                         alt="Copy"
-                        height= "20px"
+                        height="20px"
                         onClick={(e) => handleCopyItem(e, item.id)}
                       />
                     </div>
@@ -365,9 +357,12 @@ function ClientOptometry({ client }) {
           <h6>INFO</h6>
           <PuffLoaderSpinnerDark active={isLoading} />
         </div>
-          <div>
-            <OptometryInfo optometryItems={optometryItems} activeItem={activeItem}/>
-          </div>
+        <div>
+          <OptometryInfo
+            optometryItems={optometryItems}
+            activeItem={activeItem}
+          />
+        </div>
         <div className="optometry-right-container-body">
           {optometryItems[activeItem - 1]?.component.name ===
             "OptometryAnamnesis" && (
