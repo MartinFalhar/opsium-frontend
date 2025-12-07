@@ -29,7 +29,7 @@ function ClientOptometry({ client }) {
     useUser();
 
   const [activeItem, setActiveItem] = useState(null);
-  const [activeModul, setActiveModul] = useState(null);
+  const [activeModul, setActiveModul] = useState(false);
   const [optometryRecordName, setOptometryRecordName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hoveredItemId, setHoveredItemId] = useState(null);
@@ -252,6 +252,20 @@ function ClientOptometry({ client }) {
     setMemory((prev) => ({ ...prev, dpt: id }));
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && activeModul) {
+      setActiveModul(false);
+    }
+    if (e.key === "ArrowRight" && activeModul) {
+      setActiveItem(activeItem + 1);
+    }
+    if (e.key === "ArrowLeft" && activeModul) {
+      activeItem > 1 ? setActiveItem(activeItem - 1) : null;
+    }
+  };
+
+
+
   return (
     <div className="optometry-container">
       <div className="optometry-left-container">
@@ -304,22 +318,26 @@ function ClientOptometry({ client }) {
           </div>
         </div>
 
-        <div className="optometry-area">
+        <div className="optometry-area" tabIndex={0} onKeyDown={handleKeyDown}>
           {optometryItems.map((item) => {
             const Component = item.component;
             return (
               <div
+
                 key={item.id}
                 id={item.id}
                 className={`optometry-modul ${item.width} ${
                   activeItem === item.id ? "active" : ""
-                } ${activeModul === 0 && activeItem === item.id ? "move" : ""}`}
+                } ${
+                  activeModul === true && activeItem === item.id ? "move" : ""
+                }`}
                 onClick={() => setActiveItem(item.id)}
                 onMouseEnter={() => setHoveredItemId(item.id)}
                 onMouseLeave={() => setHoveredItemId(null)}
               >
                 <Component
                   isActive={activeItem === item.id}
+                  activeModul={activeModul}
                   setActiveModul={setActiveModul}
                   itemValues={item.values}
                   onChange={(newValues) => handleUpdateItem(item.id, newValues)}

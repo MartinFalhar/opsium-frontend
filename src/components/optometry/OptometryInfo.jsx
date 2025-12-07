@@ -4,9 +4,7 @@ import { useUser } from "../../context/UserContext";
 
 export default function OptometryInfo(optometryItems, activeItem) {
     const { user, headerClients, activeId, memory, setMemory} = useUser();
-    console.log(headerClients);
-    console.log(activeId.id_client);
-    // console.log(activeItem);
+     // console.log(activeItem);
     const activeClient = headerClients.map((c, index) =>
     c.id === activeId.id_client ? index : null)
     

@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 
 function OptometryAnamnesis({
   isActive,
-  setActiveElement,
+  activeModul,
+  setActiveModul,
   itemValues,
   onChange,
 }) {
@@ -18,22 +19,28 @@ function OptometryAnamnesis({
     onChange?.(newData);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowUp") {
+      setActiveModul(true);
+    }
+  };
+
   return (
-    <>
-      <div className={`modul ${isActive ? "active" : ""}`}>
-        <input
-          value={values.name}
-          className={`modul-name ${isActive ? "active" : ""}`}
-          type="numeric"
-          onChange={(e) => handleChange("name", e.target.value)}
-        />
-        <textarea
-          value={values.text}
-          placeholder={`Zde zadejte text...`}
-          onChange={(e) => handleChange("text", e.target.value)}
-        />
-      </div>
-    </>
+    <div
+      className={`modul ${isActive ? "active" : ""}`}
+      onKeyDown={handleKeyDown}
+    >
+      <input
+        value={values.name}
+        className={`modul-name ${isActive ? "active" : ""}`}
+        onChange={(e) => handleChange("name", e.target.value)}
+      />
+
+      <textarea
+        value={values.text}
+        onChange={(e) => handleChange("text", e.target.value)}
+      />
+    </div>
   );
 }
 

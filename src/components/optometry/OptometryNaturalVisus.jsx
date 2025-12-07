@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from "react";
 
 function OptometryNaturalVisus({
   isActive,
-  setActiveElement,
+  setActiveModul,
   itemValues,
   onChange,
 }) {
@@ -23,16 +23,19 @@ function OptometryNaturalVisus({
     onChange?.(newData);
   };
 
-  const handleKeyDown = (e) => {
+    const handleKeyDown = (e) => {
     if (e.key === "ArrowUp") {
-      input2Ref.current?.focus();
-      setActiveElement(0);
+      setActiveModul(true);
+      console.log(`activeModul = true`);
     }
   };
 
   return (
     
-      <div className={`modul ${isActive ? "active" : ""}`}>
+      <div className={`modul ${isActive ? "active" : ""}`}
+      onKeyDown={(e) => handleKeyDown(e)}>
+
+
         <input
           value={values.name}
           className={`modul-name ${isActive ? "active" : ""}`}
