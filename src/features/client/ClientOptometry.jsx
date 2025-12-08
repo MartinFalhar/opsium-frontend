@@ -252,9 +252,13 @@ function ClientOptometry({ client }) {
     setMemory((prev) => ({ ...prev, dpt: id }));
   };
 
+  const ruka = useRef(null);
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && activeModul) {
+      e.preventDefault();
       setActiveModul(false);
+      ruka.current.focus();
     }
     if (e.key === "ArrowRight" && activeModul) {
       setActiveItem(activeItem + 1);
@@ -263,8 +267,6 @@ function ClientOptometry({ client }) {
       activeItem > 1 ? setActiveItem(activeItem - 1) : null;
     }
   };
-
-
 
   return (
     <div className="optometry-container">
@@ -321,9 +323,9 @@ function ClientOptometry({ client }) {
         <div className="optometry-area" tabIndex={0} onKeyDown={handleKeyDown}>
           {optometryItems.map((item) => {
             const Component = item.component;
+            const isActive = activeItem === item.id;
             return (
               <div
-
                 key={item.id}
                 id={item.id}
                 className={`optometry-modul ${item.width} ${
@@ -336,6 +338,7 @@ function ClientOptometry({ client }) {
                 onMouseLeave={() => setHoveredItemId(null)}
               >
                 <Component
+                  ref={isActive ? ruka : null}
                   isActive={activeItem === item.id}
                   activeModul={activeModul}
                   setActiveModul={setActiveModul}

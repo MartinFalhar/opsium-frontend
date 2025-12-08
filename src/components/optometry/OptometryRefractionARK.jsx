@@ -54,6 +54,10 @@ function OptometryRefractionARK({
     }
   };
 
+  const handleFocus = (e) => {
+    e.target.select();
+  };
+
   return (
     <div className={`modul ${isActive ? "active" : ""}`}>
       <input
@@ -80,6 +84,7 @@ function OptometryRefractionARK({
           onKeyDown={(e) => handleKeyDown(e, pCylRef)}
         /> */}
         <input
+          onFocus={handleFocus}
           ref={pSphRef}
           value={values.pS || ""}
           type="text"

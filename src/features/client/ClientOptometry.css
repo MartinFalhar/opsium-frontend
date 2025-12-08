@@ -29,6 +29,7 @@
   /* padding: 10px; */
   box-sizing: border-box;
   margin: 0px;
+  outline: none;
 }
 .optometry-right-container {
   background: var(--color-bg-b2);
