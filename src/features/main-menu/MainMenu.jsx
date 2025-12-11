@@ -31,10 +31,17 @@ const buttons = [
     icon: "clients",
   },
   {
-    id: "shop",
-    label: "Obchod",
+    id: "invoices",
+    label: "Zakázky",
     rights: 1,
-    path: "/shop",
+    path: "/invoices",
+    icon: "catalog",
+  },
+  {
+    id: "cashdesk",
+    label: "Pokladna",
+    rights: 1,
+    path: "/cashdesk",
     icon: "shop",
   },
   {

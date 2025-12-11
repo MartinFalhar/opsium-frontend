@@ -12,7 +12,8 @@ import VistrainingLayout from "./layouts/VistrainingLayout";
 
 import Dashboard from "./features/dashboard/Dashboard";
 import Clients from "./features/clients/Clients";
-import Shop from "./features/shop/Shop";
+import Invoices from "./features/invoices/Invoices";
+import Cashdesk from "./features/cashdesk/Cashdesk";
 import Assistant from "./features/assistant/Assistant";
 import Store from "./features/store/Store";
 import Catalog from "./features/catalog/Catalog";
@@ -43,7 +44,8 @@ export default function RoutesConfig() {
 
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/clients" element={<Clients />} />
-        <Route path="/shop" element={<Shop />} />
+        <Route path="/invoices" element={<Invoices />} />
+        <Route path="/cashdesk" element={<Cashdesk />} />
         <Route path="/assistant" element={<Assistant />} />
         <Route path="/store" element={<Store />} />
         <Route path="/catalog" element={<Catalog />} />
