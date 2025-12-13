@@ -88,9 +88,6 @@ function AdminMembers() {
 
   return (
     <div className="admin-content-container ">
-      <div className="header-button-group">
-        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>Nový člen</button>
-      </div>
       <div className="search-container">
         <input
           className="client-search-input"
@@ -99,6 +96,7 @@ function AdminMembers() {
           onChange={(e) => setSearchClient(e.target.value)}
           placeholder="Hledej uživatele"
         />
+        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>Nový člen</button>
       </div>
       <div className="clients-list-container">
         <h1>

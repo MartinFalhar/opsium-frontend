@@ -160,9 +160,10 @@ input {
 }
 
 h1 {
-  font-size: clamp(var(--font-size-small), 2.5vw, var(--font-size-large));
-  color: var(--color-bg-b9);
+  font-size: clamp(var(--font-size-small), 2.5vw, var(--font-size-xlarge));
+  color: var(--color-bg-b11);
   text-align: left;
+  font-weight: 800;
   letter-spacing: 1px;
   font-weight: 400;
 }
@@ -216,6 +217,11 @@ h6 {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
+}
+
+h7 {
+  font-size: clamp(var(--font-size-small), 2.2vw, var(--font-size-large));
+  color: var(--color-bg-b1);    
 }
 
 p {
@@ -292,6 +298,12 @@ button {
   font-size: clamp(var(--font-size-small), 2.5vw, var(--font-size-regular));
 }
 
+button:hover {
+    background: var(--color-bg-b1);
+  color: var(--color-bg-b11);
+
+}
+
 .menu-btn {
   position: relative;
   font-size: small;
@@ -361,7 +373,21 @@ button {
   margin-left: 6px;
 }
 
-/* ----------- INFO BOX MANAGEMENT*/
+/* ----------- INFO BOX & INPUT PANEL MANAGEMENT*/
+.input-panel {
+  display: flex;
+  flex-flow: column;
+  border: 1px solid var(--color-bg-b9);
+  padding: 16px;
+  border-radius: 8px;
+  margin: 16px 10px 0px 10px; 
+  flex: 1;
+  min-width: 150px;
+  background: var(--color-bg-b9);
+}
+
+
+
 
 .info-box {
   border: 1px solid var(--color-el-e);
@@ -676,30 +702,51 @@ button {
 .search-container {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
   background: var(--color-grd-g13);
   width: 100%;
   height: 50px;
   padding-left: 50px;
+  gap: 50px;
 }
 
 .admin-menu-btn {
   position: relative;
-  font-size: small;
-  background: var(--color-bg-b3);
-  color: var(--color-bg-b9);
-  border: 1px solid var(--color-el-e);
+  font-size: regular;
+  background: var(--color-grd-g2);
+  color: var(--color-bg-b1);
+  border: 1px solid var(--color-el-i);
   border-radius: 5px;
   padding: 0px;
   cursor: pointer;
   transition: all 0.2s ease;
-  width: clamp(2vw, 5vw, 6vw);
+  width: clamp(2vw, 7vw, 8vw);
   height: clamp(1vw, 2vw, 3vw);
-  margin-top: 5px;
+  margin-right: 50px;
 }
 
 .admin-menu-btn:hover {
-  background: var(--color-grd-g3);
-  color: var(--color-bg-b1);
-  border: 1px solid var(--color-bg-b4);
+  background: var(--color-bg-b1);
+  color: var(--color-bg-b11);
+  border: 1px solid var(--color-bg-b11);
+}
+
+/* ----------- NEW INVOICE LAYOUT */
+
+.input-area-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;  
+    
+}
+
+.input-area-content {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;  
+    
 }

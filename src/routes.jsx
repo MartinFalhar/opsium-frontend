@@ -13,6 +13,7 @@ import VistrainingLayout from "./layouts/VistrainingLayout";
 import Dashboard from "./features/dashboard/Dashboard";
 import Clients from "./features/clients/Clients";
 import Invoices from "./features/invoices/Invoices";
+import InvoiceNew from "./features/invoices/InvoiceNew";
 import Cashdesk from "./features/cashdesk/Cashdesk";
 import Assistant from "./features/assistant/Assistant";
 import Store from "./features/store/Store";
@@ -45,6 +46,7 @@ export default function RoutesConfig() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/clients" element={<Clients />} />
         <Route path="/invoices" element={<Invoices />} />
+        <Route path="/invoice-new" element={<InvoiceNew />} />
         <Route path="/cashdesk" element={<Cashdesk />} />
         <Route path="/assistant" element={<Assistant />} />
         <Route path="/store" element={<Store />} />

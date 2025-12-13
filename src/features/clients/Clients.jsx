@@ -2,6 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import "./Clients.css";
 import Modal from "../../components/modal/Modal.jsx";
+import { useNavigate, Navigate } from "react-router-dom";
 
 import { useUser } from "../../context/UserContext";
 
@@ -36,6 +37,7 @@ function Clients() {
   const [searchClient, setSearchClient] = useState("");
   const [clients, setClients] = useState([]);
   const [showModal, setShowModal] = useState(false);
+    const navigate = useNavigate();
 
   const addClient = (newClient) => {
     setHeaderClients((prev) => {
@@ -50,6 +52,8 @@ function Clients() {
         },
       ];
     });
+
+    navigate(`/client/${newClient.id}`)
   };
 
   useEffect(() => {
@@ -107,9 +111,6 @@ function Clients() {
   return (
     <div className="clients-container">
       <div className="clients-left-column">
-        <div className="button-group">
-          <button onClick={() => setShowModal(true)}>Přidat klienta</button>
-        </div>
         <div className="clients-search-container">
           <div className="client-search">
             <input
@@ -120,6 +121,7 @@ function Clients() {
               placeholder="Hledej klienta"
             />
             <button type="submit">Hledej</button>
+          <button onClick={() => setShowModal(true)}>Přidat klienta</button>
           </div>
         </div>
         <div className="clients-list-container">

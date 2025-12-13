@@ -93,11 +93,7 @@ function AdminAccounts() {
 
   return (
     <div className="admin-content-container ">
-      <div className="header-button-group">
-        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>
-          Nový účet
-        </button>
-      </div>
+
       <div className="search-container">
         <input
           className="client-search-input"
@@ -106,6 +102,9 @@ function AdminAccounts() {
           onChange={(e) => setSearchClient(e.target.value)}
           placeholder="Hledej uživatele"
         />
+        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>
+          Nový účet
+        </button>
       </div>
       <div className="clients-list-container">
         <h1>

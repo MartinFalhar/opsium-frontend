@@ -31,7 +31,7 @@ function Client() {
     },
     {
       id: 3,
-      label: "Zakázky",
+      label: "Zakázky klienta",
       onClick: () => console.log("Invoices clicked"),
       rights: 0,
       component: ClientInvoices,
