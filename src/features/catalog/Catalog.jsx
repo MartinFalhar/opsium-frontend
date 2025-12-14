@@ -95,9 +95,9 @@ function Catalog() {
       <div className="left-container">
         {Component ? <Component client={user} /> : null}
       </div>
-      <div className="right-container">
+      {/* <div className="right-container">
         <h1>INFO</h1>
-      </div>
+      </div> */}
     </div>
   );
 }

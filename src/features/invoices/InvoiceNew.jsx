@@ -35,7 +35,7 @@ function InvoiceNew() {
     vat_b: 22.22,
     price_c: 333.33,
     vat_c: 33.33,
-  }
+  };
 
   const handleSaveNewInvoice = async () => {
     try {
@@ -60,7 +60,6 @@ function InvoiceNew() {
   };
 
   const handleSaveTransaction = async () => {
-
     try {
       const res = await fetch(`${API_URL}/store/new-transaction`, {
         method: "POST",
