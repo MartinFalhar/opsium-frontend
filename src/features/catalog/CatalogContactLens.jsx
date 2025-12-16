@@ -11,6 +11,8 @@ function CatalogContactLens({ client }) {
         className="input-panel"
         style={{
           flexDirection: "row",
+          background: "var(--color-bg-b9)",
+          border: "var(--color-bg-b1)",
         }}
       >
         <div
@@ -22,7 +24,6 @@ function CatalogContactLens({ client }) {
             flex: "1",
           }}
         >
-          <h2>Filtr kontaktních čoček</h2>
           <div className="segmented-control">
             {["1D", "7D", "14D", "30D", "více"].map((value) => (
               <button
@@ -50,19 +51,17 @@ function CatalogContactLens({ client }) {
             ))}
           </div>
           <div className="segmented-control">
-            {["Alcon", "Bausch+Lomb", "Coopervision", "Johnson&Johnson"].map(
-              (value) => (
-                <button
-                  key={value}
-                  className={`button-controler ${
-                    selected === value ? "active" : ""
-                  }`}
-                  onClick={() => setSelected(value)}
-                >
-                  {value}
-                </button>
-              )
-            )}
+            {["Alcon", "B+L", "Coopervision", "J&J"].map((value) => (
+              <button
+                key={value}
+                className={`button-controler ${
+                  selected === value ? "active" : ""
+                }`}
+                onClick={() => setSelected(value)}
+              >
+                {value}
+              </button>
+            ))}
           </div>
           <div className="segmented-control">
             {[
