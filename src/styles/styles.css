@@ -237,7 +237,7 @@ h7 {
 
 p {
   font-size: clamp(var(--font-size-small), 1.8vw, var(--font-size-regular));
-  color: var(--color-bg-b10);
+  color: var(--color-bg-b1);
   text-align: left;
   font-weight: 400;
 }

@@ -94,7 +94,7 @@ function Store() {
                   handleSearchInStore(searchInStore);
                 }
               }}
-              placeholder="Hledej klienta"
+              placeholder="Hledej model obruby"
             />
             <button
               type="submit"
@@ -111,7 +111,7 @@ function Store() {
             </div>
             <h1>Zobrazeno položek: {clients.length} ks</h1>
             <h1>
-              Klienti (strana {page}/{totalPages})
+              Položek (strana {page}/{totalPages})
             </h1>
           </div>
           <Pagination

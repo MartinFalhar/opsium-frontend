@@ -1,10 +1,64 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Catalog.css";
+import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
+import Pagination from "../../components/pagination/Pagination.jsx";
 
-function CatalogContactLens({ client }) {
-  const [selected, setSelected] = useState("1D");
 
-  console.log("CatalogContactLens - user:", client.name);
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+
+
+function CatalogContactLens() {
+  const [selectedFreq, setSelectedFreq] = useState("1D");
+  const [selectedDesign, setSelectedDesign] = useState("MONO");
+  const [selectedManufact, setSelectedManufact] = useState("Alcon");
+
+    const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [searchInCatalog, setSearchInCatalog] = useState("");
+    const [clList, setClList] = useState([]);
+    //PAGINATION HOOKS
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const limit = 6;
+
+    useEffect(() => {
+      handleSearchInCatalog(searchInCatalog);
+    }, [page]);
+  
+    const handleSearchInCatalog = async (values) => {
+      setIsLoading(true);
+      const loadItems = async () => {
+        try {
+          const res = await fetch(
+            `${API_URL}/catalog/clsearch?page=${page}&limit=${limit}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ searchText: values }),
+            }
+          );
+          const data = await res.json();
+  
+          if (res.ok) {
+            setClList(data.items);
+            setTotalPages(data.totalPages);
+            setIsLoading(false);
+          } else {
+            setError(data.message);
+            console.error("Error loading items:", error);
+          }
+        } catch (err) {
+          console.error("Fetch error:", err);
+          setError("Nepodařilo se načíst klienty.");
+        }
+      };
+      loadItems();
+    };
+
+
+
   return (
     <div>
       <div
@@ -29,61 +83,41 @@ function CatalogContactLens({ client }) {
               <button
                 key={value}
                 className={`button-controler ${
-                  selected === value ? "active" : ""
+                  selectedFreq === value ? "active" : ""
                 }`}
-                onClick={() => setSelected(value)}
+                onClick={() => setSelectedFreq(value)}
               >
                 {value}
               </button>
             ))}
           </div>
           <div className="segmented-control">
-            {["MONO", "ASTG", "MTF", "Myopia Control"].map((value) => (
+            {["MONO", "ASTG", "MTF", "Barevné", "Myopia Control"].map((value) => (
               <button
                 key={value}
                 className={`button-controler ${
-                  selected === value ? "active" : ""
+                  selectedDesign === value ? "active" : ""
                 }`}
-                onClick={() => setSelected(value)}
+                onClick={() => setSelectedDesign(value)}
               >
                 {value}
               </button>
             ))}
           </div>
           <div className="segmented-control">
-            {["Alcon", "B+L", "Coopervision", "J&J"].map((value) => (
+            {["Alcon", "B+L", "CooperVision", "J&J"].map((value) => (
               <button
                 key={value}
                 className={`button-controler ${
-                  selected === value ? "active" : ""
+                  selectedManufact === value ? "active" : ""
                 }`}
-                onClick={() => setSelected(value)}
+                onClick={() => setSelectedManufact(value)}
               >
                 {value}
               </button>
             ))}
           </div>
-          <div className="segmented-control">
-            {[
-              "Total",
-              "Oasys",
-              "Ultra",
-              "PureVision",
-              "Biofinty",
-              "Precision",
-              "Avaira",
-            ].map((value) => (
-              <button
-                key={value}
-                className={`button-controler ${
-                  selected === value ? "active" : ""
-                }`}
-                onClick={() => setSelected(value)}
-              >
-                {value}
-              </button>
-            ))}
-          </div>
+
         </div>
         <div
           className="cl-direct-dioptric"
@@ -98,6 +132,24 @@ function CatalogContactLens({ client }) {
           <p>L/-3.50/-1.25/180/+2.50/DOM</p>
         </div>
       </div>
+
+          
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={(p) => setPage(p)}
+        />
+        {!clList?.length > 0 && <PuffLoaderSpinnerLarge active={isLoading} />}
+        {clList?.length > 0 &&
+            clList.map((clens) => (
+              <div key={clens.id} className="client-item">
+                <h1>
+                  {`${clens.name} ${clens.manufacturer} ${clens.design} ${clens.freq}`}{" "}
+                </h1>
+                <p>{`${clens.range}`}</p>
+              </div>
+            ))}
+
       <div className="input-panel">
         List container for contact lens
         <p>Expandable container</p>

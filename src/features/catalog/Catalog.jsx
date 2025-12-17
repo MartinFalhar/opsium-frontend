@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import "./Catalog.css";
 import Modal from "../../components/modal/Modal.jsx";
 
+
 import { useUser } from "../../context/UserContext";
 
 import CatalogLens from "./CatalogLens.jsx";
@@ -10,8 +11,6 @@ import CatalogContactLens from "./CatalogContactLens.jsx";
 import CatalogSolutionsDrops from "./CatalogSolutionsDrops.jsx";
 
 import menuIcon from "../../styles/svg/mirror-line.svg";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 function Catalog() {
   const buttons = [
@@ -37,6 +36,7 @@ function Catalog() {
       icon: "eye",
     },
   ];
+
 
   //nastavuje komponentu z menu
   const [menuComponent, setMenuComponent] = useState(null);
@@ -101,6 +101,7 @@ function Catalog() {
         }}
       >
         {Component ? <Component client={user} /> : null}
+
       </div>
       {/* <div className="right-container">
         <h1>INFO</h1>
