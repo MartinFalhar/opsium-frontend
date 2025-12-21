@@ -1,0 +1,66 @@
+.modul-input-dioptric-values {
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+  gap: 1px;
+  column-gap: 4px;
+  background: var(--color-bg-b9);
+}
+
+
+.modul-input-dioptric-values p,
+input {
+  height: 2.2vw; /* sjednocená výška */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  
+}
+
+.modul-input-dioptric-values input {
+  font-size: clamp(var(--font-size-xsmall), 1.2vw, 1.2vw);
+  /* border: 1px solid var(--color-bg-b3); */
+  border-radius: 0px;
+  color: var(--color-bg-b1);
+  font-weight: bold;
+  width: 100%;
+  height: 1.7vw;
+  padding: 0.2vw;
+  text-align: center;
+  background: var(--color-bg-b9);
+}
+
+
+.modul-input-dioptric-values p {
+  font-size: clamp(var(--font-size-small), 0.9vw, 1vw);
+  background: var(--color-bg-b9);
+  text-align: center;  
+  font-weight: bold;
+  margin: 0;
+  color: var(--color-bg-b1);
+}
+
+.modul-input-dioptric-values.active input {
+  color: var(--color-bg-b1);
+  background: var(--color-bg-b10);
+    border-bottom: 2px solid var(--color-bg-b8);
+  border-radius: 0px;
+  outline: none;
+}
+
+.modul-input-dioptric-values.active input:focus {
+  background-color: var(--color-bg-b3);
+  color: var(--color-bg-b10);
+  /* box-shadow: 0 0 15px var(--color-el-e); */
+  border-bottom: 2px solid var(--color-el-m);
+}
+
+
+
+.grid-input-dioptric-values {
+  display: grid;
+  grid-template-columns: 20% repeat(3, 1fr);
+  gap: 2px;
+  background: var(--color-bg-b9);
+  align-items: center;
+}
