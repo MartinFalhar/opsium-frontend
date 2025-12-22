@@ -3,6 +3,7 @@ import "./Catalog.css";
 import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
 import Pagination from "../../components/pagination/Pagination.jsx";
 import InputDioptricValues from "../../components/catalog/InputDioptricValues.jsx";
+import { useUser } from "../../context/UserContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -26,14 +27,20 @@ function CatalogContactLens() {
   const [clList, setClList] = useState([]);
 
   const [itemValues, setItemValues] = useState(item);
+
+  const { catalog_cl, setCatalog_cl } = useUser();
   //PAGINATION HOOKS
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 6;
 
+  // useEffect(() => {
+  //   handleSearchInCatalog(searchInCatalog);
+  // }, [page]);
+
   useEffect(() => {
     handleSearchInCatalog(searchInCatalog);
-  }, [page]);
+  }, []);
 
   const handleSearchInCatalog = async (values) => {
     setIsLoading(true);
@@ -50,7 +57,28 @@ function CatalogContactLens() {
         const data = await res.json();
 
         if (res.ok) {
-          setClList(data.items);
+          // Normalize items: if `clens.range` is an object that itself contains the key `range`,
+          // replace it with a fallback array so the UI can safely render it.
+          const processedItems = data.items.map((clens) => {
+
+
+            if (clens?.range && typeof clens.range === "object" && "range" in clens.range) {
+              return { ...clens, range: ["Nedostupné hodnoty"] };
+            }
+
+            console.log("CLENS RANGE TYPE:", clens.range);
+
+            // if (Array.isArray(clens.range)) {
+
+
+
+
+
+
+            return clens;
+          });
+
+          setClList(processedItems);
           setTotalPages(data.totalPages);
           setIsLoading(false);
         } else {
@@ -61,6 +89,10 @@ function CatalogContactLens() {
         console.error("Fetch error:", err);
         setError("Nepodařilo se načíst klienty.");
       }
+
+
+
+
     };
     loadItems();
   };
@@ -70,7 +102,6 @@ function CatalogContactLens() {
       <div
         className="input-panel"
         style={{
-
           flexDirection: "row",
           background: "var(--color-bg-b9)",
           border: "var(--color-bg-b1)",
@@ -128,31 +159,34 @@ function CatalogContactLens() {
           </div>
         </div>
         <div className="cl-direct-dioptric">
-
           <InputDioptricValues
             itemValues={itemValues}
             onChange={(newValues) => setItemValues(newValues)}
           />
         </div>
-
       </div>
-      <Pagination
-        currentPage={page}
-        totalPages={totalPages}
-        onPageChange={(p) => setPage(p)}
-      />
-      {!clList?.length > 0 && <PuffLoaderSpinnerLarge active={isLoading} />}
-      {clList?.length > 0 &&
-        clList.map((clens) => (
-          <div key={clens.id} className="client-item">
-            <h1>
-              {`${clens.name} ${clens.manufacturer} ${clens.design} ${clens.freq}`}{" "}
-            </h1>
-            <p>{`${clens.range}`}</p>
-          </div>
-        ))}
-
-      <div className="input-panel">
+      <div
+        className="input-panel"
+        style={{
+          height: "550px",
+          overflowY: "scroll",
+        }}
+      >
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={(p) => setPage(p)}
+        />
+        {!clList?.length > 0 && <PuffLoaderSpinnerLarge active={isLoading} />}
+        {clList?.length > 0 &&
+          clList.map((clens) => (
+            <div key={clens.id} className="client-item-2">
+              <h1>
+                {`${clens.name} ${clens.manufacturer} ${clens.design} ${clens.freq}`}{" "}
+              </h1>
+              <p>{`${JSON.stringify(clens.range)}`}</p>
+            </div>
+          ))}
         List container for contact lens
         <p>Expandable container</p>
       </div>

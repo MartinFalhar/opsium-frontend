@@ -11,6 +11,7 @@ export function UserProvider({ children }) {
     id_client: null,
   });
   const [memory, setMemory] = useState([]);
+  const [catalog_cl, setCatalog_cl] = useState([]);
 
 
   // Načtení uživatele z localStorage při startu aplikace
@@ -42,7 +43,9 @@ export function UserProvider({ children }) {
         activeId,
         setActiveId,
         memory,
-        setMemory
+        setMemory,
+        catalog_cl,
+        setCatalog_cl,
       }}
     >
       {children}
