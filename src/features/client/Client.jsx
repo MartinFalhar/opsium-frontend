@@ -263,6 +263,9 @@ function Client() {
         {/* {console.log(`XXXCLIENT ${JSON.stringify(client)}`)} */}
         {Component ? <Component client={client} /> : null}
       </div>
+      <div className="right-container">
+        <h1>INFO</h1>
+      </div>
     </div>
   );
 }

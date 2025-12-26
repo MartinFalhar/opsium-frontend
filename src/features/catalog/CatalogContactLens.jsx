@@ -9,14 +9,14 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function CatalogContactLens() {
   const demoValues = {
-    pS: "-6.50",
-    pC: "-3.25",
+    pS: "-1.00",
+    pC: "-1.75",
     pA: "180",
     lS: "+3.00",
     lC: "0",
     lA: "150",
   };
-  const vd = 0.0;
+  const vd = 0.012;
 
   const calculateCL = (values) => {
     const parse = (v) => {
@@ -32,7 +32,7 @@ function CatalogContactLens() {
       key === "pC" ? (val += parse(values["pS"]) || 0) : null;
       key === "lC" ? (val += parse(values["lS"]) || 0) : null;
 
-      let cl = val / (1 - vd * val);
+      let cl = Math.round((val / (1 - vd * val)) * 4) / 4;
 
       key === "pC" && cl > res["pS"] ? (cl += parse(res["pS"]) || 0) : null;
       key === "pC" && cl < res["pS"] ? (cl -= parse(res["pS"]) || 0) : null;
@@ -42,6 +42,8 @@ function CatalogContactLens() {
 
     return res;
   };
+
+  const [showClDetailID, setShowClDetailID] = useState(null);
 
   const [selectedFreq, setSelectedFreq] = useState("1D");
   const [selectedDesign, setSelectedDesign] = useState("MONO");
@@ -172,6 +174,10 @@ function CatalogContactLens() {
     loadItems();
   };
 
+  const showClDetail = (clId) => {
+    clId === showClDetailID ? setShowClDetailID(null) : setShowClDetailID(clId);
+  };
+
   return (
     <div>
       <div
@@ -253,13 +259,7 @@ function CatalogContactLens() {
           </div>
         </div>
       </div>
-      <div
-        className="input-panel"
-        style={{
-          height: "550px",
-          overflowY: "scroll",
-        }}
-      >
+      <div className="show-items-panel">
         <Pagination
           currentPage={page}
           totalPages={totalPages}
@@ -268,15 +268,41 @@ function CatalogContactLens() {
         {!clList?.length > 0 && <PuffLoaderSpinnerLarge active={isLoading} />}
         {clList?.length > 0 &&
           clList.map((clens) => (
-            <div key={clens?.id} className="client-item-2">
+            <div
+              key={clens?.id}
+              className="cl-item"
+              onClick={() => showClDetail(clens?.id)}
+            >
               <h1>
-                {`${clens?.name} ${clens?.manufacturer} ${clens?.design} ${clens?.freq}`}{" "}
+                {`${clens?.name} ${clens?.manufacturer} ${
+                  clens?.design == 1
+                    ? "MONO"
+                    : clens?.design == 2
+                    ? "ASTG"
+                    : clens?.design == "MTF"
+                    ? "MTF"
+                    : clens?.design == "Barevné"
+                    ? "Barevné"
+                    : "Myopia Control"
+                } ${clens?.freq} denní`}{" "}
               </h1>
-              <p>{`${JSON.stringify(clens?.range)}`}</p>
+              {showClDetailID === clens?.id && (
+                <div className="cl-item-details">
+                  <p>{`Materiál: ${
+                    clens?.material
+                  } Středová tloušťka: ${JSON.stringify(
+                    clens?.thickness / 1000
+                  )} mm`}</p>
+                  <p>{`Průměr: ${JSON.stringify(
+                    clens?.dia / 10
+                  )} Zakřivení: ${JSON.stringify(clens?.bc1 / 10)}`}</p>
+                  <p>{`Obsah vody: ${JSON.stringify(
+                    clens?.h20
+                  )}% Dk/t: ${JSON.stringify(clens?.dkt / 10)}`}</p>
+                </div>
+              )}
             </div>
           ))}
-        List container for contact lens
-        <p>Expandable container</p>
       </div>
     </div>
   );

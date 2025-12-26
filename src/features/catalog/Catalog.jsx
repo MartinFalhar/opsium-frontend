@@ -92,20 +92,9 @@ function Catalog() {
           );
         })}
       </div>
-      <div
-        className="left-container"
-        style={{
-          flexDirection: "row",
-          background: "var(--color-bg-b5)",
-          border: "var(--color-bg-b1)",
-        }}
-      >
+
         {Component ? <Component client={user} /> : null}
 
-      </div>
-      {/* <div className="right-container">
-        <h1>INFO</h1>
-      </div> */}
     </div>
   );
 }

@@ -181,6 +181,33 @@ h1 {
 
 h2 {
   font-size: clamp(var(--font-size-small), 2.3vw, var(--font-size-large));
+  color: var(--color-bg-b1);
+  text-align: left;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: clamp(var(--font-size-small), 1.0vw, var(--font-size-small));
+  color: var(--color-bg-b5);
+  text-align: left;
+  font-weight: 800;
+}
+
+h4 {
+  font-size: clamp(var(--font-size-small), 1.0vw, var(--font-size-small));
+  color: var(--color-bg-b10);
+  text-align: left;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
+h7 {
+  font-size: clamp(var(--font-size-small), 2.2vw, var(--font-size-large));
+  color: var(--color-bg-b1);
+}
+
+.fancy-1 {
+  font-size: clamp(var(--font-size-small), 2.3vw, var(--font-size-large));
   text-align: left;
   background: var(--color-grd-g6);
   -webkit-background-clip: text;
@@ -189,7 +216,7 @@ h2 {
   color: transparent;
 }
 
-h3 {
+.fancy-2 {
   font-size: clamp(var(--font-size-small), 2.2vw, var(--font-size-large));
   color: var(--color-bg-b2);
   text-align: left;
@@ -199,7 +226,8 @@ h3 {
   background-clip: text;
   color: transparent;
 }
-h4 {
+
+.fancy-3 {
   font-size: clamp(var(--font-size-small), 2.2vw, var(--font-size-large));
   color: var(--color-bg-b2);
   text-align: left;
@@ -209,7 +237,8 @@ h4 {
   background-clip: text;
   color: transparent;
 }
-h5 {
+
+.fancy-4 {
   font-size: clamp(var(--font-size-small), 2.2vw, var(--font-size-large));
   color: var(--color-bg-b2);
   text-align: left;
@@ -219,7 +248,8 @@ h5 {
   background-clip: text;
   color: transparent;
 }
-h6 {
+
+.fancy-5 {
   font-size: clamp(var(--font-size-small), 2.2vw, var(--font-size-large));
   color: var(--color-bg-b2);
   text-align: left;
@@ -230,10 +260,7 @@ h6 {
   color: transparent;
 }
 
-h7 {
-  font-size: clamp(var(--font-size-small), 2.2vw, var(--font-size-large));
-  color: var(--color-bg-b1);
-}
+
 
 p {
   font-size: clamp(var(--font-size-small), 1.8vw, var(--font-size-regular));
@@ -384,17 +411,7 @@ button:hover {
 }
 
 /* ----------- INFO BOX & INPUT PANEL MANAGEMENT*/
-.input-panel {
-  display: flex;
-  flex-flow: column;
-  border: 1px solid var(--color-bg-b9);
-  padding: 16px;
-  border-radius: 8px;
-  margin: 16px 10px 0px 10px;
-  flex: 1;
-  min-width: 150px;
-  background: var(--color-bg-b9);
-}
+
 
 .info-box {
   border: 1px solid var(--color-el-e);
@@ -444,32 +461,7 @@ button:hover {
 }
 
 /* ----------- SUB-MAIN MENU CONTENT*/
-.container {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  background: var(--color-bg-b3);
-}
 
-.left-container {
-  flex: 3;
-  display: flex;
-  flex-direction: column;
-  background: var(--color-bg-b3);
-  overflow-y: auto;
-}
-
-.right-container {
-  background: var(--color-bg-b2);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 10px 13px rgba(0, 0, 0, 0.7);
-  z-index: 1;
-  padding: 15px;
-}
 
 .header-button-group {
   display: flex;

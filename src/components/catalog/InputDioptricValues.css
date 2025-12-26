@@ -1,9 +1,5 @@
 .modul-input-dioptric-values {
-  display: grid;
-  grid-template-columns: 2fr 1fr 2fr;
-  gap: 1px;
-  column-gap: 4px;
-  background: var(--color-bg-b9);
+  /* background: var(--color-bg-b9); */
 }
 
 
@@ -59,7 +55,7 @@ input {
 
 .grid-input-dioptric-values {
   display: grid;
-  grid-template-columns: 20% repeat(3, 1fr);
+  grid-template-columns: 20% repeat(4, 1fr);
   gap: 2px;
   background: var(--color-bg-b9);
   align-items: center;

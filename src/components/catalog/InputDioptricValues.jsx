@@ -13,12 +13,13 @@ function InputDioptricValues({ entryValues, onChangeEntry }) {
   return (
     <div className="modul-input-dioptric-values active">
       <div>
-        <h1>GLASSES CORRECTION</h1>
+        <h3>Hodnota brýlových čoček</h3>
         <div className={`grid-input-dioptric-values`}>
           <p className="desc-table"></p>
           <p className="desc-table">SPH</p>
           <p className="desc-table">CYL</p>
           <p className="desc-table">AX</p>
+          <p className="desc-table">ADD</p>
           <p className="desc">P</p>
           <input
             value={entryValues.pS}
@@ -35,6 +36,11 @@ function InputDioptricValues({ entryValues, onChangeEntry }) {
             type="text"
             onChange={(e) => handleChange("pA", e.target.value)}
           />
+          <input
+            value={entryValues.pAdd}
+            type="text" 
+            onChange={(e) => handleChange("pAdd", e.target.value)}
+          />
           <p className="desc">L</p>
           <input
             value={entryValues.lS}
@@ -50,6 +56,11 @@ function InputDioptricValues({ entryValues, onChangeEntry }) {
             value={entryValues.lA}
             type="text"
             onChange={(e) => handleChange("lA", e.target.value)}
+          />
+          <input
+            value={entryValues.lAdd}
+            type="text"
+            onChange={(e) => handleChange("lAdd", e.target.value)}
           />
         </div>
       </div>

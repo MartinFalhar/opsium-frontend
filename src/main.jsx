@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 
 import App from "./App";
 import "./styles/styles.css";
+import "./styles/layout.css";
+import "./styles/controls.css";
 
 import { UserProvider } from "./context/UserContext";
 
