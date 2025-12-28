@@ -7,11 +7,11 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function CatalogLens({ client }) {
   const demoValues = {
-    pS: "-1.00",
-    pC: "-1.75",
+    pS: "+1.00",
+    pC: "+1.75",
     pA: "180",
     lS: "+3.00",
-    lC: "0",
+    lC: "+1.00",
     lA: "150",
   };
   const diameter = ["<55", "60", "65", "70", ">70"];
@@ -20,6 +20,15 @@ function CatalogLens({ client }) {
   const material = ["sklo", "plast", "polykarbonát", "trivex"];
   const func = ["čirý", "fotochromatické", "polarizační"];
   const layer = ["Tvrzení", "AR", "AR+", "BlueBlock"];
+  const manufacturer = [
+    "Rodenstock",
+    "Essilor",
+    "Zeiss",
+    "Konvex",
+    "Hoya",
+    "Čivice",
+    "Omega Optix",
+  ];
 
   const [entryValues, setEntryValues] = useState(demoValues);
   const [selectedDiameter, setSelectedDiameter] = useState(diameter[2]);
@@ -28,6 +37,9 @@ function CatalogLens({ client }) {
   const [selectedMaterial, setSelectedMaterial] = useState(material[1]);
   const [selectedFunc, setSelectedFunc] = useState(func[0]);
   const [selectedLayer, setSelectedLayer] = useState(layer[2]);
+  const [selectedManufacturer, setSelectedManufacturer] = useState(
+    manufacturer[0]
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [lensList, setLensList] = useState([]);
   const [error, setError] = useState(null);
@@ -38,14 +50,37 @@ function CatalogLens({ client }) {
 
   const handleSearchLens = async (values) => {
     setIsLoading(true);
+
+    function toIntDioptry(value) {
+      if (value === null || value === "" || value === undefined) return null;
+      return Math.round(parseFloat(value.toString().replace(",", ".")) );
+    }
+
     const loadItems = async () => {
+      const lensSearchConditions = {
+        pS: toIntDioptry(values.pS),
+        pC: values.pC,
+        lS: values.lS,
+        lC: values.lC,
+        pA: values.pA,
+        lA: values.lA,
+        pAdd: values.pAdd,
+        lAdd: values.lAdd,
+        diameter: selectedDiameter,
+        index: selectedLensIndex,
+        design: selectedDesign,
+        material: selectedMaterial,
+        function: selectedFunc,
+        layer: selectedLayer,
+      };
+
       try {
         const res = await fetch(
           `${API_URL}/catalog/lenssearch?page=${page}&limit=${limit}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ searchText: values }),
+            body: JSON.stringify(lensSearchConditions),
           }
         );
         const data = await res.json();
@@ -73,80 +108,40 @@ function CatalogLens({ client }) {
   };
 
   return (
+    // <div
+    //   style={{
+    //     display: "flex",
+    //     flexDirection: "row",
+    //   }}
+    // >
     <div
+      className="left-container"
       style={{
-        display: "flex",
-        flexDirection: "row",
+        flexDirection: "column",
+        background: "var(--color-bg-b5)",
+        border: "var(--color-bg-b1)",
       }}
     >
-      <div
-        className="left-container"
-        style={{
-          flexDirection: "column",
-          background: "var(--color-bg-b5)",
-          border: "var(--color-bg-b1)",
-        }}
-      >
-        <div className="input-panel">
-          <div className="dioptric-values-container">
-            {/* <div className="cl-direct-dioptric"> */}
-            <InputDioptricValues
-              entryValues={entryValues}
-              onChangeEntry={setEntryValues}
-            />
-          </div>
-          <div className="info-box-2">
-            <h2>Budu hledat podle těchto kritérií:</h2>
-            <p>Průměr: {selectedDiameter}</p>
-            <p>Index čočky: {selectedLensIndex}</p>
-            <p>Design: {selectedDesign}</p>
-            <p>Materiál: {selectedMaterial}</p>
-            <p>Funkce: {selectedFunc}</p>
-            <p>Povrchová úprava: {selectedLayer}</p>
-          </div>
-          <PuffLoaderSpinnerLarge active={isLoading} />
+      <div className="input-panel">
+        <div className="dioptric-values-container">
+          {/* <div className="cl-direct-dioptric"> */}
+          <InputDioptricValues
+            entryValues={entryValues}
+            onChangeEntry={setEntryValues}
+          />
         </div>
-        <div className="show-items-panel">
-          {lensList?.length > 0 &&
-            lensList.map((lens) => (
-              <div
-                key={lens?.id}
-                className="cl-item"
-                onClick={() => showLensDetail(lens?.id)}
-              >
-                <h1>
-                  {`${lens?.name} ${lens?.id_manufact} ${
-                    lens?.design == 1
-                      ? "MONO"
-                      : lens?.design == 2
-                      ? "MONO PLUS"
-                      : lens?.design == 3
-                      ? "Office"
-                      : lens?.design == 4
-                      ? "Progresivní"
-                      : "Myopia Control"
-                  } ${lens?.index} `}{" "}
-                </h1>
-                {showLensDetailID === lens?.id && (
-                  <div className="cl-item-details">
-                    <p>{`Funkce: ${
-                      lens?.func
-                    } Barva: ${JSON.stringify(
-                      lens?.colors
-                    )} Vrstva: ${lens?.layers} Výroba: ${lens?.lab}`}</p>
-                    <p>{`Průměr: ${lens?.range_dia} mm Rozsah: ${lens?.range_start} - ${lens?.range_end} D CYL: ${lens?.range_cyl} D`}</p>
-                    <p>{`Hustota: ${lens?.density} g/cm3 UVA: ${lens?.uva}% UVB: ${lens?.uvb}% Abbe: ${lens?.abbe}`}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-        </div>
-      </div>
-      <div className="right-container">
-        <h1>Filtry vyhledávání</h1>
+
         <div className="segmented-control-container">
           <div className="segmented-control-item">
-            <h4>Průměr</h4>
+            <h3>Výrobce</h3>
+            <SegmentedControl
+              items={manufacturer}
+              selectedValue={selectedManufacturer}
+              onClick={(item) => setSelectedManufacturer(item)}
+            />
+          </div>
+          <div className="segmented-control-item">
+            <h3>Průměr</h3>
             <SegmentedControl
               items={diameter}
               selectedValue={selectedDiameter}
@@ -154,7 +149,7 @@ function CatalogLens({ client }) {
             />
           </div>
           <div className="segmented-control-item">
-            <h4>Index lomu</h4>
+            <h3>Index lomu</h3>
             <SegmentedControl
               items={lensIndex}
               selectedValue={selectedLensIndex}
@@ -162,15 +157,18 @@ function CatalogLens({ client }) {
             />
           </div>
           <div className="segmented-control-item">
-            <h4>Design</h4>
+            <h3>Design</h3>
             <SegmentedControl
               items={design}
               selectedValue={selectedDesign}
               onClick={(item) => setSelectedDesign(item)}
             />
           </div>
+        </div>
+
+        <div className="segmented-control-container">
           <div className="segmented-control-item">
-            <h4>Materiál</h4>
+            <h3>Materiál</h3>
             <SegmentedControl
               items={material}
               selectedValue={selectedMaterial}
@@ -178,7 +176,7 @@ function CatalogLens({ client }) {
             />
           </div>
           <div className="segmented-control-item">
-            <h4>Funkce</h4>
+            <h3>Funkce</h3>
             <SegmentedControl
               items={func}
               selectedValue={selectedFunc}
@@ -186,7 +184,7 @@ function CatalogLens({ client }) {
             />
           </div>
           <div className="segmented-control-item">
-            <h4>Povrchová úprava</h4>
+            <h3>Povrchová úprava</h3>
             <SegmentedControl
               items={layer}
               selectedValue={selectedLayer}
@@ -194,11 +192,59 @@ function CatalogLens({ client }) {
             />
           </div>
         </div>
+
         <div className="buttons-container">
           <button type="submit" onClick={() => handleSearchLens(entryValues)}>
             Hledej
           </button>
         </div>
+      </div>
+
+      <div className="show-items-panel">
+        <PuffLoaderSpinnerLarge active={isLoading} />
+        <div className="info-box-2">
+          <h2>Budu hledat podle těchto kritérií:</h2>
+          <p>Průměr: {selectedDiameter}</p>
+          <p>Index čočky: {selectedLensIndex}</p>
+          <p>Design: {selectedDesign}</p>
+          <p>Materiál: {selectedMaterial}</p>
+          <p>Funkce: {selectedFunc}</p>
+          <p>Povrchová úprava: {selectedLayer}</p>
+        </div>
+        {lensList?.length > 0 &&
+          lensList.map((lens) => (
+            <div
+              key={lens?.id}
+              className="cl-item"
+              onClick={() => showLensDetail(lens?.id)}
+            >
+              <h1>
+                {`${lens?.name} ${lens?.manufact_name} ${
+                  lens?.design == 1
+                    ? "MONO"
+                    : lens?.design == 2
+                    ? "MONO PLUS"
+                    : lens?.design == 3
+                    ? "Office"
+                    : lens?.design == 4
+                    ? "Progresivní"
+                    : "Myopia Control"
+                } ${lens?.index} `}{" "}
+              </h1>
+              {showLensDetailID === lens?.id && (
+                <div className="cl-item-details">
+                  <p>{`Funkce: ${lens?.func} Barva: ${JSON.stringify(
+                    lens?.colors
+                  )} Vrstva: ${lens?.layers} Výroba: ${lens?.lab} Cena: ${
+                    lens?.price
+                  } Kč`}</p>
+                  <p>{`Průměr: ${lens?.range_dia} mm Rozsah: ${lens?.range_start} - ${lens?.range_end} D CYL: ${lens?.range_cyl} D`}</p>
+                  <p>{`Hustota: ${lens?.density} g/cm3 UVA: ${lens?.uva}% UVB: ${lens?.uvb}% Abbe: ${lens?.abbe}`}</p>
+                  <p>{lens?.note}</p>
+                </div>
+              )}
+            </div>
+          ))}
       </div>
     </div>
   );
