@@ -14,7 +14,7 @@ function CatalogLens({ client }) {
     lC: "+1.00",
     lA: "150",
   };
-  const diameter = ["<55", "60", "65", "70", ">70"];
+  const diameter = ["<55", "55", "60", "65", "70", ">70"];
   const lensIndex = ["~1.50", "~1.6", "1.67", "1.74"];
   const design = ["MONO", "MONO PLUS", "OFFICE", "MULTI", "MYOPIA CONTROL"];
   const material = ["sklo", "plast", "polykarbonát", "trivex"];
@@ -53,19 +53,19 @@ function CatalogLens({ client }) {
 
     function toIntDioptry(value) {
       if (value === null || value === "" || value === undefined) return null;
-      return Math.round(parseFloat(value.toString().replace(",", ".")) );
+      return Math.round(parseFloat(value.toString().replace(",", "."))*100 );
     }
 
     const loadItems = async () => {
       const lensSearchConditions = {
         pS: toIntDioptry(values.pS),
-        pC: values.pC,
-        lS: values.lS,
-        lC: values.lC,
+        pC: toIntDioptry(values.pC),
+        lS: toIntDioptry(values.lS),
+        lC: toIntDioptry(values.lC),
         pA: values.pA,
         lA: values.lA,
-        pAdd: values.pAdd,
-        lAdd: values.lAdd,
+        pAdd: toIntDioptry(values.pAdd),
+        lAdd: toIntDioptry(values.lAdd),
         diameter: selectedDiameter,
         index: selectedLensIndex,
         design: selectedDesign,
@@ -219,7 +219,7 @@ function CatalogLens({ client }) {
               onClick={() => showLensDetail(lens?.id)}
             >
               <h1>
-                {`${lens?.name} ${lens?.manufact_name} ${
+                {`${lens?.name} ${lens?.lab ? "výroba" : "sklad"} ${
                   lens?.design == 1
                     ? "MONO"
                     : lens?.design == 2
@@ -241,6 +241,10 @@ function CatalogLens({ client }) {
                   <p>{`Průměr: ${lens?.range_dia} mm Rozsah: ${lens?.range_start} - ${lens?.range_end} D CYL: ${lens?.range_cyl} D`}</p>
                   <p>{`Hustota: ${lens?.density} g/cm3 UVA: ${lens?.uva}% UVB: ${lens?.uvb}% Abbe: ${lens?.abbe}`}</p>
                   <p>{lens?.note}</p>
+                  <p>{`Barva: ${JSON.stringify(lens?.colors_data)}`}</p>
+                  <p>{`Vrstva: ${JSON.stringify(lens?.layers_data)}`}</p>
+                  <p>{`Výroba: ${JSON.stringify(lens?.manufact_data)}`}</p>
+                  
                 </div>
               )}
             </div>
