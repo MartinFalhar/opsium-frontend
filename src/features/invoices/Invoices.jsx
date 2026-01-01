@@ -10,13 +10,18 @@ const API_URL = import.meta.env.VITE_API_URL;
 function Invoices() {
   const [searchInvoice, setSearchInvoices] = useState("");
   const [showModal, setShowModal] = useState(false);
-    const [invoices, setInvoices] = useState([]);
-      const { user, activeId } = useUser();
+  const [invoices, setInvoices] = useState([]);
+  const { user, activeId } = useUser();
 
   const navigate = useNavigate();
 
   function handleNewInvoice() {
     navigate("/invoice-new");
+  }
+
+  function handlePrintInvoice(invoice) {
+  console.log("Tisk zakázky:", invoice.id);
+  window.open(`${API_URL}/pdf/invoice/${invoice.id}`, "_blank");
   }
 
   useEffect(() => {
@@ -42,28 +47,30 @@ function Invoices() {
     loadInvoices();
   }, []);
 
-
-
-
-
   return (
     <div className="clients-container">
       <div className="clients-left-column">
         <div className="search-container">
-          
-            <input
-              className="client-search-input"
-              type="text"
-              value={searchInvoice}
-              onChange={(e) => setSearchInvoices(e.target.value)}
-              placeholder="Hledej zakázku"
-            />
-            <button className="admin-menu-btn" type="submit">
-              Hledej
-            </button>
-          
+          <input
+            className="client-search-input"
+            type="text"
+            value={searchInvoice}
+            onChange={(e) => setSearchInvoices(e.target.value)}
+            placeholder="Hledej zakázku"
+          />
+          <button className="admin-menu-btn" type="submit">
+            Hledej
+          </button>
+
           <button className="admin-menu-btn" onClick={() => handleNewInvoice()}>
-            Přidat zakázku
+            Přidat
+          </button>
+
+          <button
+            className="admin-menu-btn"
+            onClick={() => handlePrintInvoice(invoices[0])}
+          >
+            Tisk
           </button>
         </div>
 
@@ -71,19 +78,13 @@ function Invoices() {
           <h1>Nalezeno {invoices.length} zakázek</h1>
           {invoices.length > 0 &&
             invoices.map((invoice) => (
-              <div
-                key={invoice.id}
-                className="client-item"
-              >
-                <h1>
-                  {`${JSON.stringify(invoice.attrib)}`} 
-                </h1>
+              <div key={invoice.id} className="client-item">
+                <h1>{`${JSON.stringify(invoice.attrib)}`}</h1>
                 <p>{`${JSON.stringify(invoice.content)}`} </p>
                 <p>{`${JSON.stringify(invoice.note)}`} </p>
               </div>
             ))}
         </div>
-
       </div>{" "}
       <div className="clients-right-column">
         <h1>Filtry</h1>

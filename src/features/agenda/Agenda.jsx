@@ -10,6 +10,8 @@ import AgendaContacts from "./AgendaContacts.jsx";
 import AgendaDefects from "./AgendaDefects.jsx";
 import AgendaOvertime from "./AgendaOvertime.jsx";
 import AgendaSalesAction from "./AgendaSalesAction.jsx";
+import AgendaEmail from "./AgendaEmail.jsx";
+import AgendaSMS from "./AgendaSMS.jsx";
 
 import menuIcon from "../../styles/svg/mirror-line.svg";
 
@@ -50,6 +52,20 @@ function Agenda() {
       label: "Prodejní akce",
       rights: 0,
       component: AgendaSalesAction,
+      icon: "eye",
+    },
+    {
+      id: "6",
+      label: "Poslat email",
+      rights: 0,
+      component: AgendaEmail,
+      icon: "eye",
+    },
+    {
+      id: "7",
+      label: "Poslat SMS",
+      rights: 0,
+      component: AgendaSMS,
       icon: "eye",
     },
   ];
