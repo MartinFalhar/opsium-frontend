@@ -39,6 +39,7 @@
   flex-direction: column;
   align-items: left;
   padding: 10px;
+  position: relative;
 }
 
 .cl-item h1 {
