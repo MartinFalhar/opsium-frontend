@@ -1,6 +1,9 @@
 import { createContext, useState, useContext, useEffect } from "react";
+import GetVat from "../components/shop/GetVat.jsx";
 
 const UserContext = createContext(null);
+
+
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -12,7 +15,7 @@ export function UserProvider({ children }) {
   });
   const [memory, setMemory] = useState([]);
   const [catalog_cl, setCatalog_cl] = useState([]);
-
+  const [vat, setVat] = useState();
 
   // Načtení uživatele z localStorage při startu aplikace
   useEffect(() => {
@@ -20,6 +23,13 @@ export function UserProvider({ children }) {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+  }, []);
+
+  // Načtení aktuální sazby DPH při startu aplikace
+  useEffect(() => {
+    // Fetch VAT rate at current date
+    const date = new Date().toISOString().split("T")[0];
+    GetVat(date, setVat);
   }, []);
 
   // Uložení uživatele do localStorage při změně
@@ -46,6 +56,8 @@ export function UserProvider({ children }) {
         setMemory,
         catalog_cl,
         setCatalog_cl,
+        vat,
+        setVat,
       }}
     >
       {children}

@@ -3,6 +3,8 @@ import { useState } from "react";
 import "./Cashdesk.css";
 import SegmentedControl from "../../components/controls/SegmentedControl.jsx";
 import { useUser } from "../../context/UserContext";
+import { useEffect } from "react";
+
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -19,15 +21,19 @@ function Cashdesk() {
   const [clients, setClients] = useState([]);
   const [goods, setGoods] = useState([]);
   const [error, setError] = useState(null);
-  const { user } = useUser();
+  const { user, vat } = useUser();
 
   const [hoveredClientId, setHoveredClientId] = useState(null);
   const [hoveredGoodId, setHoveredGoodId] = useState(null);
+
+  
 
   //PAGINATION HOOKS
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 6;
+
+
 
   const handleSearchInStore = async () => {
     // SEARCH CLIENTS
