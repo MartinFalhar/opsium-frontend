@@ -9,6 +9,7 @@ import { useUser } from "../../context/UserContext";
 import CatalogLens from "./CatalogLens.jsx";
 import CatalogContactLens from "./CatalogContactLens.jsx";
 import CatalogSolutionsDrops from "./CatalogSolutionsDrops.jsx";
+import CatalogServices from "./CatalogServices.jsx";
 
 import menuIcon from "../../styles/svg/mirror-line.svg";
 
@@ -33,6 +34,13 @@ function Catalog() {
       label: "Roztoky a kapky",
       rights: 0,
       component: CatalogSolutionsDrops,
+      icon: "eye",
+    },
+    {
+      id: "4",
+      label: "Výkony a služby",
+      rights: 0,
+      component: CatalogServices,
       icon: "eye",
     },
   ];
@@ -64,7 +72,7 @@ function Catalog() {
     <div className="container">
       <div className="secondary-menu">
         <div className="secondary-menu-header">
-          <h1>CATALOG</h1>
+          <h1>KATALOG</h1>
           <img
             onClick={() => {
               // setIsMenuExtended(!isMenuExtended);

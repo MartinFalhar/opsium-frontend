@@ -4,7 +4,7 @@ import { useUser } from "../../context/UserContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function CatalogSolutionsDrops({ client }) {
+function CatalogServices({ client }) {
   const [inputSearch, setInputSearch] = useState("");
   const [error, setError] = useState(null);
   const [items, setItems] = useState([]);
@@ -21,7 +21,7 @@ function CatalogSolutionsDrops({ client }) {
   const handleSearchInCatalog = async () => {
     // SEARCH CLIENTS
     try {
-      const res = await fetch(`${API_URL}/catalog/soldrops-search`, {
+      const res = await fetch(`${API_URL}/catalog/services-search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id_branch: user.branch_id }),
@@ -67,7 +67,7 @@ function CatalogSolutionsDrops({ client }) {
             overflowY: "scroll",
           }}
         >
-          <h5>Roztoky a kapky</h5>
+          <h5>Výkony a služby</h5>
           {items.length > 0 &&
             items.map((item) => (
               <div
@@ -98,4 +98,4 @@ function CatalogSolutionsDrops({ client }) {
   );
 }
 
-export default CatalogSolutionsDrops;
+export default CatalogServices
