@@ -10,6 +10,7 @@ import AgendaContacts from "./AgendaContacts.jsx";
 import AgendaDefects from "./AgendaDefects.jsx";
 import AgendaOvertime from "./AgendaOvertime.jsx";
 import AgendaSalesAction from "./AgendaSalesAction.jsx";
+import AgendaServices from "./AgendaServices.jsx";
 import AgendaEmail from "./AgendaEmail.jsx";
 import AgendaSMS from "./AgendaSMS.jsx";
 
@@ -66,6 +67,13 @@ function Agenda() {
       label: "Poslat SMS",
       rights: 0,
       component: AgendaSMS,
+      icon: "eye",
+    },
+    {
+      id: "8",
+      label: "Ceník výkonů",
+      rights: 0,
+      component: AgendaServices,
       icon: "eye",
     },
   ];

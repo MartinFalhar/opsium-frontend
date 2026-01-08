@@ -4,7 +4,7 @@ import { useUser } from "../../context/UserContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function CatalogServices({ client }) {
+function AgendaServices({ client }) {
   const [inputSearch, setInputSearch] = useState("");
   const [error, setError] = useState(null);
   const [items, setItems] = useState([]);
@@ -19,9 +19,10 @@ function CatalogServices({ client }) {
   }, [user?.branch_id]);
 
   const handleSearchInCatalog = async () => {
-    // SEARCH CLIENTS
+    // SEARCH SERVICES IN AGENDA
+    console.log("Searching services in agenda catalog...");
     try {
-      const res = await fetch(`${API_URL}/catalog/services-search`, {
+      const res = await fetch(`${API_URL}/agenda/services-search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id_branch: user.branch_id }),
@@ -40,7 +41,6 @@ function CatalogServices({ client }) {
     }
   };
 
-  
   return (
     <div className="container">
       <div className="left-container-2">
@@ -67,19 +67,38 @@ function CatalogServices({ client }) {
             overflowY: "scroll",
           }}
         >
-          <h5>Výkony a služby</h5>
+          <div className="items-panel-label">
+            <h3>Výkony a služby</h3>
+            <p>Nalezeno {items.length} položek</p>
+          </div>
+
+          {items.length === 0 && <p>Žádné položky k zobrazení</p>}
           {items.length > 0 &&
             items.map((item) => (
               <div
                 key={item.id}
-                className="cl-item"
+                className="item"
                 onMouseEnter={() => setHoveredItemId(item.id)}
                 onMouseLeave={() => setHoveredItemId(null)}
               >
-                <h1>
-                  {`${item.plu} ${item.name} ${item.amount}, ${item.uom}`}{" "}
-                </h1>
-                <p>{`${item.price} ${item.vat_type} ${item.description} DB ID: ${item.id}`}</p>
+                <div className="item-header">
+                  <div className="plu">{item.plu}</div>
+                  <div className="item-name">
+                    <h1>{`${item.name}`}</h1>
+                  </div>
+                  <div>{`${item.amount} ${item.uom}`}</div>
+                  <div>
+                    {console.log("User VAT data:", user?.vat)}
+                    <h2>{`${Math.round(item.price)} Kč`}</h2>
+                    {/* {`${item.amount} ${item.uom} ${Math.round(item.price)} Kč ${user?.vat[item.vat_type].rate}% DPH`} */}
+                  </div>
+                </div>
+                <div className="item-body">
+                  <p></p>
+
+                  <p>{`${item.note}`}</p>
+                </div>
+
                 {hoveredItemId === item.id && (
                   <div className="item-actions">
                     <button onClick={() => handleItemChange(item)}>
@@ -98,4 +117,4 @@ function CatalogServices({ client }) {
   );
 }
 
-export default CatalogServices
+export default AgendaServices;

@@ -9,7 +9,7 @@ import { useUser } from "../../context/UserContext";
 import CatalogLens from "./CatalogLens.jsx";
 import CatalogContactLens from "./CatalogContactLens.jsx";
 import CatalogSolutionsDrops from "./CatalogSolutionsDrops.jsx";
-import CatalogServices from "./CatalogServices.jsx";
+
 
 import menuIcon from "../../styles/svg/mirror-line.svg";
 
@@ -35,14 +35,7 @@ function Catalog() {
       rights: 0,
       component: CatalogSolutionsDrops,
       icon: "eye",
-    },
-    {
-      id: "4",
-      label: "Výkony a služby",
-      rights: 0,
-      component: CatalogServices,
-      icon: "eye",
-    },
+    }
   ];
 
 
