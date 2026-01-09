@@ -20,7 +20,6 @@ function AgendaServices({ client }) {
 
   const handleSearchInCatalog = async () => {
     // SEARCH SERVICES IN AGENDA
-    console.log("Searching services in agenda catalog...");
     try {
       const res = await fetch(`${API_URL}/agenda/services-search`, {
         method: "POST",
@@ -61,56 +60,58 @@ function AgendaServices({ client }) {
             Vyhledat
           </button>
         </div>
-        <div
-          className="show-items-panel"
-          style={{
-            overflowY: "scroll",
-          }}
-        >
+        <div className="show-items-panel">
           <div className="items-panel-label">
-            <h3>Výkony a služby</h3>
+            <h2>Výkony a služby</h2>
             <p>Nalezeno {items.length} položek</p>
           </div>
+          <div className="items-panel-header-services">
+            <p>PLU</p>
+            <p>Název služby</p>
+            <p>Množství</p>
+            <p>Cena s DPH</p>
+          </div>
+          <div className="items-list">
+            {items.length === 0 && <p>Žádné položky k zobrazení</p>}
+            {items.length > 0 &&
+              items.map((item) => (
+                <div
+                  key={item.id}
+                  className="item"
+                  onMouseEnter={() => setHoveredItemId(item.id)}
+                  onMouseLeave={() => setHoveredItemId(null)}
+                >
+                  <div className="item-header">
+                    <div className="item-plu">{item.plu}</div>
+                    <div className="item-name">
+                      <h1>{`${item.name}`}</h1>
+                    </div>
+                    <div className="item-amount">{`${item.amount} ${item.uom}`}</div>
 
-          {items.length === 0 && <p>Žádné položky k zobrazení</p>}
-          {items.length > 0 &&
-            items.map((item) => (
-              <div
-                key={item.id}
-                className="item"
-                onMouseEnter={() => setHoveredItemId(item.id)}
-                onMouseLeave={() => setHoveredItemId(null)}
-              >
-                <div className="item-header">
-                  <div className="plu">{item.plu}</div>
-                  <div className="item-name">
-                    <h1>{`${item.name}`}</h1>
+                    <div className="item-price-vat">
+                      <h2>{`${Math.round(item.price)} Kč`}</h2>
+                      <p>{`DPH ${Math.round(vat[item.vat_type].rate)}% `}</p>
+                    </div>
                   </div>
-                  <div>{`${item.amount} ${item.uom}`}</div>
-                  <div>
-                    {console.log("User VAT data:", user?.vat)}
-                    <h2>{`${Math.round(item.price)} Kč`}</h2>
-                    {/* {`${item.amount} ${item.uom} ${Math.round(item.price)} Kč ${user?.vat[item.vat_type].rate}% DPH`} */}
+                  <div className="item-body">
+                    <p></p>
+
+                    <p>{`${item.note}`}</p>
                   </div>
+
+                  {hoveredItemId === item.id && (
+                    <div className="item-actions">
+                      <button onClick={() => handleItemChange(item)}>
+                        UPRAVIT
+                      </button>
+                      <button onClick={() => handleItemDelete(item)}>
+                        SMAZAT
+                      </button>
+                    </div>
+                  )}
                 </div>
-                <div className="item-body">
-                  <p></p>
-
-                  <p>{`${item.note}`}</p>
-                </div>
-
-                {hoveredItemId === item.id && (
-                  <div className="item-actions">
-                    <button onClick={() => handleItemChange(item)}>
-                      UPRAVIT
-                    </button>
-                    <button onClick={() => handleItemDelete(item)}>
-                      SMAZAT
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
+              ))}
+          </div>
         </div>
       </div>
     </div>

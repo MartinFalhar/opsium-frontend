@@ -78,8 +78,7 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  border: 1px solid var(--color-bg-b9);
+
   padding: 16px;
   border-radius: 8px;
   margin: 8px 8px 8px 8px;
@@ -89,16 +88,47 @@
 .item-actions {
   position: absolute;
   right: 10px;
-  top: 10px;
+  top: 50px;
 }
 
 .items-panel-label {
-  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
   border-bottom: 1px solid var(--color-bg-b7);
-  padding-bottom: 5px;
+  padding-bottom: 10px;
   color: var(--color-bg-b3);
-  display: inline-block;
-} 
+}
+
+.items-panel-header-services {
+  display: grid;
+  grid-template-columns: 0.5fr 12fr 2fr 2fr;
+  column-gap: 15px;
+  border-bottom: 1px solid var(--color-bg-b7);
+  padding-bottom: 10px;
+  margin-top: 10px;
+  color: var(--color-bg-b5);
+  font-size: var(--font-size-medium);
+  font-weight: 600;
+  text-align: center;
+}
+
+.items-list {
+  overflow: auto;
+}
+
+.item-price-vat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.item-price-vat p {
+  font-size: clamp(var(--font-size-small), 0.9vw, var(--font-size-small));
+  display: flex;
+  flex-direction: row;
+  color: var(--color-bg-b5);
+  justify-content: space-between;
+}
 
 .item {
   width: 100%;
@@ -113,31 +143,32 @@
 .item-header {
   display: grid;
   grid-template-columns: 0.5fr 12fr 2fr 2fr;
-
   align-items: center;
   column-gap: 15px;
-
 }
 
 .item-body {
   display: grid;
   grid-template-columns: 0.5fr 12fr 2fr 2fr;
-
   align-items: center;
   column-gap: 15px;
-
 }
 
 .item-plu {
-  flex: none;
   font-size: clamp(var(--font-size-small), 1.5vw, var(--font-size-large));
   color: var(--color-bg-b1);
-  text-align: left;
+  text-align: center;
   font-weight: 600;
   border-radius: 4px;
-  padding: 2px 2px;
+  padding: 3px 5px 3px 5px;
   border: 1px solid var(--color-bg-b8);
   background: var(--color-grd-g2);
+  text-align: center;
+}
+
+.item-amount {
+  font-size: clamp(var(--font-size-small), 1.5vw, var(--font-size-large));
+  color: var(--color-bg-b1);
   text-align: center;
 }
 
@@ -146,8 +177,8 @@
 }
 
 .item-name h1 {
-  font-size: 18px;
-  font-weight: 600;
+  font-weight: 800;
+  color: var(--color-bg-b1);
 }
 
 .item h1 {
