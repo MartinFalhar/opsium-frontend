@@ -1,14 +1,23 @@
 import React, { useState } from "react";
 
-export default function Modal({ fields, onSubmit, onClose }) {
+export default function Modal({ fields, initialValues = {}, onSubmit, onClose, onCancel }) {
   const [values, setValues] = useState(() => {
     const init = {};
-    fields.forEach((f) => (init[f.varName] = ""));
+    fields.forEach((f) => {
+      init[f.varName] = initialValues[f.varName] || "";
+    });
     return init;
   });
 
   const handleChange = (varName, value) => {
     setValues((prev) => ({ ...prev, [varName]: value }));
+  };
+
+  const handleClose = () => {
+    if (onCancel) {
+      onCancel(); // Zavolej callback pro zrušení
+    }
+    onClose(); // Zavři modal
   };
 
   return (
@@ -29,22 +38,55 @@ export default function Modal({ fields, onSubmit, onClose }) {
                   {field.label}
                   {field.required && <span style={{ color: "red" }}> *</span>}
                 </label>
-                <input
-                  type={field.input || "text"}
-                  value={values[field.varName]}
-                  onChange={(e) => handleChange(field.varName, e.target.value)}
-                  required={field.required}
-                  autoFocus={index === 0}
-                />
+                {field.options ? (
+                  <select
+                    value={values[field.varName]}
+                    onChange={(e) => handleChange(field.varName, e.target.value)}
+                    required={field.required}
+                    disabled={field.disabled}
+                    style={field.disabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                  >
+                    <option value="">-- Vyberte --</option>
+                    {field.options.map((option, i) => (
+                      <option key={i} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                ) : field.input === "textarea" ? (
+                  <textarea
+                    value={values[field.varName]}
+                    onChange={(e) => handleChange(field.varName, e.target.value)}
+                    required={field.required}
+                    readOnly={field.readOnly}
+                    disabled={field.disabled}
+                    rows={field.rows || 3}
+                    style={field.readOnly || field.disabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                  />
+                ) : (
+                  <input
+                    type={field.input || "text"}
+                    value={values[field.varName]}
+                    onChange={(e) => handleChange(field.varName, e.target.value)}
+                    required={field.required}
+                    autoFocus={index === 0}
+                    readOnly={field.readOnly}
+                    disabled={field.disabled}
+                    style={field.readOnly || field.disabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                  />
+                )}
               </div>
             ))}
           </div>
 
           <div className="modal-actions">
-            <button type="button" onClick={onClose}>
+            <button className="button-delete" type="button" onClick={handleClose}>
+              Smazat
+            </button>
+            <button type="button" onClick={handleClose}>
               Zavřít
             </button>
-            <button type="submit">Potvrdit</button>
+            <button type="submit">Uložit</button>
           </div>
         </form>
       </div>

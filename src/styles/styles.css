@@ -38,8 +38,8 @@
   --color-bg-b12: #f3f4f6;
   --color-grd-g1: linear-gradient(
     45deg,
-    rgba(251, 214, 71, 1),
-    rgba(242, 104, 147, 1)
+    rgb(255, 175, 3),
+    rgb(255, 0, 0)
   );
   --color-grd-g2: linear-gradient(
     45deg,
@@ -53,14 +53,15 @@
   );
   --color-grd-g4: linear-gradient(
     45deg,
-    rgba(243, 156, 18, 1),
-    rgba(192, 57, 43, 1)
+    rgba(251, 191, 36, 0.9),
+    rgba(201, 128, 18, 0.9)
   );
   --color-grd-g5: linear-gradient(
     45deg,
-    rgba(26, 188, 156, 1),
-    rgba(241, 196, 15, 1)
+    rgba(20, 184, 166, 0.85),
+    rgba(56, 189, 248, 0.85)
   );
+
   --color-grd-g6: linear-gradient(
     45deg,
     rgba(22, 114, 217, 72%),
@@ -83,23 +84,23 @@
   );
   --color-grd-g10: linear-gradient(
     45deg,
-    rgba(142, 68, 173, 100%),
-    rgba(243, 244, 246, 100%)
+    rgba(99, 102, 241, 0.85),
+    rgba(139, 92, 246, 0.85)
   );
   --color-grd-g11: linear-gradient(
+    45deg,
+    rgba(226, 232, 240, 1),
+    rgba(203, 213, 225, 1)
+  );
+  --color-grd-g12: linear-gradient(
     45deg,
     rgba(41, 128, 185, 100%),
     rgba(243, 244, 246, 100%)
   );
-  --color-grd-g12: linear-gradient(
-    45deg,
-    rgba(142, 185, 234, 100%),
-    rgba(224, 231, 240, 100%)
-  );
   --color-grd-g13: linear-gradient(
     to bottom,
-    rgba(224, 231, 240, 0.5),
-    rgba(120, 154, 193, 0.5)
+    rgba(142, 185, 234, 1),
+    rgba(178, 199, 222, 1)
   );
   --color-grd-g14: linear-gradient(
     to bottom,
@@ -108,19 +109,30 @@
   );
   --color-grd-g15: linear-gradient(
     to bottom,
-    rgba(52, 73, 94, 1),
-    rgba(189, 195, 199, 1)
-  );
-  --color-grd-g16: linear-gradient(
-    to bottom,
-    rgba(142, 185, 234, 1),
-    rgba(178, 199, 222, 1)
-  );
-  --color-grd-g17: linear-gradient(
-    to bottom,
     rgba(81, 119, 158, 1),
     rgba(255, 255, 255, 1)
   );
+  --color-grd-g16: linear-gradient(
+    to bottom,
+    rgba(224, 231, 240, 0.5),
+    rgba(120, 154, 193, 0.5)
+  );
+  --color-grd-g17: linear-gradient(
+    to bottom,
+    45deg,
+    rgba(30, 41, 59, 1),
+    rgba(51, 65, 85, 1)
+  );
+
+  --color-grd-app-accent: linear-gradient(
+    80deg,
+    rgba(22, 114, 217, 72%) 0%,
+    rgba(56, 189, 248, 0.85) 25%,
+    rgba(20, 184, 166, 0.85) 40%,    
+    rgba(200, 144, 231, 1) 70%,
+    rgba(255, 191, 19, 1) 100%
+  );
+
   --icon-size: 20px;
   --font-size-xsmall: 0.7rem;
   --font-size-small: 0.8rem;
@@ -170,6 +182,26 @@ input {
   outline: none;
 }
 
+select {
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--color-bg-b8);
+  padding: 0 20px;
+  margin: 10px 0;
+  font-size: clamp(var(--font-size-small), 1vw, var(--font-size-large));
+  outline: none;
+}
+
+textarea {
+  height: 80px;
+  border-radius: 8px;
+  border: 1px solid var(--color-bg-b8);
+  padding: 5px 10px;
+  margin: 10px 0;
+  font-size: clamp(var(--font-size-small), 1vw, var(--font-size-large));
+  outline: none;
+}
+
 h1 {
   font-size: clamp(var(--font-size-small), 2.5vw, var(--font-size-xlarge));
   color: var(--color-bg-b11);
@@ -187,14 +219,14 @@ h2 {
 }
 
 h3 {
-  font-size: clamp(var(--font-size-small), 1.0vw, var(--font-size-small));
+  font-size: clamp(var(--font-size-small), 1vw, var(--font-size-small));
   color: var(--color-bg-b5);
   text-align: left;
   font-weight: 800;
 }
 
 h4 {
-  font-size: clamp(var(--font-size-small), 1.0vw, var(--font-size-small));
+  font-size: clamp(var(--font-size-small), 1vw, var(--font-size-small));
   color: var(--color-bg-b10);
   text-align: left;
   font-weight: 400;
@@ -259,8 +291,6 @@ h7 {
   background-clip: text;
   color: transparent;
 }
-
-
 
 p {
   font-size: clamp(var(--font-size-small), 1.8vw, var(--font-size-regular));
@@ -339,6 +369,25 @@ button {
 button:hover {
   background: var(--color-bg-b1);
   color: var(--color-bg-b11);
+  
+}
+
+.button-delete {
+  width: clamp(50px, 25vw, 150px);
+  height: clamp(20px, 25vw, 40px);
+  background: var(--color-grd-g1);
+  color: var(--color-bg-b12);
+  font-weight: bold;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 13px rgba(0, 0, 0, 0.3);
+  font-size: var(--font-size-main-menu);
+  /* margin-top: 20px; */
+  text-align: center;
+  color: var(--color-bg-b1);
+  font-size: clamp(var(--font-size-small), 2.5vw, var(--font-size-regular));
+  margin-right: 35px;
 }
 
 .menu-btn {
@@ -412,7 +461,6 @@ button:hover {
 
 /* ----------- INFO BOX & INPUT PANEL MANAGEMENT*/
 
-
 .info-box {
   border: 1px solid var(--color-el-e);
   padding: 16px;
@@ -461,7 +509,6 @@ button:hover {
 }
 
 /* ----------- SUB-MAIN MENU CONTENT*/
-
 
 .header-button-group {
   display: flex;
@@ -651,7 +698,7 @@ button:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -659,11 +706,16 @@ button:hover {
 }
 
 .modal {
-  background: white;
+    background: white;
   padding: 25px;
   border-radius: 10px;
-  width: 320px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+  /* width: 820px; */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
+}
+
+.modal input {
+  width: 100%;
+  margin: 10px 0;
 }
 
 .modal-actions {
@@ -747,7 +799,6 @@ button:hover {
   justify-content: space-evenly;
   align-items: center;
 }
-
 
 /* ----------- Design TEXT*/
 .plu {

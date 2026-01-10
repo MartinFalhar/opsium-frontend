@@ -1,15 +1,38 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useUser } from "../../context/UserContext";
+import Modal from "../../components/modal/Modal.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function AgendaServices({ client }) {
+
+   const { user, vat } = useUser();
+  const fields = [
+    { varName: "plu", label: "PLU", input: "number", required: false, readOnly: true },
+    { varName: "name", label: "Název služby", input: "textarea", required: true, rows: 3 },
+    { varName: "amount", label: "Množství", input: "text", required: true },
+    { varName: "uom", label: "Jednotka", input: "text", required: false },
+    { varName: "price", label: "Cena", input: "number", required: true },
+    { varName: "vat_type", label: "Výše DPH", options: [`${vat[0].rate} %`, `${vat[1].rate} %`, `${vat[2].rate} %`], required: true },
+    { varName: "note", label: "Poznámka", input: "text", required: false },
+    { 
+      varName: "category", 
+      label: "Kategorie", 
+      required: true,
+      options: ['oprava', 'náhradní díl', 'zábrusy', 'optometrie', 'letování', 'ostatní']
+    },
+  ];
+
+
+
   const [inputSearch, setInputSearch] = useState("");
   const [error, setError] = useState(null);
   const [items, setItems] = useState([]);
-  const { user, vat } = useUser();
+ 
   const [hoveredItemId, setHoveredItemId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   // Načtení dat při prvním načtení komponenty
   useEffect(() => {
@@ -40,6 +63,16 @@ function AgendaServices({ client }) {
     }
   };
 
+  const handleClick = (itemId) => {
+    const item = items.find(i => i.id === itemId);
+    setSelectedItem(item);
+    setShowModal(true);
+  }
+
+  const handleChangeItem = async (values) => {
+    console.log("Changed item values:", values);
+    // Implementace změny položky v databázi zde
+  }
   return (
     <div className="container">
       <div className="left-container-2">
@@ -66,10 +99,10 @@ function AgendaServices({ client }) {
             <p>Nalezeno {items.length} položek</p>
           </div>
           <div className="items-panel-header-services">
-            <p>PLU</p>
-            <p>Název služby</p>
-            <p>Množství</p>
-            <p>Cena s DPH</p>
+            <h3>PLU</h3>
+            <h3>Název služby</h3>
+            <h3>Množství/Kategorie</h3>
+            <h3>Cena s DPH</h3>
           </div>
           <div className="items-list">
             {items.length === 0 && <p>Žádné položky k zobrazení</p>}
@@ -80,26 +113,32 @@ function AgendaServices({ client }) {
                   className="item"
                   onMouseEnter={() => setHoveredItemId(item.id)}
                   onMouseLeave={() => setHoveredItemId(null)}
+                  onClick={() => handleClick(item.id)}
                 >
                   <div className="item-header">
                     <div className="item-plu">{item.plu}</div>
                     <div className="item-name">
                       <h1>{`${item.name}`}</h1>
                     </div>
-                    <div className="item-amount">{`${item.amount} ${item.uom}`}</div>
-
+                    <div className="item-amount">
+                      <p>{`${item.amount} ${item.uom}`}</p>
+                    </div>
                     <div className="item-price-vat">
                       <h2>{`${Math.round(item.price)} Kč`}</h2>
-                      <p>{`DPH ${Math.round(vat[item.vat_type].rate)}% `}</p>
+                  
+                        <p className="vat_info">{`DPH ${Math.round(vat[item.vat_type].rate)}% `}</p>
+                  
+                    </div>
+
+                    <div className="item-note">
+                      <p>{item.note}</p>
+                    </div>
+                    <div className="item-category">
+                      {item.category}
                     </div>
                   </div>
-                  <div className="item-body">
-                    <p></p>
 
-                    <p>{`${item.note}`}</p>
-                  </div>
-
-                  {hoveredItemId === item.id && (
+                  {/* {hoveredItemId === item.id && (
                     <div className="item-actions">
                       <button onClick={() => handleItemChange(item)}>
                         UPRAVIT
@@ -108,12 +147,22 @@ function AgendaServices({ client }) {
                         SMAZAT
                       </button>
                     </div>
-                  )}
+                  )} */}
                 </div>
               ))}
           </div>
         </div>
       </div>
+      
+      {showModal && selectedItem && (
+        <Modal
+          fields={fields}
+          initialValues={selectedItem}
+          onSubmit={handleChangeItem}
+          onClose={() => setShowModal(false)}
+          onCancel={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }
