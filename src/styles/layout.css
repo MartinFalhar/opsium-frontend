@@ -44,19 +44,28 @@
 
 /* ----------- INPUT PANEL*/
 .input-panel {
-  display: grid;
-  grid-template-columns: 2fr 3fr 1fr;
-  gap: 15px;
-  flex-flow: row;
+  display: flex;
+  flex-direction: row;
   border: 1px solid var(--color-bg-b9);
+  justify-content: space-between;
   padding: 16px;
   border-radius: 8px;
   margin: 8px 8px 8px 8px;
   /* flex: 1; */
   min-width: 150px;
   background: var(--color-bg-b9);
+  align-items: center;
 }
 
+.search-input-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+
+
+/* ----------- SEGMENTED CONTROL CONTAINER*/
 .segmented-control-container {
   display: flex;
   flex-direction: column;

@@ -102,9 +102,11 @@ export default function Modal({ fields, initialValues = {}, onSubmit, onClose, o
           </div>
 
           <div className="modal-actions">
-            <button className="button-delete" type="button" onClick={handleDeleteClick}>
-              Smazat
-            </button>
+            {initialValues.name !== "" && (
+              <button className="button-delete" type="button" onClick={handleDeleteClick}>
+                Smazat
+              </button>
+            )}
             <button type="button" onClick={handleClose}>
               Zavřít
             </button>

@@ -149,7 +149,7 @@ function AgendaServices() {
 
       if (res.ok) {
         window.showToast("Položka v databázi změněna.");
-        
+
         handleSearchInCatalog(); // Obnovení seznamu položek po změně
       } else {
         setError(data.message);
@@ -159,85 +159,76 @@ function AgendaServices() {
       console.error("Fetch error:", err);
       setError("Nepodařilo se uložit nový výkon.");
     }
-    
-    const handleAddNewItem = async () => {
-      
-    const newItem = [
-      {
-      varName: "plu",
-      label: "PLU",
-      input: "number",
-      required: false,
-      readOnly: true,
-    },
-    {
-      varName: "name",
-      label: "Název služby",
-      input: "textarea",
-      required: true,
-      rows: 3,
-    },
-    { varName: "amount", label: "Množství", input: "text", required: true },
-    { varName: "uom", label: "Jednotka", input: "text", required: false },
-    { varName: "price", label: "Cena", input: "number", required: true },
-    {
-      varName: "vat_type",
-      label: "Výše DPH",
-      options: [`${vat[0].rate} %`, `${vat[1].rate} %`, `${vat[2].rate} %`],
-      required: true,
-    },
-    { varName: "note", label: "Poznámka", input: "text", required: false },
-    {
-      varName: "category",
-      label: "Kategorie",
-      required: true,
-      options: [
-        "oprava",
-        "náhradní díl",
-        "zábrusy",
-        "optometrie",
-        "letování",
-        "ostatní",
-      ],
-    },
-    ];   
-  }
-
-
-
-
-
-
     setShowModal(false);
-    setSelectedItem(null);
+  };
+
+  const deleteItem = async () => {
+    try {
+      const res = await fetch(`${API_URL}/agenda/services-delete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selectedItem.id, id_branch: user.branch_id }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        window.showToast("Položka byla smazána.");
+        handleSearchInCatalog(); // Obnovení seznamu položek po smazání
+      } else {
+        setError(data.message);
+        console.error("Chyba při mazání položky:", error);
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Nepodařilo se smazat položku.");
+    }
+    setShowModal(false);
+  };
+
+  const handleAddNewItem = async () => {
+    // Nastavení prázdných výchozích hodnot pro novou položku
+    const newItem = {
+      plu: "",
+      name: "",
+      amount: "",
+      uom: "",
+      price: "",
+      vat_type: 2, // Výchozí index DPH
+      note: "",
+      category: "",
+    };
+
+    setSelectedItem(newItem);
+    setShowModal(true);
 
   };
+
   return (
     <div className="container">
       <div className="left-container-2">
         <div className="input-panel">
-          <input
-            className="client-search-input"
-            type="text"
-            value={inputSearch}
-            onChange={(e) => setInputSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSearchInCatalog(inputSearch);
-              }
-            }}
-            placeholder="Zadej hledaný text"
-          />
-          <button onClick={() => handleSearchInCatalog(inputSearch)}>
-            Vyhledat
-          </button>
-          <button onClick={() => handleAddNewItem()}>Nová položka</button>
-          
+          <div className="search-input-container">
+            <input
+              type="text"
+              value={inputSearch}
+              onChange={(e) => setInputSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearchInCatalog(inputSearch);
+                }
+              }}
+              placeholder="Zadej hledaný text"
+            />
+            <button onClick={() => handleSearchInCatalog(inputSearch)}>
+              Vyhledat
+            </button>
+          </div>
           <SegmentedControl
             items={categoryFilter}
             selectedValue={selectedCategory}
             onClick={(item) => setSelectedCategory(item)}
+            width={"550px"}
           />
+          <button onClick={() => handleAddNewItem()}>Nová položka</button>
         </div>
         <div className="show-items-panel">
           <div className="items-panel-label">
@@ -254,43 +245,46 @@ function AgendaServices() {
             <PuffLoaderSpinnerLarge active={isLoading} />
             {items.length === 0 && <p>Žádné položky k zobrazení</p>}
             {items.length > 0 &&
-              items.map((item) => (
-                (selectedCategory === "vše" || item.category === selectedCategory) && ( 
-                <div
-                  key={item.id}
-                  className="item"
-                  onClick={() => handleClick(item.id)}
-                >
-                  <div className="item-header">
-                    <div className="item-plu">{item.plu}</div>
-                    <div className="item-name">
-                      <h1>{`${item.name}`}</h1>
-                    </div>
-                    <div className="item-amount">
-                      <p>{`${item.amount} ${item.uom}`}</p>
-                    </div>
-                    <div className="item-price-vat">
-                      <h2>{`${Math.round(item.price)} Kč`}</h2>
-
-                      <p className="vat_info">{`DPH ${Math.round(
-                        vat[item.vat_type].rate
-                      )}% `}</p>
-                    </div>
-
-                    <div className="item-note">
-                      <p>{item.note}</p>
-                    </div>
+              items.map(
+                (item) =>
+                  (selectedCategory === "vše" ||
+                    item.category === selectedCategory) && (
                     <div
-                      className="item-category"
-                      style={{
-                        background: categoryColors[item.category] || "#95a5a6",
-                      }}
+                      key={item.id}
+                      className="item"
+                      onClick={() => handleClick(item.id)}
                     >
-                      {item.category}
-                    </div>
-                  </div>
+                      <div className="item-header">
+                        <div className="item-plu">{item.plu}</div>
+                        <div className="item-name">
+                          <h1>{`${item.name}`}</h1>
+                        </div>
+                        <div className="item-amount">
+                          <p>{`${item.amount} ${item.uom}`}</p>
+                        </div>
+                        <div className="item-price-vat">
+                          <h2>{`${Math.round(item.price)} Kč`}</h2>
 
-                  {/* {hoveredItemId === item.id && (
+                          <p className="vat_info">{`DPH ${Math.round(
+                            vat[item.vat_type].rate
+                          )}% `}</p>
+                        </div>
+
+                        <div className="item-note">
+                          <p>{item.note}</p>
+                        </div>
+                        <div
+                          className="item-category"
+                          style={{
+                            background:
+                              categoryColors[item.category] || "#95a5a6",
+                          }}
+                        >
+                          {item.category}
+                        </div>
+                      </div>
+
+                      {/* {hoveredItemId === item.id && (
                     <div className="item-actions">
                       <button onClick={() => handleItemChange(item)}>
                         UPRAVIT
@@ -300,10 +294,9 @@ function AgendaServices() {
                       </button>
                     </div>
                   )} */}
-                </div>
-                )
-              ))}
-            
+                    </div>
+                  )
+              )}
           </div>
         </div>
       </div>
@@ -313,11 +306,15 @@ function AgendaServices() {
           fields={fields}
           initialValues={{
             ...selectedItem,
-            vat_type: `${vat[selectedItem.vat_type].rate} %`,
+            vat_type:
+              selectedItem.vat_type !== undefined
+                ? `${vat[selectedItem.vat_type].rate} %`
+                : "",
           }}
           onSubmit={handleChangeItem}
           onClose={() => setShowModal(false)}
           onCancel={() => setShowModal(false)}
+          onDelete={deleteItem}
         />
       )}
     </div>
