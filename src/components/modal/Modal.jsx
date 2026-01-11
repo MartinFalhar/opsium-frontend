@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import ConfirmDelete from "./ConfirmDelete";
 
-export default function Modal({ fields, initialValues = {}, onSubmit, onClose, onCancel }) {
+export default function Modal({ fields, initialValues = {}, onSubmit, onClose, onCancel, onDelete }) {
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [values, setValues] = useState(() => {
     const init = {};
     fields.forEach((f) => {
@@ -19,6 +21,26 @@ export default function Modal({ fields, initialValues = {}, onSubmit, onClose, o
     }
     onClose(); // Zavři modal
   };
+
+  const handleDeleteClick = () => {
+    setShowConfirmDelete(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (onDelete) {
+      onDelete();
+    }
+    setShowConfirmDelete(false);
+    onClose();
+  };
+
+  const handleCancelDelete = () => {
+    setShowConfirmDelete(false);
+  };
+
+  if (showConfirmDelete) {
+    return <ConfirmDelete onConfirm={handleConfirmDelete} onCancel={handleCancelDelete} />;
+  }
 
   return (
     <div className="modal-overlay">
@@ -80,7 +102,7 @@ export default function Modal({ fields, initialValues = {}, onSubmit, onClose, o
           </div>
 
           <div className="modal-actions">
-            <button className="button-delete" type="button" onClick={handleClose}>
+            <button className="button-delete" type="button" onClick={handleDeleteClick}>
               Smazat
             </button>
             <button type="button" onClick={handleClose}>

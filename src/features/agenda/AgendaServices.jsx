@@ -2,37 +2,71 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useUser } from "../../context/UserContext";
 import Modal from "../../components/modal/Modal.jsx";
+import SegmentedControl from "../../components/controls/SegmentedControl.jsx";
+import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function AgendaServices({ client }) {
+const categoryColors = {
+  oprava: "var(--color-grd-g13)",
+  "náhradní díl": "var(--color-grd-g7)",
+  zábrusy: "var(--color-grd-g8)",
+  optometrie: "var(--color-grd-g9)",
+  letování: "var(--color-grd-g3)",
+  ostatní: "var(--color-grd-g5)",
+};
 
-   const { user, vat } = useUser();
+function AgendaServices() {
+  const { user, vat } = useUser();
   const fields = [
-    { varName: "plu", label: "PLU", input: "number", required: false, readOnly: true },
-    { varName: "name", label: "Název služby", input: "textarea", required: true, rows: 3 },
+    {
+      varName: "plu",
+      label: "PLU",
+      input: "number",
+      required: false,
+      readOnly: true,
+    },
+    {
+      varName: "name",
+      label: "Název služby",
+      input: "textarea",
+      required: true,
+      rows: 3,
+    },
     { varName: "amount", label: "Množství", input: "text", required: true },
     { varName: "uom", label: "Jednotka", input: "text", required: false },
     { varName: "price", label: "Cena", input: "number", required: true },
-    { varName: "vat_type", label: "Výše DPH", options: [`${vat[0].rate} %`, `${vat[1].rate} %`, `${vat[2].rate} %`], required: true },
-    { varName: "note", label: "Poznámka", input: "text", required: false },
-    { 
-      varName: "category", 
-      label: "Kategorie", 
+    {
+      varName: "vat_type",
+      label: "Výše DPH",
+      options: [`${vat[0].rate} %`, `${vat[1].rate} %`, `${vat[2].rate} %`],
       required: true,
-      options: ['oprava', 'náhradní díl', 'zábrusy', 'optometrie', 'letování', 'ostatní']
+    },
+    { varName: "note", label: "Poznámka", input: "text", required: false },
+    {
+      varName: "category",
+      label: "Kategorie",
+      required: true,
+      options: [
+        "oprava",
+        "náhradní díl",
+        "zábrusy",
+        "optometrie",
+        "letování",
+        "ostatní",
+      ],
     },
   ];
-
-
 
   const [inputSearch, setInputSearch] = useState("");
   const [error, setError] = useState(null);
   const [items, setItems] = useState([]);
- 
-  const [hoveredItemId, setHoveredItemId] = useState(null);
+
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState(["vše"]);
+  const [selectedCategory, setSelectedCategory] = useState("vše");
 
   // Načtení dat při prvním načtení komponenty
   useEffect(() => {
@@ -53,6 +87,16 @@ function AgendaServices({ client }) {
 
       if (res.ok) {
         setItems(data);
+        setIsLoading(false);
+
+        // Získání unikátních kategorií z načtených položek
+        const uniqueCategories = [
+          "vše",
+          ...new Set(data.map((i) => i.category)),
+        ];
+
+        setCategoryFilter(uniqueCategories);
+        console.log("Categories fetched:", uniqueCategories);
       } else {
         setError(data.message);
         console.error("Error loading users:", error);
@@ -64,15 +108,110 @@ function AgendaServices({ client }) {
   };
 
   const handleClick = (itemId) => {
-    const item = items.find(i => i.id === itemId);
+    const item = items.find((i) => i.id === itemId);
+    // Převod vat_type z indexu na string pro zobrazení v SELECT
+    const itemWithVatString = {
+      ...item,
+      vat_type: `${vat[item.vat_type].rate} %`,
+    };
     setSelectedItem(item);
     setShowModal(true);
-  }
+  };
 
   const handleChangeItem = async (values) => {
     console.log("Changed item values:", values);
-    // Implementace změny položky v databázi zde
+
+    // Převod vat_type ze stringu zpět na index
+    const vatIndex = vat.findIndex((v) => `${v.rate} %` === values.vat_type);
+
+    //Příprava dat pro odeslání na backend
+    const changedItem = {
+      id: Number(selectedItem.id),
+      plu: selectedItem.plu,
+      name: values.name,
+      amount: values.amount,
+      uom: values.uom,
+      price: Number(values.price),
+      vat_type: vatIndex,
+      note: values.note,
+      category: values.category,
+      id_branch: user.branch_id,
+    };
+
+    // Odeslání změněné položky na backend
+    try {
+      const res = await fetch(`${API_URL}/agenda/services-update`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ changedItem }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        window.showToast("Položka v databázi změněna.");
+        
+        handleSearchInCatalog(); // Obnovení seznamu položek po změně
+      } else {
+        setError(data.message);
+        console.error("Chyba při ukládání výkonu:", error);
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Nepodařilo se uložit nový výkon.");
+    }
+    
+    const handleAddNewItem = async () => {
+      
+    const newItem = [
+      {
+      varName: "plu",
+      label: "PLU",
+      input: "number",
+      required: false,
+      readOnly: true,
+    },
+    {
+      varName: "name",
+      label: "Název služby",
+      input: "textarea",
+      required: true,
+      rows: 3,
+    },
+    { varName: "amount", label: "Množství", input: "text", required: true },
+    { varName: "uom", label: "Jednotka", input: "text", required: false },
+    { varName: "price", label: "Cena", input: "number", required: true },
+    {
+      varName: "vat_type",
+      label: "Výše DPH",
+      options: [`${vat[0].rate} %`, `${vat[1].rate} %`, `${vat[2].rate} %`],
+      required: true,
+    },
+    { varName: "note", label: "Poznámka", input: "text", required: false },
+    {
+      varName: "category",
+      label: "Kategorie",
+      required: true,
+      options: [
+        "oprava",
+        "náhradní díl",
+        "zábrusy",
+        "optometrie",
+        "letování",
+        "ostatní",
+      ],
+    },
+    ];   
   }
+
+
+
+
+
+
+    setShowModal(false);
+    setSelectedItem(null);
+
+  };
   return (
     <div className="container">
       <div className="left-container-2">
@@ -92,6 +231,13 @@ function AgendaServices({ client }) {
           <button onClick={() => handleSearchInCatalog(inputSearch)}>
             Vyhledat
           </button>
+          <button onClick={() => handleAddNewItem()}>Nová položka</button>
+          
+          <SegmentedControl
+            items={categoryFilter}
+            selectedValue={selectedCategory}
+            onClick={(item) => setSelectedCategory(item)}
+          />
         </div>
         <div className="show-items-panel">
           <div className="items-panel-label">
@@ -105,14 +251,14 @@ function AgendaServices({ client }) {
             <h3>Cena s DPH</h3>
           </div>
           <div className="items-list">
+            <PuffLoaderSpinnerLarge active={isLoading} />
             {items.length === 0 && <p>Žádné položky k zobrazení</p>}
             {items.length > 0 &&
               items.map((item) => (
+                (selectedCategory === "vše" || item.category === selectedCategory) && ( 
                 <div
                   key={item.id}
                   className="item"
-                  onMouseEnter={() => setHoveredItemId(item.id)}
-                  onMouseLeave={() => setHoveredItemId(null)}
                   onClick={() => handleClick(item.id)}
                 >
                   <div className="item-header">
@@ -125,15 +271,21 @@ function AgendaServices({ client }) {
                     </div>
                     <div className="item-price-vat">
                       <h2>{`${Math.round(item.price)} Kč`}</h2>
-                  
-                        <p className="vat_info">{`DPH ${Math.round(vat[item.vat_type].rate)}% `}</p>
-                  
+
+                      <p className="vat_info">{`DPH ${Math.round(
+                        vat[item.vat_type].rate
+                      )}% `}</p>
                     </div>
 
                     <div className="item-note">
                       <p>{item.note}</p>
                     </div>
-                    <div className="item-category">
+                    <div
+                      className="item-category"
+                      style={{
+                        background: categoryColors[item.category] || "#95a5a6",
+                      }}
+                    >
                       {item.category}
                     </div>
                   </div>
@@ -149,15 +301,20 @@ function AgendaServices({ client }) {
                     </div>
                   )} */}
                 </div>
+                )
               ))}
+            
           </div>
         </div>
       </div>
-      
+
       {showModal && selectedItem && (
         <Modal
           fields={fields}
-          initialValues={selectedItem}
+          initialValues={{
+            ...selectedItem,
+            vat_type: `${vat[selectedItem.vat_type].rate} %`,
+          }}
           onSubmit={handleChangeItem}
           onClose={() => setShowModal(false)}
           onCancel={() => setShowModal(false)}
