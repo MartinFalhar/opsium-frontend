@@ -16,18 +16,18 @@ function Invoices() {
   const navigate = useNavigate();
 
   function handleNewInvoice() {
-    navigate("/invoice-new");
+    navigate("/new-order");
   }
 
   function handlePrintInvoice(invoice) {
-  console.log("Tisk zakázky:", invoice.id);
-  window.open(`${API_URL}/pdf/invoice/${invoice.id}`, "_blank");
+    console.log("Tisk zakázky:", invoice.id);
+    window.open(`${API_URL}/pdf/invoice/${invoice.id}`, "_blank");
   }
 
   useEffect(() => {
     const loadInvoices = async () => {
       try {
-        const res = await fetch(`${API_URL}/store/invoices-list`, {
+        const res = await fetch(`${API_URL}/store/orders-list`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id_branch: user.branch_id }),
@@ -48,46 +48,44 @@ function Invoices() {
   }, []);
 
   return (
-    <div className="clients-container">
-      <div className="clients-left-column">
-        <div className="search-container">
-          <input
-            className="client-search-input"
-            type="text"
-            value={searchInvoice}
-            onChange={(e) => setSearchInvoices(e.target.value)}
-            placeholder="Hledej zakázku"
-          />
-          <button className="admin-menu-btn" type="submit">
-            Hledej
-          </button>
-
-          <button className="admin-menu-btn" onClick={() => handleNewInvoice()}>
-            Přidat
-          </button>
-
-          <button
-            className="admin-menu-btn"
-            onClick={() => handlePrintInvoice(invoices[0])}
-          >
-            Tisk
-          </button>
+    <div className="container">
+      <div className="left-container-2">
+        <div className="input-panel">
+          <div className="search-input-container">
+            <input
+              type="text"
+              value={searchInvoice}
+              onChange={(e) => setSearchInvoices(e.target.value)}
+              placeholder="Hledej zakázku"
+            />
+            <button type="submit">Hledej</button>
+          </div>
+          <button onClick={() => handleNewInvoice()}>Přidat</button>
+          <button onClick={() => handlePrintInvoice(invoices[0])}>Tisk</button>
         </div>
-
-        <div className="clients-list-container">
-          <h1>Nalezeno {invoices.length} zakázek</h1>
-          {invoices.length > 0 &&
-            invoices.map((invoice) => (
-              <div key={invoice.id} className="client-item">
-                <h1>{`${JSON.stringify(invoice.attrib)}`}</h1>
-                <p>{`${JSON.stringify(invoice.content)}`} </p>
-                <p>{`${JSON.stringify(invoice.note)}`} </p>
-              </div>
-            ))}
+        <div className="show-items-panel">
+          <div className="items-panel-label">
+            <h2>Zakázky</h2>
+            <p>...přidat paginaci...</p>
+            <p>Nalezeno {invoices.length} zakázek</p>
+          </div>
+          <div className="items-panel-header-services">
+            <p>a</p>
+          </div>
+          <div className="items-list">
+            {invoices.length > 0 &&
+              invoices.map((invoice) => (
+                <div key={invoice.id} className="item">
+                  <h1>{`${JSON.stringify(invoice.attrib)}`}</h1>
+                  <p>{`${JSON.stringify(invoice.content)}`} </p>
+                  <p>{`${JSON.stringify(invoice.note)}`} </p>
+                </div>
+              ))}
+          </div>{" "}
+          {/* <div className="clients-right-column">
+            <h1>Filtry</h1>
+          </div> */}
         </div>
-      </div>{" "}
-      <div className="clients-right-column">
-        <h1>Filtry</h1>
       </div>
     </div>
   );

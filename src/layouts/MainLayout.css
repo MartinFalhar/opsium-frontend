@@ -14,7 +14,6 @@
   flex-direction: row;
   background: var(--color-bg-b1);
   margin: 0;
-
 }
 
 .layout-header h1 {
@@ -43,8 +42,6 @@
   padding: 0px;
   font-size: 1rem;
   background: var(--color-bg-b1);
-
-
 }
 .layout-content {
   flex: 1;
@@ -56,7 +53,7 @@
   padding: 0;
   margin: 0;
   background: var(--color-bg-b3);
-  border-radius: 25px 0 0 0;
+  border-radius: 8px 0 0 0;
   overflow: hidden;
   min-height: 0;
 }

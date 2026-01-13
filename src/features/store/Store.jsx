@@ -5,11 +5,57 @@ import Modal from "../../components/modal/Modal.jsx";
 import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
 import Pagination from "../../components/pagination/Pagination.jsx";
 
+import { useUser } from "../../context/UserContext";
+import menuIcon from "../../styles/svg/mirror-line.svg";
+import StoreLens from "./StoreLens.jsx";
+import StoreSunglasses from "./StoreSunglasses.jsx";
+import StoreContactLens from "./StoreCL.jsx";
+import StoreSolutionsDrops from "./StoreSoldrops.jsx";
+import StoreGoods from "./StoreGoods.jsx";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Store() {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const buttons = [
+    {
+      id: "1",
+      label: "Brýle",
+      rights: 0,
+      component: StoreLens,
+      icon: "clients",
+    },
+    {
+      id: "2",
+      label: "Sluneční brýle",
+      rights: 0,
+      component: StoreSunglasses,
+      icon: "eye",
+    },
+    {
+      id: "3",
+      label: "Kontaktní čočky",
+      rights: 0,
+      component: StoreContactLens,
+      icon: "eye",
+    },
+    {
+      id: "4",
+      label: "Roztoky a kapky",
+      rights: 0,
+      component: StoreSolutionsDrops,
+      icon: "eye",
+    },
+    {
+      id: "5",
+      label: "Hotové zboží",
+      rights: 0,
+      component: StoreGoods,
+      icon: "eye",
+    },
+  ];
 
   const fields = [
     {
@@ -33,6 +79,18 @@ function Store() {
       required: true,
     },
   ];
+
+  //nastavuje komponentu z menu
+  const [menuComponent, setMenuComponent] = useState(null);
+
+  //předává data přihlášeného uživatele
+  const { user } = useUser();
+
+  //nutné pro správnou manipulaci s komponentou menu
+  const Component = menuComponent;
+
+  //zachycení kliku na tlačítko menu
+  const [activeButton, setActiveButton] = useState(null);
 
   const [searchInStore, setSearchInStore] = useState("");
   const [clients, setClients] = useState([]);
@@ -76,8 +134,50 @@ function Store() {
     loadItems();
   };
 
+  //handling kliků na tlačítka menu
+  const handleClick = (button) => {
+    setActiveButton(button.id);
+    setMenuComponent(() => button.component);
+  };
+
+  useEffect(() => {
+    handleClick(buttons[0]);
+  }, []);
+
   return (
     <div className="clients-container">
+      <div className="secondary-menu">
+        <div className="secondary-menu-header">
+          <h1>KATALOG</h1>
+          <img
+            onClick={() => {
+              // setIsMenuExtended(!isMenuExtended);
+            }}
+            className="secondary-menu-icon"
+            src={menuIcon}
+            alt="Menu"
+          ></img>
+        </div>
+        {buttons.map((button) => {
+          return (
+            <button
+              key={button.id}
+              id={button.id}
+              style={{
+                width: "200px",
+              }}
+              className={`button-secondary-menu ${
+                activeButton === button.id ? "active" : ""
+              } ${button.icon}`}
+              onClick={() => handleClick(button)}
+            >
+              {button.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {Component ? <Component client={user} /> : null}
       <div className="store-left-column">
         <div className="button-group">
           <button onClick={() => setShowModal(true)}>Přidat položku</button>
@@ -139,9 +239,6 @@ function Store() {
             onClose={() => setShowModal(false)}
           />
         )}
-      </div>
-      <div className="clients-right-column">
-        <h1>Filtry</h1>
       </div>
     </div>
   );

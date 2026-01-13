@@ -1,0 +1,104 @@
+chci přidat sloupec number která bude sledovat číselnou řadu zakázky (každá id_branches bude svou řadu). Tabulka ale již obsahuje 19 záznamů.
+
+Rozumné řešení 👍
+Protože tabulka už má 19 záznamů a číselná řada je zvlášť pro každé id_branches, je potřeba postupovat ve 3 krocích:
+
+🧱 1️⃣ Přidání sloupce number (zatím bez unikátnosti)
+Nejdřív jen technicky přidáme sloupec, aby se vyplnil u stávajících řádků.
+ALTER TABLE invoices
+ADD COLUMN number INTEGER;
+
+
+⚠️ Zatím bez NOT NULL a bez DEFAULT
+
+
+🔄 2️⃣ Dopočítání číselné řady pro EXISTUJÍCÍ záznamy
+Každá pobočka (id_branches) dostane vlastní řadu od 1 nahoru.
+WITH ranked AS (
+  SELECT
+    id,
+    ROW_NUMBER() OVER (
+      PARTITION BY id_branches
+      ORDER BY created_at, id
+    ) AS rn
+  FROM invoices
+)
+UPDATE invoices i
+SET number = r.rn
+FROM ranked r
+WHERE i.id = r.id;
+
+📌 Řazení:
+
+
+primárně created_at
+
+
+fallback id (pro jistotu)
+
+
+
+🔒 3️⃣ Zpřísnění pravidel (NOT NULL + unikátnost)
+Teď už víme, že každý řádek má číslo.
+ALTER TABLE invoices
+ALTER COLUMN number SET NOT NULL;
+
+Unikátní číslo v rámci pobočky
+CREATE UNIQUE INDEX uniq_invoice_number_per_branch
+ON invoices (id_branches, number);
+
+
+➕ 4️⃣ Automatické číslování pro NOVÉ faktury
+PostgreSQL neumí „sekvenci per branch“, takže se to řeší triggerem.
+Trigger funkce
+CREATE OR REPLACE FUNCTION invoice_number_per_branch()
+RETURNS trigger AS $$
+BEGIN
+  IF NEW.number IS NULL THEN
+    SELECT COALESCE(MAX(number), 0) + 1
+    INTO NEW.number
+    FROM invoices
+    WHERE id_branches = NEW.id_branches;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+Trigger
+CREATE TRIGGER trg_invoice_number
+BEFORE INSERT ON invoices
+FOR EACH ROW
+EXECUTE FUNCTION invoice_number_per_branch();
+
+
+✅ Výsledek
+
+
+každá pobočka má vlastní číselnou řadu
+
+
+stará data jsou správně dopočítaná
+
+
+nové faktury se číslují automaticky
+
+
+DB nedovolí duplicitu
+
+
+
+💡 Doporučení z praxe
+Pokud budeš chtít:
+
+
+ročně resetovat řadu (2026/001)
+
+
+nebo mít číslo zakázky ≠ číslo faktury
+
+
+nebo generovat číslo až při issued statusu
+
+
+→ napiš, to už je jen malá úprava logiky 👌

@@ -1,0 +1,102 @@
+Roční restart číselné řady je klasický požadavek 👍
+Nejčistší řešení v PostgreSQL je zahrnout rok přímo do logiky číslování a oddělit řady podle (id_branches, rok).
+
+Ukážu robustní a běžně používané řešení.
+
+✅ Princip řešení
+
+Číselná řada se resetuje automaticky 1. 1., protože:
+
+číslo se počítá jen z faktur stejného roku
+
+rok se bere z issued_at (ne z created_at!)
+
+1️⃣ Přidej sloupec issued_at (pokud ho nemáš)
+ALTER TABLE invoices
+ADD COLUMN issued_at DATE;
+
+
+📌 Pokud už existuje, tento krok přeskoč.
+
+2️⃣ Uprav unikátnost – přidej rok
+
+Zruš starý index (pokud existuje):
+
+DROP INDEX IF EXISTS uniq_invoice_number_per_branch;
+
+
+Vytvoř nový:
+
+CREATE UNIQUE INDEX uniq_invoice_number_branch_year
+ON invoices (
+  id_branches,
+  EXTRACT(YEAR FROM issued_at),
+  number
+);
+
+3️⃣ Trigger funkce s ročním resetem
+CREATE OR REPLACE FUNCTION invoice_number_per_branch_year()
+RETURNS trigger AS $$
+DECLARE
+  current_year INTEGER;
+BEGIN
+  -- pokud není issued_at, použij dnešek
+  IF NEW.issued_at IS NULL THEN
+    NEW.issued_at := CURRENT_DATE;
+  END IF;
+
+  current_year := EXTRACT(YEAR FROM NEW.issued_at);
+
+  IF NEW.number IS NULL THEN
+    SELECT COALESCE(MAX(number), 0) + 1
+    INTO NEW.number
+    FROM invoices
+    WHERE id_branches = NEW.id_branches
+      AND EXTRACT(YEAR FROM issued_at) = current_year;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+4️⃣ Trigger
+DROP TRIGGER IF EXISTS trg_invoice_number ON invoices;
+
+CREATE TRIGGER trg_invoice_number
+BEFORE INSERT ON invoices
+FOR EACH ROW
+EXECUTE FUNCTION invoice_number_per_branch_year();
+
+🎯 Výsledek
+
+každá pobočka má novou řadu každý rok
+
+žádný ruční reset
+
+DB sama hlídá unikátnost
+
+bezpečné i při paralelních vkladech
+
+💡 Doporučení navíc (best practice)
+Formát faktury ukládej odděleně
+number = 15
+issued_at = 2026-03-12
+
+
+Formátuj až v aplikaci:
+
+2026-0015
+
+🧠 Chceš ještě lepší řešení?
+
+Mohu ti ukázat:
+
+tabulku invoice_counters (100% bezpečné při vysoké zátěži)
+
+reset při změně statusu na issued
+
+číslování zakázek ≠ faktur
+
+retroaktivní dopočítání starých let
+
+Stačí říct 👍
