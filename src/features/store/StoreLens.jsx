@@ -14,17 +14,24 @@ function StoreLens({ client }) {
   // Načtení dat při prvním načtení komponenty
   useEffect(() => {
     if (user?.branch_id) {
-      handleSearchInCatalog();
+      handleSearchFrames();
     }
   }, [user?.branch_id]);
 
-  const handleSearchInCatalog = async () => {
-    // SEARCH CLIENTS
+  const handleSearchFrames = async () => {
+    const searchData = {
+      id_branch: user.branch_id,
+      query: inputSearch,
+      page: 1,
+      limit: 20,
+      offset: 0,
+      table: "store_frames",
+    };
     try {
-      const res = await fetch(`${API_URL}/catalog/soldrops-search`, {
+      const res = await fetch(`${API_URL}/store/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_branch: user.branch_id }),
+        body: JSON.stringify(searchData),
       });
       const data = await res.json();
 
@@ -51,12 +58,12 @@ function StoreLens({ client }) {
             onChange={(e) => setInputSearch(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                handleSearchInCatalog(inputSearch);
+                handleSearchFrames(inputSearch);
               }
             }}
             placeholder="Zadej hledaný text"
           />
-          <button onClick={() => handleSearchInCatalog(inputSearch)}>
+          <button onClick={() => handleSearchFrames(inputSearch)}>
             Vyhledat
           </button>
         </div>
@@ -66,7 +73,7 @@ function StoreLens({ client }) {
             overflowY: "scroll",
           }}
         >
-          <h5>Roztoky a kapky</h5>
+          <h5>Brýlové obruby</h5>
           {items.length > 0 &&
             items.map((item) => (
               <div

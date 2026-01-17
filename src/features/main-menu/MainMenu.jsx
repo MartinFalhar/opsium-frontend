@@ -131,10 +131,11 @@ function MainMenu({ isMenuExtended, setIsMenuExtended }) {
     }
   }, [user]);
 
-    useEffect(() => {
+  useEffect(() => {
     //pokud je uživatel přihlášen, automaticky otevřít klienty
     if (location.pathname.includes("client")) {
-      setActiveButton("clients");}
+      setActiveButton("clients");
+    }
   }, [location]);
 
   return (
@@ -180,10 +181,12 @@ function MainMenu({ isMenuExtended, setIsMenuExtended }) {
         })}
       </div>
 
-      <div className="main-menu-footer"
-                style={{
-            width: isMenuExtended ? "" : "60px",
-          }}>
+      <div
+        className="main-menu-footer"
+        style={{
+          width: isMenuExtended ? "" : "60px",
+        }}
+      >
         <button
           key={login_button.id}
           id={login_button.id}
