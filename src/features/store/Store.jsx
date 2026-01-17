@@ -3,6 +3,7 @@ import { useState } from "react";
 import "./Store.css";
 import { useUser } from "../../context/UserContext";
 import menuIcon from "../../styles/svg/mirror-line.svg";
+import StoreFrames from "./StoreFrames.jsx";
 import StoreLens from "./StoreLens.jsx";
 import StoreSunglasses from "./StoreSunglasses.jsx";
 import StoreContactLens from "./StoreCL.jsx";
@@ -15,7 +16,7 @@ function Store() {
       id: "1",
       label: "Brýle",
       rights: 0,
-      component: StoreLens,
+      component: StoreFrames,
       icon: "optician",
     },
     {
@@ -29,7 +30,7 @@ function Store() {
       id: "3",
       label: "Brýlové čočky",
       rights: 0,
-      component: StoreContactLens,
+      component: StoreLens,
       icon: "ico",
     },
     {

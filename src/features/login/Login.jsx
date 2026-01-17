@@ -195,7 +195,7 @@ function Login() {
             const next = {
               ...(prev || {}), // prev může být null/undefined
               branch_id: dataBranch?.id ?? 0,
-              branch_name: dataBranch?.name ?? "HULK",
+              branch_name: dataBranch?.name ?? "",
               branch_street: dataBranch?.street ?? "",
               branch_city: dataBranch?.city ?? "",
               branch_ico: dataBranch?.ico ?? "",
@@ -229,8 +229,12 @@ function Login() {
 
       const user = await res.json();
       if (res.ok) {
-        // localStorage.setItem("token", data.token);
-        // nebo cookie, podle implementace
+        // Uložíme JWT token do localStorage
+        if (user.token) {
+          localStorage.setItem("authToken", user.token);
+          console.log("JWT token byl uložen");
+        }
+        
         await setUser(user);
         console.log(`Login successful, user data:", ${user}`);
         //Pokud je vše v pořádku, stáhnu si
