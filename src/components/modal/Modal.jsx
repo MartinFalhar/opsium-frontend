@@ -53,7 +53,7 @@ export default function Modal({ fields, initialValues = {}, onSubmit, onClose, o
             setTimeout(onClose, 2);
           }}
         >
-          <div className="modal-content">
+          <div className={`modal-content ${fields.length > 5 ? 'two-columns' : ''}`}>
             {fields.map((field, index) => (
               <div key={index} className="modal-field">
                 <label>

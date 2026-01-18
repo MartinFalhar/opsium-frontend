@@ -724,16 +724,54 @@ button:hover {
 }
 
 .modal {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  /* width: 820px; */
+  position: relative; 
+  /* padding: 25px;   */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
 }
+
+.modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(to right,rgba(22, 114, 217, 72%) 0%, rgba(56, 189, 248, 0.85) 25%, rgba(20, 184, 166, 0.85) 40%, rgba(200, 144, 231, 1) 70%, rgba(255, 191, 19, 1) 100%);
+  border-radius: 10px 10px 0 0;
+}
+
+
 
 .modal input {
   width: 100%;
   margin: 10px 0;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content.two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 20px;
+}
+
+.modal-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-field label {
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.modal-field input,
+.modal-field select,
+.modal-field textarea {
+  width: 100%;
 }
 
 .modal-actions {
