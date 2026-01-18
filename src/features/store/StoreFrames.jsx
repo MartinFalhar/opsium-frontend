@@ -220,6 +220,7 @@ function StoreFrames({ client }) {
                     )}
                   </div>
                   {hoveredItemId === item.id && (
+                    
                     <div className="item-actions">
                       {/* <button onClick={() => handleItemChange(item)}>
                         UPRAVIT
