@@ -30,6 +30,23 @@ function StoreFrames({ client }) {
       required: true,
     },
   ];
+
+  const categoryColorsGender = {
+    Pánská: "var(--color-grd-g13)",
+    Dámská: "var(--color-grd-g8)",
+    Uni: "var(--color-grd-g9)",
+    Dětská: "var(--color-grd-g10)",
+  };
+  const categoryColorsMaterial = {
+    plastová: "var(--color-grd-g13)",
+    kovová: "var(--color-grd-g8)",
+    "kovová s klipem": "var(--color-grd-g9)",
+    "ultem s klipem": "var(--color-grd-g10)",
+  };
+  const categoryColorsType = {
+    Dioptrická: "var(--color-grd-g13)",
+  };
+
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -124,9 +141,15 @@ function StoreFrames({ client }) {
               Položek: {items.length} ks (strana {page}/{totalPages})
             </p>
           </div>
-          <div className="items-panel-header-services">
+          <div className="items-panel-table-header six-columns">
             <h3>PLU</h3>
+            <h3>Model obruby</h3>
+            <h3>Barva</h3>
+            <h3>Dodavatel</h3>
+            <h3>Množství (ks)</h3>
+            <h3>Cena</h3>
           </div>
+
           <div className="items-list">
             {!items.length > 0 && <PuffLoaderSpinnerLarge active={isLoading} />}
 
@@ -134,25 +157,67 @@ function StoreFrames({ client }) {
               items.map((item) => (
                 <div
                   key={item.id}
-                  className="item"
+                  className="item six-columns"
                   onMouseEnter={() => setHoveredItemId(item.id)}
                   onMouseLeave={() => setHoveredItemId(null)}
                 >
-                  <div className="item-header">
-                    <div className="item-plu">{item.plu}</div>
-                    <div className="item-name">
-                      <h1>{item.product}</h1>
-                    </div>
-                    <h1>{` ${item.collection}, ${item.color}`}</h1>
-                    <p>s</p>
+                  <div className="item-plu">{item.plu}</div>
+
+                  <div className="item-name">
+                    <h1>{`${item.collection} ${item.product}`}</h1>
+                  </div>
+                  <div className="item-name">
+                    <h1>{`${item.color}`}</h1>
+                  </div>
+                  <div className="item-name">
+                    <h1>{`${item.supplier}`}</h1>
+                  </div>
+                  <div className="item-name">
+                    <h1>{`${item.quantity}`}</h1>
+                  </div>
+                  <div className="item-name">
+                    <h1>{`${Math.round(item.price)} Kč`}</h1>
                   </div>
                   <div className="item-note">
-                    <div className="item.supplier">
-                      <p>{`${item.supplier} ${item.quantity}ks ${item.price} Kč DB ID: ${item.id}`}</p>
-                    </div>
-                    <div className="item.category">
-                      <p>{`Materiál: ${item.material} Gender: ${item.gender} Typ: ${item.type}`}</p>
-                    </div>
+                    {item.note && (
+                      <div
+                        className="item-category"
+                        style={{
+                          background: "var(--color-grd-g5)",
+                        }}
+                      >{`Poznámka`}</div>
+                    )}
+                    <div
+                      className="item-category"
+                      style={{
+                        background:
+                          categoryColorsGender[item.gender] || "#95a5a6",
+                      }}
+                    >{`${item.gender}`}</div>
+                    {item.size && (
+                      <div
+                        className="item-category"
+                        style={{
+                          background: "var(--color-grd-g12)",
+                        }}
+                      >{`${item.size}`}</div>
+                    )}
+                    <div
+                      className="item-category"
+                      style={{
+                        background:
+                          categoryColorsMaterial[item.material] || "#95a5a6",
+                      }}
+                    >{`${item.material}`}</div>
+                    {item.type && (
+                      <div
+                        className="item-category"
+                        style={{
+                          background:
+                            categoryColorsType[item.type] || "#95a5a6",
+                        }}
+                      >{`${item.type}`}</div>
+                    )}
                   </div>
                   {hoveredItemId === item.id && (
                     <div className="item-actions">

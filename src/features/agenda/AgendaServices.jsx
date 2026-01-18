@@ -235,7 +235,7 @@ function AgendaServices() {
             <h2>Výkony a služby</h2>
             <p>Nalezeno {items.length} položek</p>
           </div>
-          <div className="items-panel-header-services">
+          <div className="items-panel-header-4-columns">
             <h3>PLU</h3>
             <h3>Název služby</h3>
             <h3>Množství/Kategorie</h3>
@@ -255,13 +255,17 @@ function AgendaServices() {
                       onClick={() => handleClick(item.id)}
                     >
                       <div className="item-header">
+                        
                         <div className="item-plu">{item.plu}</div>
+
                         <div className="item-name">
                           <h1>{`${item.name}`}</h1>
                         </div>
+
                         <div className="item-amount">
                           <p>{`${item.amount} ${item.uom}`}</p>
                         </div>
+
                         <div className="item-price-vat">
                           <h2>{`${Math.round(item.price)} Kč`}</h2>
 
@@ -273,6 +277,7 @@ function AgendaServices() {
                         <div className="item-note">
                           <p>{item.note}</p>
                         </div>
+
                         <div
                           className="item-category"
                           style={{
@@ -282,6 +287,7 @@ function AgendaServices() {
                         >
                           {item.category}
                         </div>
+
                       </div>
 
                       {/* {hoveredItemId === item.id && (
