@@ -5,15 +5,17 @@ import Pagination from "../../components/pagination/Pagination.jsx";
 import Modal from "../../components/modal/Modal.jsx";
 import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
 import SearchInStore from "../../components/store/SearchInStore.jsx";
-import DeleteFromStore from "../../components/store/DeleteFromStore.jsx";
+import UpdateInStore from "../../components/store/UpdateInStore.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function StoreFrames() {
-   // ID skladu, může být dynamické podle potřeby   
+  //******************************
+  // ID skladu
   const storeId = 1;
+  //******************************
 
-  const fields = [
+  const fieldsForStockInput = [
     {
       varName: "date",
       label: "Datum příjmu",
@@ -26,21 +28,29 @@ function StoreFrames() {
       input: "text",
       required: true,
     },
+  ];
+
+  const fieldsBasic = [
     {
       varName: "plu",
       label: "PLU kód",
       input: "number",
       readOnly: true,
+    },
+    {
+      varName: "id_supplier",
+      label: "Dodavatel",
+      options: { field: "brýle" },
       required: true,
     },
     {
       varName: "collection",
       label: "Kolekce",
       input: "text",
-      required: true,
+      required: false,
     },
-    { varName: "product", label: "Model", input: "text", required: true },
-    { varName: "color", label: "Barva", input: "text", required: true },
+    { varName: "product", label: "Model", input: "text", required: false },
+    { varName: "color", label: "Barva", input: "text", required: false },
     {
       varName: "quantity",
       label: "Množství",
@@ -49,33 +59,33 @@ function StoreFrames() {
     },
     {
       varName: "price_buy",
-      label: "Nákupní cena",      
+      label: "Nákupní cena",
       input: "number",
-      required: true,
+      required: false,
     },
     {
       varName: "price",
-      label: "Prodejní cena",      
+      label: "Prodejní cena",
       input: "number",
-      required: true,
+      required: false,
     },
     {
       varName: "gender",
       label: "Gender",
       options: [`Pánská`, `Dámská`, `Uni`, `Dětská`],
-      required: true,
+      required: false,
     },
     {
       varName: "material",
       label: "Materiál obruby",
       options: [`plastová`, `kovová`, `kovová s klipem`, `ultem s klipem`],
-      required: true,
+      required: false,
     },
     {
       varName: "type",
       label: "Typ obruby",
       options: [`Dioptrická`, `Typ 2`, `Typ 3`, `Typ 4`],
-      required: true,
+      required: false,
     },
   ];
 
@@ -100,6 +110,7 @@ function StoreFrames() {
   // Stavové hooky
   const { user, vat } = useUser();
   const [showModal, setShowModal] = useState(false);
+  const [isNewItem, setIsNewItem] = useState(false);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   // const [hoveredItemId, setHoveredItemId] = useState(null);
@@ -111,14 +122,20 @@ function StoreFrames() {
 
   // Triggery pro vyhledávání a mazání
   const [searchTrigger, setSearchTrigger] = useState("");
-  const [deleteTrigger, setDeleteTrigger] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
-  
+  const [updateTrigger, setUpdateTrigger] = useState(0);
+  const [itemToUpdate, setItemToUpdate] = useState(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   // Paginace
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 6;
 
+  //HANDLE SEARCH IN STORE
+  const handleSearchInStore = (value) => {
+    fields = fieldsBasic;
+    setSearchTrigger(value || "");
+  };
   const handleSearchResult = (result) => {
     setItems(result.items);
     setTotalPages(result.totalPages);
@@ -127,78 +144,65 @@ function StoreFrames() {
     }
   };
 
-  const handleSearchInStore = (value) => {
-    setSearchTrigger(value || "");
+  //HANDLE UPDATE IN STORE
+  const handleUpdateItem = (item) => {
+    console.log("handleUpdateItem received:", item); // Debug
+    const changedItem = {
+      plu: item.plu,
+      collection: item.collection,
+      product: item.product,
+      color: item.color,
+      quantity: Number(item.quantity),
+      price: Number(item.price),
+      gender: item.gender,
+      material: item.material,
+      type: item.type,
+      id_supplier: Number(item.id_supplier) || null, // Převeď na number
+    };
+    console.log("changedItem:", changedItem); // Debug
+    setItemToUpdate({ values: changedItem, storeId });
+    setUpdateTrigger((prev) => prev + 1);
   };
 
-  const handleDeleteResult = (result) => {
+  const handleUpdateResult = (result) => {
     if (result.success) {
-      handleSearchInStore(searchTrigger); // Obnovení seznamu
+      setRefreshTrigger((prev) => prev + 1); // Vynutit obnovení seznamu
       setShowModal(false);
     } else if (result.error) {
       setError(result.error);
     }
   };
 
-  const deleteItem = () => {
-    setItemToDelete({ plu: selectedItem.plu, storeId });
-    setDeleteTrigger(prev => !prev);
-  };
-  
-  const handleChangeItem = async (values) => {
-    console.log("Changed item values:", values);
-
-    // Převod vat_type ze stringu zpět na index
-    const vatIndex = vat.findIndex((v) => `${v.rate} %` === values.vat_type);
-
-    //Příprava dat pro odeslání na backend
-    const changedItem = {
-      date: values.date,
-      delivery_note: values.delivery_note,
-      plu: selectedItem.plu,
-      collection: values.collection,
-      product: values.product,
-      color: values.color,
-      quantity: Number(values.quantity),
-      price_buy: Number(values.price_buy),
-      price: Number(values.price),
-      gender: values.gender,
-      material: values.material,
-      type: values.type,
-    };
-  };
-        //   const res = await fetch(
-        //   `${API_URL}/store/search?store=1&page=${page}&limit=${limit}&value=${searchValue}`,
-        //   {
-        //     method: "GET",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //       Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        //     },
-        //   },
-        // );
-
-  const handleAddNewItem = async () => {
+  //HANDLE NEW ITEM
+  const handleNewItem = async () => {
     // Nastavení prázdných výchozích hodnot pro novou položku
-    const newItem = {
-      collection: "",
-      product: "",
-      color: "",
-      supplier: "",
-      quantity: "",
-      price: "",
+    const emptyValues = {
+      plu: "", // prázdné plu pro novou položku
+      collection: "TEST",
+      product: "TEST",
+      color: "Black",
+      id_supplier: "", // prázdný string místo 0
+      quantity: 1,
+      price: 1,
       note: "",
-      size: "",
+      size: "54/18-140",
       gender: "",
       material: "",
       type: "",
+      date: "",
+      delivery_note: "",
     };
-    setSelectedItem(newItem);
+
+    setIsNewItem(true);
+    setSelectedItem(emptyValues);
     setShowModal(true);
   };
 
+  //HANDLE CLICK ITEM IN LIST
   const handleClick = (itemId) => {
+    //podle ID najde položku a otevři modal s jejími daty
     const item = items.find((itm) => itm.id === itemId);
+    setIsNewItem(false);
     setSelectedItem(item);
     setShowModal(true);
   };
@@ -222,7 +226,7 @@ function StoreFrames() {
           <button onClick={() => handleSearchInStore(inputSearch)}>
             Vyhledat
           </button>
-          <button onClick={() => handleAddNewItem()}>Nová obruba</button>
+          <button onClick={() => handleNewItem()}>Nová obruba</button>
         </div>
 
         <div className="show-items-panel">
@@ -269,7 +273,7 @@ function StoreFrames() {
                     <h2>{`${item.color}`}</h2>
                   </div>
                   <div className="item-name">
-                    <h2>{`${item.supplier}`}</h2>
+                    <h2>{`${item.supplier_nick}`}</h2>
                   </div>
                   <div className="item-name">
                     <h2>{`${item.quantity}`}</h2>
@@ -279,14 +283,6 @@ function StoreFrames() {
                   </div>
                   {/* Druhý řádek s kategoriemi */}
                   <div className="item-note">
-                    {item.note && (
-                      <div
-                        className="item-category"
-                        style={{
-                          background: "var(--color-grd-g5)",
-                        }}
-                      >{`Poznámka`}</div>
-                    )}
                     {item.size && (
                       <div
                         className="item-category"
@@ -323,6 +319,14 @@ function StoreFrames() {
                         }}
                       >{`${item.type}`}</div>
                     )}
+                    {item.note && (
+                      <div
+                        className="item-category"
+                        style={{
+                          background: "var(--color-grd-g16)",
+                        }}
+                      >{`ID ${item.note}`}</div>
+                    )}
                   </div>
                   {/* {hoveredItemId === item.id && (
                     <div className="item-actions">
@@ -344,25 +348,26 @@ function StoreFrames() {
         page={page}
         limit={limit}
         searchValue={searchTrigger}
+        refreshTrigger={refreshTrigger}
         onResult={handleSearchResult}
       />
-      {itemToDelete && (
-        <DeleteFromStore
-          plu={itemToDelete.plu}
-          storeId={itemToDelete.storeId}
-          trigger={deleteTrigger}
-          onResult={handleDeleteResult}
+      {itemToUpdate && (
+        <UpdateInStore
+          values={itemToUpdate.values}
+          storeId={itemToUpdate.storeId}
+          updateTrigger={updateTrigger}
+          onResult={handleUpdateResult}
         />
       )}
       <div>
         {showModal && (
           <Modal
-            fields={fields}
+            fields={isNewItem ? [...fieldsForStockInput, ...fieldsBasic] : fieldsBasic}
             initialValues={selectedItem}
-            onSubmit={handleChangeItem}
+            thirdButton={null}
+            onSubmit={handleUpdateItem}
             onClose={() => setShowModal(false)}
             onCancel={() => setShowModal(false)}
-            onDelete={deleteItem}
           />
         )}
       </div>

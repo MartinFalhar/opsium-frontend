@@ -367,7 +367,7 @@ button:hover {
   color: var(--color-bg-b11);
 }
 
-.button-delete {
+.button-warning {
   width: clamp(50px, 25vw, 150px);
   height: clamp(20px, 25vw, 40px);
   background: var(--color-grd-g1);

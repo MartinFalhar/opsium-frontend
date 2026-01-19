@@ -1,43 +1,45 @@
+//Ryze datová komponenta pro aktualizaci položky ve skladu
+//Neposktuje žádné JSX, pouze efektivně volá API a vrací výsledek přes onResult callback
 import { useEffect, useState } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function DeleteFromStore({ plu, storeId, trigger, onResult }) {
+export default function UpdateInStore({ values, storeId, updateTrigger, onResult }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const deleteItem = async () => {
+    const updateItem = async () => {
       try {
-        const res = await fetch(`${API_URL}/store/delete`, {
+        const res = await fetch(`${API_URL}/store/update`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
-          body: JSON.stringify({ plu, storeId }),
+          body: JSON.stringify({ values, storeId }),
         });
         const data = await res.json();
 
         if (res.ok) {
-          window.showToast("Položka byla smazána.");
+          window.showToast("Položka byla aktualizována.");
           onResult({ success: true, error: null });
         } else {
           setError(data.message);
           onResult({ success: false, error: data.message });
-          console.error("Chyba při mazání položky:", data.message);
+          console.error("Chyba při aktualizaci položky:", data.message);
         }
       } catch (err) {
         console.error("Fetch error:", err);
-        const errorMsg = "Nepodařilo se smazat položku.";
+        const errorMsg = "Nepodařilo se aktualizovat položku.";
         setError(errorMsg);
         onResult({ success: false, error: errorMsg });
       }
     };
 
-    if (trigger && plu && storeId) {
-      deleteItem();
+    if (values && storeId && updateTrigger > 0) {
+      updateItem();
     }
-  }, [trigger, plu, storeId]);
+  }, [updateTrigger, values, storeId]);
 
-  return null; // Tato komponenta nevrací žádné JSX
+  return null;
 }

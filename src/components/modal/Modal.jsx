@@ -1,8 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import ConfirmDelete from "./ConfirmDelete";
+import useNameList from "../store/GetNameList";
 
-export default function Modal({ fields, initialValues = {}, onSubmit, onClose, onCancel, onDelete }) {
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+export default function Modal({
+  thirdButton,
+  fields,
+  initialValues = {},
+  onSubmit,
+  onClose,
+  onCancel,
+  onClickThirdButton,
+}) {
+  const [showConfirm, setShowConfirm] = useState(false);
+  
+  // Najdi první pole s dynamickými options (zatím podporujeme pouze jedno)
+  const dynamicField = useMemo(() => {
+
+    return fields.find(f => f.options && typeof f.options === 'object' && !Array.isArray(f.options));
+  }, [fields]);
+  
+  // Načti data pro dynamické pole
+  const dynamicData = useNameList(dynamicField?.options?.field);
+  
   const [values, setValues] = useState(() => {
     const init = {};
     fields.forEach((f) => {
@@ -22,24 +41,29 @@ export default function Modal({ fields, initialValues = {}, onSubmit, onClose, o
     onClose(); // Zavři modal
   };
 
-  const handleDeleteClick = () => {
-    setShowConfirmDelete(true);
+  const handleThirdButtonClick = () => {
+    setShowConfirm(true);
   };
 
   const handleConfirmDelete = () => {
-    if (onDelete) {
-      onDelete();
+    if (onClickThirdButton) {
+      onClickThirdButton();
     }
-    setShowConfirmDelete(false);
+    setShowConfirm(false);
     onClose();
   };
 
-  const handleCancelDelete = () => {
-    setShowConfirmDelete(false);
+  const handleCancelConfirm = () => {
+    setShowConfirm(false);
   };
 
-  if (showConfirmDelete) {
-    return <ConfirmDelete onConfirm={handleConfirmDelete} onCancel={handleCancelDelete} />;
+  if (showConfirm) {
+    return (
+      <ConfirmDelete
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelConfirm}
+      />
+    );
   }
 
   return (
@@ -53,58 +77,95 @@ export default function Modal({ fields, initialValues = {}, onSubmit, onClose, o
             setTimeout(onClose, 2);
           }}
         >
-          <div className={`modal-content ${fields.length > 5 ? 'two-columns' : ''}`}>
-            {fields.map((field, index) => (
+          <div
+            className={`modal-content ${fields.length > 5 ? "two-columns" : ""}`}
+          >
+            {fields.map((field, index) => {
+              // Pro pole s dynamickými options použij předem načtená data
+              const isDynamic = field.options && typeof field.options === 'object' && !Array.isArray(field.options);
+              const optionsList = isDynamic ? (dynamicData?.data || []) : (Array.isArray(field.options) ? field.options : []);
+              
+              return (
               <div key={index} className="modal-field">
                 <label>
                   {field.label}
                   {field.required && <span style={{ color: "red" }}> *</span>}
                 </label>
-                {field.options ? (
+                {(field.options && Array.isArray(field.options)) || (field.options && typeof field.options === 'object' && !Array.isArray(field.options)) ? (
                   <select
                     value={values[field.varName]}
-                    onChange={(e) => handleChange(field.varName, e.target.value)}
+                    onChange={(e) =>
+                      handleChange(field.varName, e.target.value)
+                    }
                     required={field.required}
                     disabled={field.disabled}
-                    style={field.disabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                    style={
+                      field.disabled
+                        ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" }
+                        : {}
+                    }
                   >
                     <option value="">-- Vyberte --</option>
-                    {field.options.map((option, i) => (
-                      <option key={i} value={option}>
-                        {option}
-                      </option>
-                    ))}
+                    {optionsList.map((option, i) => {
+                      // Pokud je option objekt, použij id jako value a nick jako text
+                      const isObject = typeof option === 'object' && option !== null;
+                      return (
+                        <option 
+                          key={i} 
+                          value={isObject ? option.id : option}
+                        >
+                          {isObject ? option.nick : option}
+                        </option>
+                      );
+                    })}
                   </select>
                 ) : field.input === "textarea" ? (
                   <textarea
                     value={values[field.varName]}
-                    onChange={(e) => handleChange(field.varName, e.target.value)}
+                    onChange={(e) =>
+                      handleChange(field.varName, e.target.value)
+                    }
                     required={field.required}
                     readOnly={field.readOnly}
                     disabled={field.disabled}
                     rows={field.rows || 3}
-                    style={field.readOnly || field.disabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                    style={
+                      field.readOnly || field.disabled
+                        ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" }
+                        : {}
+                    }
                   />
                 ) : (
                   <input
                     type={field.input || "text"}
                     value={values[field.varName]}
-                    onChange={(e) => handleChange(field.varName, e.target.value)}
+                    onChange={(e) =>
+                      handleChange(field.varName, e.target.value)
+                    }
                     required={field.required}
                     autoFocus={index === 0}
                     readOnly={field.readOnly}
                     disabled={field.disabled}
-                    style={field.readOnly || field.disabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                    style={
+                      field.readOnly || field.disabled
+                        ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" }
+                        : {}
+                    }
                   />
                 )}
               </div>
-            ))}
+            );
+            })}
           </div>
 
           <div className="modal-actions">
-            {initialValues.name !== "" && (
-              <button className="button-delete" type="button" onClick={handleDeleteClick}>
-                Smazat
+            {thirdButton !== null && initialValues.name !== "" && (
+              <button
+                className="button-warning"
+                type="button"
+                onClick={handleThirdButtonClick}
+              >
+                {thirdButton}
               </button>
             )}
             <button type="button" onClick={handleClose}>

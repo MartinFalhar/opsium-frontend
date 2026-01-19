@@ -7,6 +7,7 @@ export default function SearchInStore({
   page,
   limit,
   searchValue,
+  refreshTrigger,
   onResult,
 }) {
   const [error, setError] = useState(null);
@@ -50,7 +51,7 @@ export default function SearchInStore({
     if (storeId) {
       loadItems();
     }
-  }, [storeId, page, limit, searchValue]);
+  }, [storeId, page, limit, searchValue, refreshTrigger ]);
 
   return null; // Tato komponenta nevrací žádné JSX
 }
