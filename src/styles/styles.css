@@ -668,7 +668,6 @@ button:hover {
   font-size: 0.5rem;
 }
 
-
 /* ---- TERTIARY MENU ---- */
 .button-tertiary-menu {
   display: flex;
@@ -724,23 +723,36 @@ button:hover {
 }
 
 .modal {
-  position: relative; 
+  position: relative;
   /* padding: 25px;   */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
+  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9); */
+  background-color: white;
+  padding: 20px 30px;
+  border-radius: 5px 5px 10px 10px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
 }
 
+
+
 .modal::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 5px;
-  background: linear-gradient(to right,rgba(22, 114, 217, 72%) 0%, rgba(56, 189, 248, 0.85) 25%, rgba(20, 184, 166, 0.85) 40%, rgba(200, 144, 231, 1) 70%, rgba(255, 191, 19, 1) 100%);
-  border-radius: 10px 10px 0 0;
+  background: linear-gradient(
+    to right,
+    rgba(22, 114, 217, 0.72) 0%,
+    rgba(56, 189, 248, 0.85) 25%,
+    rgba(20, 184, 166, 0.85) 40%,
+    rgba(200, 144, 231, 1) 70%,
+    rgba(255, 191, 19, 1) 100%
+  );
+  border-radius: 10px 10px 0px 0px;
 }
-
-
 
 .modal input {
   width: 100%;
@@ -780,6 +792,29 @@ button:hover {
   align-items: center;
   gap: 15px;
   margin-top: 25px;
+}
+
+.modal-member-item {
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.modal h3 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.modal-member-item:hover {
+  background-color: #f0f0f0;
+}
+
+.modal-pin-info {
+  font-size: x-small;
+  color: var(--color-el-g);
+  margin-top: 10px;
 }
 
 /* ----------- ADMIN LAYOUT */

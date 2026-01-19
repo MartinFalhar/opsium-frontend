@@ -175,47 +175,8 @@
   }
 } */
 
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
 
-.modal {
-  background-color: white;
-  padding: 20px 30px;
-  border-radius: 12px;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
 
-.modal h3 {
-  margin-bottom: 15px;
-  font-size: 18px;
-  text-align: center;
-}
-
-.modal-member-item {
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.modal-member-item:hover {
-  background-color: #f0f0f0;
-}
-
-.modal-pin-info {
-  font-size: x-small;
-  color: var(--color-el-g);
-  margin-top: 10px;
-}
 
 .deleteSign {
   /* position: absolute;
@@ -240,8 +201,4 @@
 .deleteSign img:hover {
   opacity: 1;
   transform: scale(1.3);
-}
-
-.empty-info {
-  fon
 }
