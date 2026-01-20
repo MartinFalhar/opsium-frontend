@@ -42,6 +42,7 @@ function StoreFrames() {
       label: "Dodavatel",
       options: { field: "brýle" },
       required: true,
+      readOnly: true,
     },
     {
       varName: "collection",
@@ -52,22 +53,17 @@ function StoreFrames() {
     { varName: "product", label: "Model", input: "text", required: false },
     { varName: "color", label: "Barva", input: "text", required: false },
     {
-      varName: "quantity",
-      label: "Množství",
-      input: "number",
-      required: false,
-    },
-    {
-      varName: "price_buy",
-      label: "Nákupní cena",
-      input: "number",
-      required: false,
-    },
-    {
       varName: "price",
       label: "Prodejní cena",
       input: "number",
       required: false,
+    },
+    {
+      varName: "quantity",
+      label: "Množství",
+      input: "number",
+      required: false,
+      readOnly: true,
     },
     {
       varName: "gender",
@@ -85,7 +81,7 @@ function StoreFrames() {
       varName: "type",
       label: "Typ obruby",
       options: [`Dioptrická`, `Typ 2`, `Typ 3`, `Typ 4`],
-      required: false,
+      required: false, 
     },
   ];
 
@@ -152,7 +148,6 @@ function StoreFrames() {
       collection: item.collection,
       product: item.product,
       color: item.color,
-      quantity: Number(item.quantity),
       price: Number(item.price),
       gender: item.gender,
       material: item.material,
@@ -182,7 +177,7 @@ function StoreFrames() {
       product: "TEST",
       color: "Black",
       id_supplier: "", // prázdný string místo 0
-      quantity: 1,
+      quantity: 0,
       price: 1,
       note: "",
       size: "54/18-140",
@@ -226,7 +221,7 @@ function StoreFrames() {
           <button onClick={() => handleSearchInStore(inputSearch)}>
             Vyhledat
           </button>
-          <button onClick={() => handleNewItem()}>Nová obruba</button>
+          <button onClick={() => handleNewItem()}>Příjemka</button>
         </div>
 
         <div className="show-items-panel">

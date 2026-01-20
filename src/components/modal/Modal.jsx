@@ -94,14 +94,16 @@ export default function Modal({
                 {(field.options && Array.isArray(field.options)) || (field.options && typeof field.options === 'object' && !Array.isArray(field.options)) ? (
                   <select
                     value={values[field.varName]}
-                    onChange={(e) =>
-                      handleChange(field.varName, e.target.value)
-                    }
+                    onChange={(e) => {
+                      if (!field.readOnly) {
+                        handleChange(field.varName, e.target.value);
+                      }
+                    }}
                     required={field.required}
                     disabled={field.disabled}
                     style={
-                      field.disabled
-                        ? { backgroundColor: "#f0f0f0", cursor: "not-allowed" }
+                      field.disabled || field.readOnly
+                        ? { backgroundColor: "#f0f0f0", cursor: "not-allowed", pointerEvents: field.readOnly ? "none" : "auto" }
                         : {}
                     }
                   >
