@@ -6,6 +6,7 @@ import Modal from "../../components/modal/Modal.jsx";
 import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
 import SearchInStore from "../../components/store/SearchInStore.jsx";
 import UpdateInStore from "../../components/store/UpdateInStore.jsx";
+import OneItemPutInStore from "../../components/store/OneItemPutInStore.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -17,6 +18,21 @@ function StoreFrames() {
 
   const fieldsForStockInput = [
     {
+      varName: "text01",
+      input: "message",
+    },
+    {
+      varName: "text02",
+      input: "message",
+    },
+    {
+      varName: "id_supplier",
+      label: "Dodavatel",
+      options: { field: "brýle" },
+      required: true,
+      readOnly: true,
+    },
+    {
       varName: "date",
       label: "Datum příjmu",
       input: "date",
@@ -24,9 +40,21 @@ function StoreFrames() {
     },
     {
       varName: "delivery_note",
-      label: "Číslo dodacího listu",
+      label: "Dodací list",
       input: "text",
       required: true,
+    },
+    {
+      varName: "quantity",
+      label: "Počet",
+      input: "number",
+      required: false,
+    },
+    {
+      varName: "price_buy",
+      label: "Nákupní cena [Kč bez DPH]",
+      input: "number",
+      required: false,
     },
   ];
 
@@ -54,7 +82,7 @@ function StoreFrames() {
     { varName: "color", label: "Barva", input: "text", required: false },
     {
       varName: "price",
-      label: "Prodejní cena",
+      label: "Prodejní cena [Kč s DPH]",
       input: "number",
       required: false,
     },
@@ -81,7 +109,7 @@ function StoreFrames() {
       varName: "type",
       label: "Typ obruby",
       options: [`Dioptrická`, `Typ 2`, `Typ 3`, `Typ 4`],
-      required: false, 
+      required: false,
     },
   ];
 
@@ -107,6 +135,7 @@ function StoreFrames() {
   const { user, vat } = useUser();
   const [showModal, setShowModal] = useState(false);
   const [isNewItem, setIsNewItem] = useState(false);
+  const [isOneItemPutInStore, setIsOneItemPutInStore] = useState(false);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   // const [hoveredItemId, setHoveredItemId] = useState(null);
@@ -121,6 +150,7 @@ function StoreFrames() {
   const [updateTrigger, setUpdateTrigger] = useState(0);
   const [itemToUpdate, setItemToUpdate] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [putInStoreTrigger, setPutInStoreTrigger] = useState(0);
 
   // Paginace
   const [page, setPage] = useState(1);
@@ -132,6 +162,7 @@ function StoreFrames() {
     fields = fieldsBasic;
     setSearchTrigger(value || "");
   };
+
   const handleSearchResult = (result) => {
     setItems(result.items);
     setTotalPages(result.totalPages);
@@ -143,6 +174,13 @@ function StoreFrames() {
   //HANDLE UPDATE IN STORE
   const handleUpdateItem = (item) => {
     console.log("handleUpdateItem received:", item); // Debug
+
+    // Pokud je režim naskladnění jedné položky, spusť trigger pro OneItemPutInStore
+    if (isOneItemPutInStore) {
+      setPutInStoreTrigger((prev) => prev + 1);
+      return;
+    }
+
     const changedItem = {
       plu: item.plu,
       collection: item.collection,
@@ -166,6 +204,27 @@ function StoreFrames() {
     } else if (result.error) {
       setError(result.error);
     }
+  };
+
+  const handleOneItemPutInStore = (item) => {
+    setPutInStoreTrigger((prev) => prev + 1);
+    if (result.success) {
+      setRefreshTrigger((prev) => prev + 1); // Vynutit obnovení seznamu
+      setShowModal(false);
+      setIsOneItemPutInStore(false);
+    } else if (result.error) {
+      setError(result.error);
+    }
+  };
+
+  //HANDLE CLICK ITEM IN LIST
+  const handleClick = (itemId) => {
+    //podle ID najde položku a otevři modal s jejími daty
+    const item = items.find((itm) => itm.id === itemId);
+    setIsNewItem(false);
+    setIsOneItemPutInStore(false);
+    setSelectedItem(item);
+    setShowModal(true);
   };
 
   //HANDLE NEW ITEM
@@ -193,12 +252,29 @@ function StoreFrames() {
     setShowModal(true);
   };
 
-  //HANDLE CLICK ITEM IN LIST
-  const handleClick = (itemId) => {
-    //podle ID najde položku a otevři modal s jejími daty
-    const item = items.find((itm) => itm.id === itemId);
-    setIsNewItem(false);
-    setSelectedItem(item);
+  //HANDLE GET ON STOCK JUST ONE ITEM
+  const handleClickOnThirdButton = () => {
+    window.showToast("Naskladnit položku...");
+    // setShowModal(false);
+    const today = new Date();
+    const onStockOneItemValues = {
+      text01: "plu " + selectedItem.plu,
+      text02:
+        selectedItem.collection +
+        " " +
+        selectedItem.product +
+        " " +
+        selectedItem.color,
+      id_supplier: selectedItem.id_supplier,
+      quantity: 1,
+      price_buy: Math.floor(Math.random() * 10000),
+      date: today.toISOString().split("T")[0],
+      delivery_note: "XL-123456",
+    };
+    //Aktivuje režim připsání jedné položky
+    setIsOneItemPutInStore(true);
+    //Načítá položky do modalu pro naskladnění
+    setSelectedItem((prev) => ({ ...prev, ...onStockOneItemValues }));
     setShowModal(true);
   };
 
@@ -354,15 +430,48 @@ function StoreFrames() {
           onResult={handleUpdateResult}
         />
       )}
+      {isOneItemPutInStore && selectedItem && (
+        <OneItemPutInStore
+          values={{
+            store_item: selectedItem.id_store_item,
+            plu: selectedItem.plu,
+            supplier: selectedItem.id_supplier,
+            delivery_note: selectedItem.delivery_note,
+            quantity: selectedItem.quantity,
+            price_buy: selectedItem.price_buy,
+            date: selectedItem.date,
+          }}
+          putInStoreTrigger={putInStoreTrigger}
+          onResult={handleOneItemPutInStore}
+        />
+      )}
       <div>
         {showModal && (
           <Modal
-            fields={isNewItem ? [...fieldsForStockInput, ...fieldsBasic] : fieldsBasic}
+            fields={
+              isNewItem
+                ? fieldsForStockInput
+                : isOneItemPutInStore
+                  ? fieldsForStockInput
+                  : fieldsBasic
+            }
+            // fields={
+            //   isNewItem ? [...fieldsForStockInput, ...fieldsBasic] : fieldsBasic
+            // }
             initialValues={selectedItem}
-            thirdButton={null}
             onSubmit={handleUpdateItem}
             onClose={() => setShowModal(false)}
             onCancel={() => setShowModal(false)}
+            firstButton={
+              isNewItem || isOneItemPutInStore
+                ? "Připsat zboží"
+                : "Uložit změny"
+            }
+            secondButton={"Zavřít"}
+            thirdButton={
+              !isNewItem && !isOneItemPutInStore ? "Naskladnit" : null
+            }
+            onClickThirdButton={handleClickOnThirdButton}
           />
         )}
       </div>
