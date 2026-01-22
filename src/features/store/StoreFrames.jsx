@@ -1,12 +1,11 @@
-import React from "react";
 import { useState, useEffect } from "react";
-import { useUser } from "../../context/UserContext";
 import Pagination from "../../components/pagination/Pagination.jsx";
 import Modal from "../../components/modal/Modal.jsx";
 import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
-import SearchInStore from "../../components/store/SearchInStore.jsx";
-import UpdateInStore from "../../components/store/UpdateInStore.jsx";
-import OneItemPutInStore from "../../components/store/OneItemPutInStore.jsx";
+import { useStoreSearch } from "../../hooks/useStoreSearch.js";
+import { useStoreUpdate } from "../../hooks/useStoreUpdate.js";
+import { useStorePutIn } from "../../hooks/useStorePutIn.js";
+import { useStoreGetSuppliers } from "../../hooks/useStoreGetSuppliers.js";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -17,6 +16,10 @@ function StoreFrames() {
   //******************************
 
   const fieldsForStockInput = [
+    {
+      varName: "plu",
+      input: "hidden",  // Skryté pole
+    },
     {
       varName: "text01",
       input: "message",
@@ -132,55 +135,61 @@ function StoreFrames() {
   };
 
   // Stavové hooky
-  const { user, vat } = useUser();
   const [showModal, setShowModal] = useState(false);
   const [isNewItem, setIsNewItem] = useState(false);
-  const [isOneItemPutInStore, setIsOneItemPutInStore] = useState(false);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  // const [hoveredItemId, setHoveredItemId] = useState(null);
+  const [isPutInStore, setIsPutInStore] = useState(false);
 
   // Stav pro vyhledávací vstup a položky skladu
   const [inputSearch, setInputSearch] = useState("");
-  const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // Triggery pro vyhledávání a mazání
-  const [searchTrigger, setSearchTrigger] = useState("");
-  const [updateTrigger, setUpdateTrigger] = useState(0);
-  const [itemToUpdate, setItemToUpdate] = useState(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [putInStoreTrigger, setPutInStoreTrigger] = useState(0);
+  // Custom hooky pro práci se skladem
+  const {
+    items,
+    totalPages,
+    loading: searchLoading,
+    searchItems,
+  } = useStoreSearch(storeId);
+  const { loading: updateLoading, updateItem } = useStoreUpdate(storeId);
+  const { loading: putInLoading, putInItem } = useStorePutIn(storeId);
+  const { suppliers } = useStoreGetSuppliers("brýle");
 
   // Paginace
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const limit = 6;
+
+  // Effect pro automatické načtení položek při změně stránky nebo inputu
+  useEffect(() => {
+    searchItems(page, limit, inputSearch);
+  }, [page, inputSearch, searchItems]);
 
   //HANDLE SEARCH IN STORE
   const handleSearchInStore = (value) => {
-    fields = fieldsBasic;
-    setSearchTrigger(value || "");
-  };
-
-  const handleSearchResult = (result) => {
-    setItems(result.items);
-    setTotalPages(result.totalPages);
-    if (result.error) {
-      setError(result.error);
-    }
+    setInputSearch(value || "");
+    setPage(1); // Reset na první stránku při novém vyhledávání
   };
 
   //HANDLE UPDATE IN STORE
-  const handleUpdateItem = (item) => {
-    console.log("handleUpdateItem received:", item); // Debug
-
-    // Pokud je režim naskladnění jedné položky, spusť trigger pro OneItemPutInStore
-    if (isOneItemPutInStore) {
-      setPutInStoreTrigger((prev) => prev + 1);
+  const handleUpdateItem = async (item) => {
+    // Pokud je režim naskladnění jedné položky, použij putInItem hook
+    if (isPutInStore) {
+      const putInData = {
+        plu: Number(item.plu),
+        id_supplier: Number(item.id_supplier),
+        delivery_note: item.delivery_note,
+        quantity: Number(item.quantity),
+        price_buy: Number(item.price_buy),
+        date: item.date,
+      };
+      console.log("putInData:", putInData);
+      const result = await putInItem(putInData);
+      if (result.success) {
+        searchItems(page, limit, inputSearch);
+        setShowModal(false);
+        setIsPutInStore(false);
+      }
       return;
     }
-
     const changedItem = {
       plu: item.plu,
       collection: item.collection,
@@ -190,30 +199,13 @@ function StoreFrames() {
       gender: item.gender,
       material: item.material,
       type: item.type,
-      id_supplier: Number(item.id_supplier) || null, // Převeď na number
+      id_supplier: Number(item.id_supplier) || null,
     };
-    console.log("changedItem:", changedItem); // Debug
-    setItemToUpdate({ values: changedItem, storeId });
-    setUpdateTrigger((prev) => prev + 1);
-  };
-
-  const handleUpdateResult = (result) => {
+    console.log("changedItem:", changedItem);
+    const result = await updateItem(changedItem);
     if (result.success) {
-      setRefreshTrigger((prev) => prev + 1); // Vynutit obnovení seznamu
+      searchItems(page, limit, inputSearch);
       setShowModal(false);
-    } else if (result.error) {
-      setError(result.error);
-    }
-  };
-
-  const handleOneItemPutInStore = (item) => {
-    setPutInStoreTrigger((prev) => prev + 1);
-    if (result.success) {
-      setRefreshTrigger((prev) => prev + 1); // Vynutit obnovení seznamu
-      setShowModal(false);
-      setIsOneItemPutInStore(false);
-    } else if (result.error) {
-      setError(result.error);
     }
   };
 
@@ -221,8 +213,10 @@ function StoreFrames() {
   const handleClick = (itemId) => {
     //podle ID najde položku a otevři modal s jejími daty
     const item = items.find((itm) => itm.id === itemId);
+    //vypnout režim nové položky a naskladnění
     setIsNewItem(false);
-    setIsOneItemPutInStore(false);
+    setIsPutInStore(false);
+    //nastaví vybranou položku a otevře modal
     setSelectedItem(item);
     setShowModal(true);
   };
@@ -246,18 +240,16 @@ function StoreFrames() {
       date: "",
       delivery_note: "",
     };
-
     setIsNewItem(true);
     setSelectedItem(emptyValues);
     setShowModal(true);
   };
 
-  //HANDLE GET ON STOCK JUST ONE ITEM
+  //HANDLE PUT IN STORE JUST ONE ITEM
   const handleClickOnThirdButton = () => {
     window.showToast("Naskladnit položku...");
-    // setShowModal(false);
     const today = new Date();
-    const onStockOneItemValues = {
+    const onStockValues = {
       text01: "plu " + selectedItem.plu,
       text02:
         selectedItem.collection +
@@ -265,16 +257,19 @@ function StoreFrames() {
         selectedItem.product +
         " " +
         selectedItem.color,
+      plu: selectedItem.plu,  
       id_supplier: selectedItem.id_supplier,
       quantity: 1,
       price_buy: Math.floor(Math.random() * 10000),
       date: today.toISOString().split("T")[0],
       delivery_note: "XL-123456",
     };
+
     //Aktivuje režim připsání jedné položky
-    setIsOneItemPutInStore(true);
+    setIsPutInStore(true);
+
     //Načítá položky do modalu pro naskladnění
-    setSelectedItem((prev) => ({ ...prev, ...onStockOneItemValues }));
+    setSelectedItem((prev) => ({ ...prev, ...onStockValues }));
     setShowModal(true);
   };
 
@@ -318,11 +313,15 @@ function StoreFrames() {
             <h3>Barva</h3>
             <h3>Dodavatel</h3>
             <h3>Množství (ks)</h3>
-            <h3>Cena</h3>
+            <h3>Prodejní cena</h3>
           </div>
 
           <div className="items-list">
-            {!items.length > 0 && <PuffLoaderSpinnerLarge active={isLoading} />}
+            {!items.length > 0 && (
+              <PuffLoaderSpinnerLarge
+                active={searchLoading || updateLoading || putInLoading}
+              />
+            )}
 
             {items.length > 0 &&
               items.map((item) => (
@@ -399,78 +398,38 @@ function StoreFrames() {
                       >{`ID ${item.note}`}</div>
                     )}
                   </div>
-                  {/* {hoveredItemId === item.id && (
-                    <div className="item-actions">
-                      <button onClick={() => handleItemChange(item)}>
-                        UPRAVIT
-                      </button>
-                      <button onClick={() => handleItemDelete(item)}>
-                        SMAZAT
-                      </button>
-                    </div> 
-                  )}*/}
                 </div>
               ))}
           </div>
         </div>
       </div>
-      <SearchInStore
-        storeId={storeId}
-        page={page}
-        limit={limit}
-        searchValue={searchTrigger}
-        refreshTrigger={refreshTrigger}
-        onResult={handleSearchResult}
-      />
-      {itemToUpdate && (
-        <UpdateInStore
-          values={itemToUpdate.values}
-          storeId={itemToUpdate.storeId}
-          updateTrigger={updateTrigger}
-          onResult={handleUpdateResult}
-        />
-      )}
-      {isOneItemPutInStore && selectedItem && (
-        <OneItemPutInStore
-          values={{
-            store_item: selectedItem.id_store_item,
-            plu: selectedItem.plu,
-            supplier: selectedItem.id_supplier,
-            delivery_note: selectedItem.delivery_note,
-            quantity: selectedItem.quantity,
-            price_buy: selectedItem.price_buy,
-            date: selectedItem.date,
-          }}
-          putInStoreTrigger={putInStoreTrigger}
-          onResult={handleOneItemPutInStore}
-        />
-      )}
+
       <div>
         {showModal && (
           <Modal
             fields={
               isNewItem
                 ? fieldsForStockInput
-                : isOneItemPutInStore
+                : isPutInStore
                   ? fieldsForStockInput
                   : fieldsBasic
             }
-            // fields={
-            //   isNewItem ? [...fieldsForStockInput, ...fieldsBasic] : fieldsBasic
-            // }
             initialValues={selectedItem}
+            suppliers={suppliers}
             onSubmit={handleUpdateItem}
             onClose={() => setShowModal(false)}
             onCancel={() => setShowModal(false)}
             firstButton={
-              isNewItem || isOneItemPutInStore
+              isNewItem || isPutInStore
                 ? "Připsat zboží"
                 : "Uložit změny"
             }
             secondButton={"Zavřít"}
             thirdButton={
-              !isNewItem && !isOneItemPutInStore ? "Naskladnit" : null
+              !isNewItem && !isPutInStore ? "Naskladnit" : null
             }
+            //Pokud bylo stisknuto třetí tlačítko zprava provede se redesign modalu na naskladnění jedné položky
+            //Načtou se jiné fields a initialValues
             onClickThirdButton={handleClickOnThirdButton}
           />
         )}

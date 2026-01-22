@@ -13,7 +13,17 @@ export default function OneItemPutInStore({
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const updateItem = async () => {
+
+     window.showToast("PUTIN aktivován");
+     console.log("PUTIN values:", values);
+     console.log("PUTIN values:",   putInStoreTrigger  );
+     console.log("PUTIN values:", storeId);
+     
+
+     const updateItem = async () => {
+
+      window.showToast("JELCIN aktivován");
+
       try {
         const res = await fetch(`${API_URL}/store/putin-stock`, {
           method: "POST",
@@ -21,14 +31,13 @@ export default function OneItemPutInStore({
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
-          body: JSON.stringify({
-            store_item,
-            plu,
-            supplier,
-            delivery_note,
-            quantity,
-            price_buy,
-            date,
+          body: JSON.stringify({            
+            plu: values.plu,
+            id_supplier: values.id_supplier,
+            delivery_note: values.delivery_note,
+            quantity: values.quantity,
+            price_buy: values.price_buy,
+            date: values.date,
           }),
         });
         const data = await res.json();

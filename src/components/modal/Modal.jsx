@@ -1,6 +1,5 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import ConfirmDelete from "./ConfirmDelete";
-import useNameList from "../store/GetNameList";
 
 export default function Modal({
   fields,
@@ -12,28 +11,12 @@ export default function Modal({
   secondButton,
   thirdButton,
   onClickThirdButton,
+  suppliers = [],
 }) {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [values, setValues] = useState({});
 
-  // Najdi první pole s dynamickými options (zatím podporujeme pouze jedno)
-  const dynamicField = useMemo(() => {
-    return fields.find(
-      (f) =>
-        f.options && typeof f.options === "object" && !Array.isArray(f.options),
-    );
-  }, [fields]);
-
-  // Načti data pro dynamické pole
-  const dynamicData = useNameList(dynamicField?.options?.field);
-
-  const [values, setValues] = useState(() => {
-    const init = {};
-    fields.forEach((f) => {
-      init[f.varName] = initialValues[f.varName] || "";
-    });
-    return init;
-  });
-
+  // Aktualizace values při změně initialValues nebo fields
   useEffect(() => {
     const init = {};
     fields.forEach((f) => {
@@ -43,6 +26,8 @@ export default function Modal({
     setValues(init);
   }, [fields, initialValues]);
 
+  //Univerzální handler pro změnu hodnoty pole
+  //libovolného elementu formuláře
   const handleChange = (varName, value) => {
     setValues((prev) => ({ ...prev, [varName]: value }));
   };
@@ -54,10 +39,16 @@ export default function Modal({
     onClose(); // Zavři modal
   };
 
+  // Handler pro třetí tlačítko
+  // Má hlídat stavy, kvůli zobrazení
+  // konfirmačního formuláře (Smazat atd.)
   const handleThirdButtonClick = () => {
     if (thirdButton === "Smazat") {
       setShowConfirm(true);
     } else {
+      // Pro jiné akce než smazání
+      // vyvolá příslušný callback
+      // který změní fields a values
       if (thirdButton === "Naskladnit" && onClickThirdButton) {
         onClickThirdButton();
       }
@@ -97,6 +88,8 @@ export default function Modal({
           }}
         >
           <div
+            //Jestliže je více než 5 polí, použij dva
+            //sloupce pro zobrazení
             className={`modal-content ${fields.length > 5 ? "two-columns" : ""}`}
           >
             {fields.map((field, index) => {
@@ -106,13 +99,13 @@ export default function Modal({
                 typeof field.options === "object" &&
                 !Array.isArray(field.options);
               const optionsList = isDynamic
-                ? dynamicData?.data || []
+                ? suppliers
                 : Array.isArray(field.options)
                   ? field.options
                   : [];
 
               return (
-                <div key={index} className="modal-field">
+                <div key={index} className="modal-field" style={field.input === "hidden" ? { display: "none" } : {}}>
                   <label>
                     {field.label}
                     {field.required && <span style={{ color: "red" }}> *</span>}
