@@ -292,7 +292,7 @@ function StoreFrames() {
           <button onClick={() => handleSearchInStore(inputSearch)}>
             Vyhledat
           </button>
-          <button onClick={() => handleNewItem()}>Příjemka</button>
+          <button onClick={() => handleNewItem()}>Nové zboží</button>
         </div>
 
         <div className="show-items-panel">
@@ -304,7 +304,7 @@ function StoreFrames() {
               onPageChange={(p) => setPage(p)}
             />
             <p>
-              Položek: {items.length} ks (strana {page}/{totalPages})
+              Položek: {items?.length} ks (strana {page}/{totalPages})
             </p>
           </div>
           <div className="items-panel-table-header six-columns">
@@ -323,7 +323,7 @@ function StoreFrames() {
               />
             )}
 
-            {items.length > 0 &&
+            {items?.length > 0 &&
               items.map((item) => (
                 <div
                   key={item.id}
