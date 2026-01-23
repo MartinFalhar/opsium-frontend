@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Pagination from "../../components/pagination/Pagination.jsx";
 import Modal from "../../components/modal/Modal.jsx";
+import ModalMultipleItem from "../../components/modal/ModalMultipleItem.jsx";
 import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
 import { useStoreSearch } from "../../hooks/useStoreSearch.js";
 import { useStoreUpdate } from "../../hooks/useStoreUpdate.js";
@@ -15,10 +16,81 @@ function StoreFrames() {
   const storeId = 1;
   //******************************
 
+  const fieldsForStockInputMultiple = [
+    {
+      varName: "id_supplier",
+      label: "Dodavatel",
+      options: { field: "brýle" },
+      required: true,
+    },
+    {
+      varName: "date",
+      label: "Datum příjmu",
+      input: "date",
+      required: true,
+    },
+    {
+      varName: "delivery_note",
+      label: "Dodací list",
+      input: "text",
+      required: true,
+    },
+    {
+      varName: "plu",
+      label: "PLU kód",
+      input: "hidden",
+      required: false,
+    },
+    {
+      varName: "collection",
+      label: "Kolekce",
+      input: "text",
+      required: false,
+    },
+    { varName: "product", label: "Model", input: "text", required: false },
+    { varName: "color", label: "Barva", input: "text", required: false },
+    {
+      varName: "price_buy",
+      label: "Nákupní cena [bez DPH]",
+      input: "number",
+      required: false,
+    },
+    {
+      varName: "quantity",
+      label: "Množství",
+      input: "number",
+      required: false,
+    },
+    {
+      varName: "size",
+      label: "Velikost",
+      input: "text",
+      required: false,
+    },
+    {
+      varName: "gender",
+      label: "Gender",
+      options: [`Pánská`, `Dámská`, `Uni`, `Dětská`],
+      required: false,
+    },
+    {
+      varName: "material",
+      label: "Materiál obruby",
+      options: [`plastová`, `kovová`, `kovová s klipem`, `ultem s klipem`],
+      required: false,
+    },
+    {
+      varName: "type",
+      label: "Typ obruby",
+      options: [`Dioptrická`, `Typ 2`, `Typ 3`, `Typ 4`],
+      required: false,
+    },
+  ];
+
   const fieldsForStockInput = [
     {
       varName: "plu",
-      input: "hidden",  // Skryté pole
+      input: "hidden", // Skryté pole
     },
     {
       varName: "text01",
@@ -83,6 +155,7 @@ function StoreFrames() {
     },
     { varName: "product", label: "Model", input: "text", required: false },
     { varName: "color", label: "Barva", input: "text", required: false },
+    { varName: "size", label: "Velikost", input: "text", required: false },
     {
       varName: "price",
       label: "Prodejní cena [Kč s DPH]",
@@ -136,12 +209,15 @@ function StoreFrames() {
 
   // Stavové hooky
   const [showModal, setShowModal] = useState(false);
+  const [showModalMultipleItem, setShowModalMultipleItem] = useState(false);
   const [isNewItem, setIsNewItem] = useState(false);
   const [isPutInStore, setIsPutInStore] = useState(false);
+  const [isPutInStoreMultiple, setIsPutInStoreMultiple] = useState(false);
 
   // Stav pro vyhledávací vstup a položky skladu
   const [inputSearch, setInputSearch] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedMultiItem, setSelectedMultiItem] = useState(null);
 
   // Custom hooky pro práci se skladem
   const {
@@ -216,6 +292,7 @@ function StoreFrames() {
     //vypnout režim nové položky a naskladnění
     setIsNewItem(false);
     setIsPutInStore(false);
+    setIsPutInStoreMultiple(false);
     //nastaví vybranou položku a otevře modal
     setSelectedItem(item);
     setShowModal(true);
@@ -247,6 +324,8 @@ function StoreFrames() {
 
   //HANDLE PUT IN STORE JUST ONE ITEM
   const handleClickOnThirdButton = () => {
+    //aktivuje režim naskladnění jedné položky
+    //přehodí tlačítka a definuje nové initialValues pro Modal
     window.showToast("Naskladnit položku...");
     const today = new Date();
     const onStockValues = {
@@ -257,7 +336,7 @@ function StoreFrames() {
         selectedItem.product +
         " " +
         selectedItem.color,
-      plu: selectedItem.plu,  
+      plu: selectedItem.plu,
       id_supplier: selectedItem.id_supplier,
       quantity: 1,
       price_buy: Math.floor(Math.random() * 10000),
@@ -271,6 +350,37 @@ function StoreFrames() {
     //Načítá položky do modalu pro naskladnění
     setSelectedItem((prev) => ({ ...prev, ...onStockValues }));
     setShowModal(true);
+  };
+
+  //Naskladnění více položek
+  const handlePutInMultipleItems = () => {
+    window.showToast(
+      "Funkce naskladnění více položek není zatím implementována.",
+    );
+
+    const predefinedValues = [
+      {
+        id_supplier: 146,
+        date: new Date().toISOString().split("T")[0],
+        delivery_note: "XL-654321",
+      },
+      {
+        plu: "",
+        collection: "BOOM",
+        product: "Bite ME!",
+        color: "Funny RED",
+        quantity: 1,
+        price_buy: 990,
+        size: "54/18-140",
+        gender: "",
+        material: "",
+        type: "",
+      },
+    ];
+
+    setIsPutInStoreMultiple(true);
+    setSelectedMultiItem(predefinedValues);
+    setShowModalMultipleItem(true);
   };
 
   return (
@@ -292,7 +402,7 @@ function StoreFrames() {
           <button onClick={() => handleSearchInStore(inputSearch)}>
             Vyhledat
           </button>
-          <button onClick={() => handleNewItem()}>Nové zboží</button>
+          <button onClick={() => handlePutInMultipleItems()}>Nové zboží</button>
         </div>
 
         <div className="show-items-panel">
@@ -420,17 +530,26 @@ function StoreFrames() {
             onClose={() => setShowModal(false)}
             onCancel={() => setShowModal(false)}
             firstButton={
-              isNewItem || isPutInStore
-                ? "Připsat zboží"
-                : "Uložit změny"
+              isNewItem || isPutInStore ? "Připsat zboží" : "Uložit změny"
             }
             secondButton={"Zavřít"}
-            thirdButton={
-              !isNewItem && !isPutInStore ? "Naskladnit" : null
-            }
+            thirdButton={!isNewItem && !isPutInStore ? "Naskladnit" : null}
             //Pokud bylo stisknuto třetí tlačítko zprava provede se redesign modalu na naskladnění jedné položky
             //Načtou se jiné fields a initialValues
             onClickThirdButton={handleClickOnThirdButton}
+          />
+        )}
+        {showModalMultipleItem && (
+          <ModalMultipleItem
+            fields={fieldsForStockInputMultiple}
+            predefinedValues={selectedMultiItem}
+            suppliers={suppliers}
+            onSubmit={handleUpdateItem}
+            onClose={() => setShowModalMultipleItem(false)}
+            onCancel={() => setShowModalMultipleItem(false)}
+            firstButton={"Připsat zboží"}
+            secondButton={"Zavřít"}
+            thirdButton={null}
           />
         )}
       </div>

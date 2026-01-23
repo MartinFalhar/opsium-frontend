@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ConfirmDelete from "./ConfirmDelete";
+import "./Modal.css";
 
 export default function Modal({
   fields,
@@ -105,7 +106,11 @@ export default function Modal({
                   : [];
 
               return (
-                <div key={index} className="modal-field" style={field.input === "hidden" ? { display: "none" } : {}}>
+                <div
+                  key={index}
+                  className="modal-field"
+                  style={field.input === "hidden" ? { display: "none" } : {}}
+                >
                   <label>
                     {field.label}
                     {field.required && <span style={{ color: "red" }}> *</span>}
