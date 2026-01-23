@@ -6,6 +6,7 @@ import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLar
 import { useStoreSearch } from "../../hooks/useStoreSearch.js";
 import { useStoreUpdate } from "../../hooks/useStoreUpdate.js";
 import { useStorePutIn } from "../../hooks/useStorePutIn.js";
+import { useStorePutInMultipleItems } from "../../hooks/useStorePutInMultipleItems.js";
 import { useStoreGetSuppliers } from "../../hooks/useStoreGetSuppliers.js";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -52,6 +53,12 @@ function StoreFrames() {
     {
       varName: "price_buy",
       label: "Nákupní cena [bez DPH]",
+      input: "number",
+      required: false,
+    },
+    {
+      varName: "price_sold",
+      label: "Prodejní cena [Kč s DPH]",
       input: "number",
       required: false,
     },
@@ -228,6 +235,7 @@ function StoreFrames() {
   } = useStoreSearch(storeId);
   const { loading: updateLoading, updateItem } = useStoreUpdate(storeId);
   const { loading: putInLoading, putInItem } = useStorePutIn(storeId);
+  const { loading: putInMultipleLoading, putInMultipleItems } = useStorePutInMultipleItems(storeId);
   const { suppliers } = useStoreGetSuppliers("brýle");
 
   // Paginace
@@ -277,7 +285,7 @@ function StoreFrames() {
       type: item.type,
       id_supplier: Number(item.id_supplier) || null,
     };
-    console.log("changedItem:", changedItem);
+    
     const result = await updateItem(changedItem);
     if (result.success) {
       searchItems(page, limit, inputSearch);
@@ -298,35 +306,10 @@ function StoreFrames() {
     setShowModal(true);
   };
 
-  //HANDLE NEW ITEM
-  const handleNewItem = async () => {
-    // Nastavení prázdných výchozích hodnot pro novou položku
-    const emptyValues = {
-      plu: "", // prázdné plu pro novou položku
-      collection: "TEST",
-      product: "TEST",
-      color: "Black",
-      id_supplier: "", // prázdný string místo 0
-      quantity: 0,
-      price: 1,
-      note: "",
-      size: "54/18-140",
-      gender: "",
-      material: "",
-      type: "",
-      date: "",
-      delivery_note: "",
-    };
-    setIsNewItem(true);
-    setSelectedItem(emptyValues);
-    setShowModal(true);
-  };
-
   //HANDLE PUT IN STORE JUST ONE ITEM
   const handleClickOnThirdButton = () => {
     //aktivuje režim naskladnění jedné položky
     //přehodí tlačítka a definuje nové initialValues pro Modal
-    window.showToast("Naskladnit položku...");
     const today = new Date();
     const onStockValues = {
       text01: "plu " + selectedItem.plu,
@@ -352,11 +335,9 @@ function StoreFrames() {
     setShowModal(true);
   };
 
-  //Naskladnění více položek
-  const handlePutInMultipleItems = () => {
-    window.showToast(
-      "Funkce naskladnění více položek není zatím implementována.",
-    );
+  //Otevření modalu pro naskladnění více položek
+  const handleOpenMultipleItemsModal = () => {
+    window.showToast("HAF HAF - Přepínám do režimu naskladnění položky.");
 
     const predefinedValues = [
       {
@@ -366,11 +347,12 @@ function StoreFrames() {
       },
       {
         plu: "",
-        collection: "BOOM",
-        product: "Bite ME!",
+        collection: "NOVA",
+        product: "OPTIC",
         color: "Funny RED",
         quantity: 1,
         price_buy: 990,
+        price_sold: 1990,
         size: "54/18-140",
         gender: "",
         material: "",
@@ -381,6 +363,17 @@ function StoreFrames() {
     setIsPutInStoreMultiple(true);
     setSelectedMultiItem(predefinedValues);
     setShowModalMultipleItem(true);
+  };
+
+  //Odeslání více položek na backend
+  const handleSubmitMultipleItems = async (values) => {
+    console.log("Odesílám více položek na backend:", values);
+    const result = await putInMultipleItems(values);
+    if (result.success) {
+      searchItems(page, limit, inputSearch);
+      setShowModalMultipleItem(false);
+      setIsPutInStoreMultiple(false);
+    }
   };
 
   return (
@@ -402,7 +395,7 @@ function StoreFrames() {
           <button onClick={() => handleSearchInStore(inputSearch)}>
             Vyhledat
           </button>
-          <button onClick={() => handlePutInMultipleItems()}>Nové zboží</button>
+          <button onClick={() => handleOpenMultipleItemsModal()}>Nové zboží</button>
         </div>
 
         <div className="show-items-panel">
@@ -429,7 +422,7 @@ function StoreFrames() {
           <div className="items-list">
             {!items.length > 0 && (
               <PuffLoaderSpinnerLarge
-                active={searchLoading || updateLoading || putInLoading}
+                active={searchLoading || updateLoading || putInLoading || putInMultipleLoading}
               />
             )}
 
@@ -456,7 +449,7 @@ function StoreFrames() {
                     <h2>{`${item.supplier_nick}`}</h2>
                   </div>
                   <div className="item-name">
-                    <h2>{`${item.quantity}`}</h2>
+                    <h2>{`${item.quantity_available}`}</h2>
                   </div>
                   <div className="item-name">
                     <h2>{`${Math.round(item.price)} Kč`}</h2>
@@ -544,7 +537,7 @@ function StoreFrames() {
             fields={fieldsForStockInputMultiple}
             predefinedValues={selectedMultiItem}
             suppliers={suppliers}
-            onSubmit={handleUpdateItem}
+            onSubmit={handleSubmitMultipleItems}
             onClose={() => setShowModalMultipleItem(false)}
             onCancel={() => setShowModalMultipleItem(false)}
             firstButton={"Připsat zboží"}
