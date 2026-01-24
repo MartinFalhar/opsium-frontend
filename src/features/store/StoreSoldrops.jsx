@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import Pagination from "../../components/pagination/Pagination.jsx";
 import Modal from "../../components/modal/Modal.jsx";
+import ModalMultipleItem from "../../components/modal/ModalMultipleItem.jsx";
 import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
 import { useStoreSearch } from "../../hooks/useStoreSearch.js";
 import { useStoreUpdate } from "../../hooks/useStoreUpdate.js";
 import { useStorePutIn } from "../../hooks/useStorePutIn.js";
+import { useStorePutInMultipleItems } from "../../hooks/useStorePutInMultipleItems.js";
 import { useStoreGetSuppliers } from "../../hooks/useStoreGetSuppliers.js";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -14,6 +16,83 @@ function StoreSoldrops() {
   // ID skladu
   const storeId = 5;
   //******************************
+
+  const fieldsForStockInputMultiple = [
+    {
+      varName: "id_supplier",
+      label: "Dodavatel",
+      options: { field: "brýle" },
+      required: true,
+    },
+    {
+      varName: "date",
+      label: "Datum příjmu",
+      input: "date",
+      required: true,
+    },
+    {
+      varName: "delivery_note",
+      label: "Dodací list",
+      input: "text",
+      required: true,
+    },
+    {
+      varName: "plu",
+      label: "PLU kód",
+      input: "hidden",
+      required: false,
+    },
+    {
+      varName: "collection",
+      label: "Kolekce",
+      input: "text",
+      required: false,
+    },
+    { varName: "product", label: "Model", input: "text", required: false },
+    { varName: "color", label: "Barva", input: "text", required: false },
+    {
+      varName: "price_buy",
+      label: "Nákupní cena [bez DPH]",
+      input: "number",
+      required: false,
+    },
+    {
+      varName: "price_sold",
+      label: "Prodejní cena [Kč s DPH]",
+      input: "number",
+      required: false,
+    },
+    {
+      varName: "quantity",
+      label: "Množství",
+      input: "number",
+      required: false,
+    },
+    {
+      varName: "size",
+      label: "Velikost",
+      input: "text",
+      required: false,
+    },
+    {
+      varName: "gender",
+      label: "Gender",
+      options: [`Pánská`, `Dámská`, `Uni`, `Dětská`],
+      required: false,
+    },
+    {
+      varName: "material",
+      label: "Materiál obruby",
+      options: [`plastová`, `kovová`, `kovová s klipem`, `ultem s klipem`],
+      required: false,
+    },
+    {
+      varName: "type",
+      label: "Typ obruby",
+      options: [`Dioptrická`, `Typ 2`, `Typ 3`, `Typ 4`],
+      required: false,
+    },
+  ];
 
   const fieldsForStockInput = [
     {
@@ -83,6 +162,7 @@ function StoreSoldrops() {
     },
     { varName: "product", label: "Model", input: "text", required: false },
     { varName: "color", label: "Barva", input: "text", required: false },
+    { varName: "size", label: "Velikost", input: "text", required: false },
     {
       varName: "price",
       label: "Prodejní cena [Kč s DPH]",
@@ -136,12 +216,15 @@ function StoreSoldrops() {
 
   // Stavové hooky
   const [showModal, setShowModal] = useState(false);
+  const [showModalMultipleItem, setShowModalMultipleItem] = useState(false);
   const [isNewItem, setIsNewItem] = useState(false);
   const [isPutInStore, setIsPutInStore] = useState(false);
+  const [isPutInStoreMultiple, setIsPutInStoreMultiple] = useState(false);
 
   // Stav pro vyhledávací vstup a položky skladu
   const [inputSearch, setInputSearch] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedMultiItem, setSelectedMultiItem] = useState(null);
 
   // Custom hooky pro práci se skladem
   const {
@@ -152,6 +235,7 @@ function StoreSoldrops() {
   } = useStoreSearch(storeId);
   const { loading: updateLoading, updateItem } = useStoreUpdate(storeId);
   const { loading: putInLoading, putInItem } = useStorePutIn(storeId);
+  const { loading: putInMultipleLoading, putInMultipleItems } = useStorePutInMultipleItems(storeId);
   const { suppliers } = useStoreGetSuppliers("brýle");
 
   // Paginace
@@ -201,7 +285,7 @@ function StoreSoldrops() {
       type: item.type,
       id_supplier: Number(item.id_supplier) || null,
     };
-    console.log("changedItem:", changedItem);
+    
     const result = await updateItem(changedItem);
     if (result.success) {
       searchItems(page, limit, inputSearch);
@@ -216,38 +300,16 @@ function StoreSoldrops() {
     //vypnout režim nové položky a naskladnění
     setIsNewItem(false);
     setIsPutInStore(false);
+    setIsPutInStoreMultiple(false);
     //nastaví vybranou položku a otevře modal
     setSelectedItem(item);
     setShowModal(true);
   };
 
-  //HANDLE NEW ITEM
-  const handleNewItem = async () => {
-    // Nastavení prázdných výchozích hodnot pro novou položku
-    const emptyValues = {
-      plu: "", // prázdné plu pro novou položku
-      collection: "TEST",
-      product: "TEST",
-      color: "Black",
-      id_supplier: "", // prázdný string místo 0
-      quantity: 0,
-      price: 1,
-      note: "",
-      size: "54/18-140",
-      gender: "",
-      material: "",
-      type: "",
-      date: "",
-      delivery_note: "",
-    };
-    setIsNewItem(true);
-    setSelectedItem(emptyValues);
-    setShowModal(true);
-  };
-
   //HANDLE PUT IN STORE JUST ONE ITEM
   const handleClickOnThirdButton = () => {
-    window.showToast("Naskladnit položku...");
+    //aktivuje režim naskladnění jedné položky
+    //přehodí tlačítka a definuje nové initialValues pro Modal
     const today = new Date();
     const onStockValues = {
       text01: "plu " + selectedItem.plu,
@@ -257,7 +319,7 @@ function StoreSoldrops() {
         selectedItem.product +
         " " +
         selectedItem.color,
-      plu: selectedItem.plu,  
+      plu: selectedItem.plu,
       id_supplier: selectedItem.id_supplier,
       quantity: 1,
       price_buy: Math.floor(Math.random() * 10000),
@@ -271,6 +333,47 @@ function StoreSoldrops() {
     //Načítá položky do modalu pro naskladnění
     setSelectedItem((prev) => ({ ...prev, ...onStockValues }));
     setShowModal(true);
+  };
+
+  //Otevření modalu pro naskladnění více položek
+  const handleOpenMultipleItemsModal = () => {
+    window.showToast("HAF HAF - Přepínám do režimu naskladnění položky.");
+
+    const predefinedValues = [
+      {
+        id_supplier: 146,
+        date: new Date().toISOString().split("T")[0],
+        delivery_note: "XL-654321",
+      },
+      {
+        plu: "",
+        collection: "NOVA",
+        product: "OPTIC",
+        color: "Funny RED",
+        quantity: 1,
+        price_buy: 990,
+        price_sold: 1990,
+        size: "54/18-140",
+        gender: "",
+        material: "",
+        type: "",
+      },
+    ];
+
+    setIsPutInStoreMultiple(true);
+    setSelectedMultiItem(predefinedValues);
+    setShowModalMultipleItem(true);
+  };
+
+  //Odeslání více položek na backend
+  const handleSubmitMultipleItems = async (values) => {
+    console.log("Odesílám více položek na backend:", values);
+    const result = await putInMultipleItems(values);
+    if (result.success) {
+      searchItems(page, limit, inputSearch);
+      setShowModalMultipleItem(false);
+      setIsPutInStoreMultiple(false);
+    }
   };
 
   return (
@@ -292,7 +395,7 @@ function StoreSoldrops() {
           <button onClick={() => handleSearchInStore(inputSearch)}>
             Vyhledat
           </button>
-          <button onClick={() => handleNewItem()}>Příjemka</button>
+          <button onClick={() => handleOpenMultipleItemsModal()}>Nové zboží</button>
         </div>
 
         <div className="show-items-panel">
@@ -317,9 +420,9 @@ function StoreSoldrops() {
           </div>
 
           <div className="items-list">
-            {!items?.length > 0 && (
+            {!items.length > 0 && (
               <PuffLoaderSpinnerLarge
-                active={searchLoading || updateLoading || putInLoading}
+                active={searchLoading || updateLoading || putInLoading || putInMultipleLoading}
               />
             )}
 
@@ -346,7 +449,7 @@ function StoreSoldrops() {
                     <h2>{`${item.supplier_nick}`}</h2>
                   </div>
                   <div className="item-name">
-                    <h2>{`${item.quantity}`}</h2>
+                    <h2>{`${item.quantity_available}`}</h2>
                   </div>
                   <div className="item-name">
                     <h2>{`${Math.round(item.price)} Kč`}</h2>
@@ -420,17 +523,26 @@ function StoreSoldrops() {
             onClose={() => setShowModal(false)}
             onCancel={() => setShowModal(false)}
             firstButton={
-              isNewItem || isPutInStore
-                ? "Připsat zboží"
-                : "Uložit změny"
+              isNewItem || isPutInStore ? "Připsat zboží" : "Uložit změny"
             }
             secondButton={"Zavřít"}
-            thirdButton={
-              !isNewItem && !isPutInStore ? "Naskladnit" : null
-            }
+            thirdButton={!isNewItem && !isPutInStore ? "Naskladnit" : null}
             //Pokud bylo stisknuto třetí tlačítko zprava provede se redesign modalu na naskladnění jedné položky
             //Načtou se jiné fields a initialValues
             onClickThirdButton={handleClickOnThirdButton}
+          />
+        )}
+        {showModalMultipleItem && (
+          <ModalMultipleItem
+            fields={fieldsForStockInputMultiple}
+            predefinedValues={selectedMultiItem}
+            suppliers={suppliers}
+            onSubmit={handleSubmitMultipleItems}
+            onClose={() => setShowModalMultipleItem(false)}
+            onCancel={() => setShowModalMultipleItem(false)}
+            firstButton={"Připsat zboží"}
+            secondButton={"Zavřít"}
+            thirdButton={null}
           />
         )}
       </div>

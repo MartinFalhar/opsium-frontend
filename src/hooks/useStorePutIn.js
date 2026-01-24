@@ -24,6 +24,7 @@ export function useStorePutIn(storeId) {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
           body: JSON.stringify({
+            store: storeId,
             plu: values.plu,
             id_supplier: values.id_supplier,
             delivery_note: values.delivery_note,

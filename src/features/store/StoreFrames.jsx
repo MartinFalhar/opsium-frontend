@@ -420,7 +420,7 @@ function StoreFrames() {
           </div>
 
           <div className="items-list">
-            {!items.length > 0 && (
+            {!items?.length > 0 && (
               <PuffLoaderSpinnerLarge
                 active={searchLoading || updateLoading || putInLoading || putInMultipleLoading}
               />
