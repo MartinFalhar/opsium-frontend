@@ -33,7 +33,7 @@ export default function OneItemPutInStore({
           },
           body: JSON.stringify({            
             plu: values.plu,
-            id_supplier: values.id_supplier,
+            supplier_id: values.supplier_id,
             delivery_note: values.delivery_note,
             quantity: values.quantity,
             price_buy: values.price_buy,

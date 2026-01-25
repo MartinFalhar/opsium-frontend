@@ -62,7 +62,7 @@ function Clients() {
         const res = await fetch(`${API_URL}/client/clients_list`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id_branch: user.branch_id }),
+          body: JSON.stringify({ branch_id: user.branch_id }),
         });
         const data = await res.json();
         if (res.ok) {
@@ -86,7 +86,7 @@ function Clients() {
       surname: values.surname,
       degree_after: values.degree_after,
       birth_date: values.birth_date,
-      id_organizations: user.id_organizations,
+      organization_id: user.organization_id,
     };
     console.log("New client to add:", newClient);
 

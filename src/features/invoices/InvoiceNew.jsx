@@ -14,9 +14,9 @@ function InvoiceNew() {
   const navigate = useNavigate();
 
   const newInvoice = {
-    id_client: activeId?.id_client || 1,
-    id_branch: user?.branch_id,
-    id_member: activeId?.id_member,
+    client_id: activeId?.client_id || 1,
+    branch_id: user?.branch_id,
+    member_id: activeId?.member_id,
     attrib: { attr: "OK" },
     content: {
       b: 526358,
@@ -27,7 +27,7 @@ function InvoiceNew() {
   };
 
   const newTransaction = {
-    id_invoice: 7,
+    invoice_id: 7,
     attrib: 1,
     price_a: 111.11,
     vat_a: 11.11,
@@ -97,11 +97,11 @@ function InvoiceNew() {
           <div className="input-panel">
             <h7>Údaje zákazníka</h7>
             <h7>ID KLIENTA</h7>
-            <h7>{newInvoice.id_client}</h7>
+            <h7>{newInvoice.client_id}</h7>
             <h7>ID POBOČKY</h7>
-            <h7>{newInvoice.id_branch}</h7>
+            <h7>{newInvoice.branch_id}</h7>
             <h7>ID ČLENA</h7>
-            <h7>{newInvoice.id_member}</h7>
+            <h7>{newInvoice.member_id}</h7>
             <h7>Poznámka</h7>
             <h7>{newInvoice.note}</h7>
           </div>

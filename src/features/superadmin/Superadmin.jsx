@@ -104,7 +104,7 @@ function Superadmin() {
       <div className="right-container">
         <h1>INFO</h1>
         <p>Jste přihlášen jako SuperAdmin.</p>
-        <pre>Organization:{user.id_organizations}</pre>
+        <pre>Organization:{user.organization_id}</pre>
       </div>
     </div>
   );

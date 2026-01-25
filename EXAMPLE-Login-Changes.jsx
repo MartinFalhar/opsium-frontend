@@ -42,7 +42,7 @@ const handleLogin = async (e) => {
 
       // Načíst ostatní data
       await loadMembers(userData.id);
-      await loadOrganizationInfo(userData.id_organizations);
+      await loadOrganizationInfo(userData.organization_id);
       await loadBranchInfo(userData.id);
 
       navigate("/dashboard");

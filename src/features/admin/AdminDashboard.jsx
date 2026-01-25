@@ -14,7 +14,7 @@ function AdminDashboard({ client }) {
       const res = await fetch(`${API_URL}/admin/adminInfo`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_organizations: user.id_organizations }),
+        body: JSON.stringify({ organization_id: user.organization_id }),
       });
       const info = await res.json();
       console.log(info);
@@ -39,7 +39,7 @@ function AdminDashboard({ client }) {
         <p>{`Jméno: ${user.name}`}</p>
         <p>{`Příjmení: ${user.surname}`}</p>
         <p>{`Email: ${user.email}`}</p>
-        <p>{`ID organizace: ${user.id_organizations}`}</p>
+        <p>{`ID organizace: ${user.organization_id}`}</p>
         <p>{`Práva: ${user.rights}`}</p>
       </div>
 

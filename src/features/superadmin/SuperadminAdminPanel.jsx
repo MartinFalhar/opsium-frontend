@@ -94,7 +94,7 @@ function SuperadminAdminPanel() {
         {users.map((client) => (
           <div key={client.id} className="client-item" onClick={() => null}>
             <h1>{`${client.name} ${client.surname} (${client.rights})`}</h1>
-            <p>{`Email: ${client.email} || ID Organizace: ${client.id_organizations}`}</p>
+              <p>{`Email: ${client.email} || ID Organizace: ${client.organization_id}`}</p>
           </div>
         ))}
       </div>

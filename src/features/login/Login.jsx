@@ -121,10 +121,9 @@ function Login() {
         const dataMember = await res.json();
 
         if (res.ok) {
-          console.log("Members loaded:", dataMember);
               setActiveId((prev) => ({
       ...prev,
-      id_member: dataMember[0].id,
+      member_id: dataMember[0].id,
     }));
           setMembers(dataMember);
         } else {
@@ -140,17 +139,16 @@ function Login() {
       }
     };
 
-    const loadOrganizationInfo = async (id_organizations) => {
+    const loadOrganizationInfo = async (organization_id) => {
       try {
         const res = await fetch(`${API_URL}/admin/organizationInfo`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id_organizations: id_organizations }),
+          body: JSON.stringify({ organization_id: organization_id }),
         });
         const dataOrganization = await res.json();
 
         if (res.ok) {
-          console.log("Organization info loaded:", dataOrganization);
           setUser((prev) => {
             const next = {
               ...(prev || {}), // prev může být null/undefined
@@ -179,18 +177,17 @@ function Login() {
       }
     };
 
-    const loadBranchInfo = async (id_user) => {
+    const loadBranchInfo = async (user_id) => {
       try {
         const res = await fetch(`${API_URL}/admin/branchInfo`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id_user: id_user }),
+          body: JSON.stringify({ user_id: user_id }),
         });
         const dataBranch = await res.json();
 
 
         if (res.ok) {
-          console.log("Branch info loaded:", dataBranch);
           setUser((prev) => {
             const next = {
               ...(prev || {}), // prev může být null/undefined
@@ -236,17 +233,17 @@ function Login() {
         }
         
         await setUser(user);
-        console.log(`Login successful, user data:", ${user}`);
         //Pokud je vše v pořádku, stáhnu si
         //seznam členů pro daný USER-ACCOUNT
 
         //******** */
-        // await loadBranch(data.id_organizations);
+        // await loadBranch(data.organization_id);
         //******** */
+    
 
         await loadMembers(user.id);
 
-        await loadOrganizationInfo(user.id_organizations);
+        await loadOrganizationInfo(user.organization_id);
         
         await loadBranchInfo(user.id);
 

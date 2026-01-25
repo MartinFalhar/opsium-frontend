@@ -41,7 +41,7 @@ function AdminAccounts() {
       const res = await fetch(`${API_URL}/admin/users_list`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ organization: user.id_organizations }),
+        body: JSON.stringify({ organization: user.organization_id }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -66,7 +66,7 @@ function AdminAccounts() {
       email: values.email,
       password: values.password,
       //zde je USER organization z CONTEXTu, což je organization ADMINA, který uživatele vytváří
-      id_organizations: user.id_organizations,
+      organization_id: user.organization_id,
       rights: 1,
       branch_name: values.branch_name,
       street: values.street,
@@ -122,7 +122,7 @@ function AdminAccounts() {
           users?.map((client) => (
             <div key={client.id} className="client-item" onClick={() => null}>
               <h1>{`${client.name} ${client.surname} (${client.rights})`}</h1>
-              <p>{`Email: ${client.email} | ID Organizace: ${client.id_organizations}`}</p>
+              <p>{`Email: ${client.email} | ID Organizace: ${client.organization_id}`}</p>
             </div>
           ))}
       </div>

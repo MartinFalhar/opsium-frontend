@@ -81,7 +81,7 @@ function AgendaServices() {
       const res = await fetch(`${API_URL}/agenda/services-search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_branch: user.branch_id }),
+        body: JSON.stringify({ branch_id: user.branch_id }),
       });
       const data = await res.json();
 
@@ -135,7 +135,7 @@ function AgendaServices() {
       vat_type: vatIndex,
       note: values.note,
       category: values.category,
-      id_branch: user.branch_id,
+      branch_id: user.branch_id,
     };
 
     // Odeslání změněné položky na backend
@@ -167,7 +167,7 @@ function AgendaServices() {
       const res = await fetch(`${API_URL}/agenda/services-delete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: selectedItem.id, id_branch: user.branch_id }),
+        body: JSON.stringify({ id: selectedItem.id, branch_id: user.branch_id }),
       });
       const data = await res.json();
       if (res.ok) {

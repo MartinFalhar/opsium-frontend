@@ -29,7 +29,7 @@ function AdminBranches() {
       const res = await fetch(`${API_URL}/admin/branches_list`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ organization: user.id_organizations }),
+        body: JSON.stringify({ organization: user.organization_id }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -54,7 +54,7 @@ function AdminBranches() {
       city: values.city,
       postal_code: values.postal_code,
       //zde je USER organization z CONTEXTu, což je organization ADMINA, který uživatele vytváří
-      id_organizations: user.id_organizations,  
+      organization_id: user.organization_id,  
       
     };
     try {
@@ -93,7 +93,7 @@ function AdminBranches() {
         {users?.length > 0 && (users?.map((client) => (
           <div key={client.id} className="client-item" onClick={() => null}>
             <h1>{`${client.name}, ${client.street}, ${client.postal_code} ${client.city}`}</h1>
-            <p>{`Email: ${JSON.stringify(client.email)} | Telefon: ${JSON.stringify(client.phone)} | Otevírací doba: ${JSON.stringify(client.open_hours)} | ID Organizace: ${client.id_organizations}`}</p>
+            <p>{`Email: ${JSON.stringify(client.email)} | Telefon: ${JSON.stringify(client.phone)} | Otevírací doba: ${JSON.stringify(client.open_hours)} | ID Organizace: ${client.organization_id}`}</p>
           </div>
         )))}
       </div>

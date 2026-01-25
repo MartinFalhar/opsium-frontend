@@ -103,18 +103,18 @@ function Client() {
 
   useEffect(() => {
     const loadExams = async () => {
-      if (!activeId.id_client || !user.branch_id) return;
+      if (!activeId.client_id || !user.branch_id) return;
 
       setLoadingExams(true);
 
       try {
         //načte seznam examů (name) pro daného klienta a pobočku
         const data = await LoadExamsListFromDB(
-          activeId.id_client,
+          activeId.client_id,
           user.branch_id
         );
         // najdeme klienta jen jednou
-        const client = headerClients?.find((c) => c.id === activeId.id_client);
+        const client = headerClients?.find((c) => c.id === activeId.client_id);
         let finalList = [...data];
         //pokud je to prvotní načtení, přidá na začátek položku (neuloženo)
 
@@ -162,7 +162,7 @@ function Client() {
       loadExams();
     }
   }, [
-    activeId.id_client,
+    activeId.client_id,
     user.branch_id,
     client.activeSecondaryButton,
     client.notSavedDetected,
@@ -174,7 +174,7 @@ function Client() {
 
     setMenuComponent(() => button.component);
 
-    const client = headerClients?.find((c) => c.id === activeId.id_client);
+    const client = headerClients?.find((c) => c.id === activeId.client_id);
 
     setHeaderClients((prev) =>
       prev.map((c) =>
@@ -188,7 +188,7 @@ function Client() {
   const handleClickExamList = (examId) => {
     // setActiveTertiaryButton(examId.id);
     //do aktivn9ho CLIENTa uložím do jeho vlastností polohu tertiárního menu
-    const client = headerClients?.find((c) => c.id === activeId.id_client);
+    const client = headerClients?.find((c) => c.id === activeId.client_id);
     setHeaderClients((prev) =>
       prev.map((c) =>
         c.id === client.id
@@ -199,8 +199,8 @@ function Client() {
   };
 
   const Component = menuComponent;
-  // console.log("LoadInfo:", activeId.id_client, user.branch_id);
-  // const examMenuList = LoadExamsFromDB(activeId.id_client, user.branch_id);
+  // console.log("LoadInfo:", activeId.client_id, user.branch_id);
+  // const examMenuList = LoadExamsFromDB(activeId.client_id, user.branch_id);
   // console.log("9999Loaded Exams Menu List:", examMenuList);
 
   return (
@@ -242,7 +242,7 @@ function Client() {
                       className={`button-tertiary-menu ${
                         showExams ? "show" : ""
                       } ${
-                        headerClients?.find((c) => c.id === activeId.id_client)
+                        headerClients?.find((c) => c.id === activeId.client_id)
                           ?.activeTertiaryButton === exam.id
                           ? "active"
                           : ""

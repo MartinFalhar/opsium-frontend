@@ -45,15 +45,15 @@ function ClientOptometry({ client }) {
     setIsLoading(true); // 👈 zapneme loader
     const exportObject = ConvertOptometryItems(optometryItems);
 
-    console.log(`ID CLIENT ${activeId.id_client}`);
+    console.log(`ID CLIENT ${activeId.client_id}`);
     console.log(`ID BRANCH ${user.branch_id}`);
-    console.log(`ID MEMBER ${activeId.id_member}`);
+    console.log(`ID MEMBER ${activeId.member_id}`);
     console.log(`Name ${optometryRecordName}`);
 
     const newExamDataSet = {
-      id_clients: activeId.id_client,
-      id_branches: user.branch_id,
-      id_members: activeId.id_member,
+      client_id: activeId.client_id,
+      branch_id: user.branch_id,
+      member_id: activeId.member_id,
       name: optometryRecordName,
       data: exportObject,
     };
@@ -62,7 +62,7 @@ function ClientOptometry({ client }) {
     if (typeof setHeaderClients === "function") {
       setHeaderClients((prev) =>
         prev.map((c) =>
-          c.id === activeId.id_client ? { ...c, notSavedDetected: false } : c
+          c.id === activeId.client_id ? { ...c, notSavedDetected: false } : c
         )
       );
     }
@@ -74,7 +74,7 @@ function ClientOptometry({ client }) {
     }
 
     localStorage.setItem(
-      newExamDataSet.id_clients,
+      newExamDataSet.client_id,
       JSON.stringify(newExamDataSet)
     );
 
@@ -112,14 +112,14 @@ function ClientOptometry({ client }) {
       return;
     }
 
-    if (!activeId?.id_client) return;
+    if (!activeId?.client_id) return;
     // připravíme data k uložení
     const dataToSave = {
       name: optometryRecordName,
       data: optometryItems,
     };
 
-    saveToLocalStorage(dataToSave, activeId.id_client);
+    saveToLocalStorage(dataToSave, activeId.client_id);
   }, [optometryItems, optometryRecordName, activeId]);
 
   //ukládání do DBF pokud je příznak notSavedDetected FALSE
@@ -131,20 +131,20 @@ function ClientOptometry({ client }) {
       //a ukládá se pouze do localStorage. Až když se uloží klientem
       //začne pravidelní 60 sekundové ukládání do DBF
       console.log(
-        headerClients.find((c) => c.id === activeId.id_client)?.notSavedDetected
+        headerClients.find((c) => c.id === activeId.client_id)?.notSavedDetected
       );
-      if (!activeId?.id_client) return;
+      if (!activeId?.client_id) return;
       if (!changeOccuredRef.current) return;
       if (
-        headerClients.find((c) => c.id === activeId.id_client)
+        headerClients.find((c) => c.id === activeId.client_id)
           ?.notSavedDetected === true
       )
         return;
       changeOccuredRef.current = false;
 
-      console.log(`${activeId.id_client} - autosave to DB triggered`);
+      console.log(`${activeId.client_id} - autosave to DB triggered`);
 
-      const getSavedFromLocalStorage = localStorage.getItem(activeId.id_client);
+      const getSavedFromLocalStorage = localStorage.getItem(activeId.client_id);
       console.log("getSavedFromLocalStorage:", getSavedFromLocalStorage);
 
       if (!getSavedFromLocalStorage) return;
@@ -154,9 +154,9 @@ function ClientOptometry({ client }) {
       );
 
       const newExamDataSet = {
-        id_clients: activeId.id_client,
-        id_branches: user.branch_id,
-        id_members: activeId.id_member,
+        client_id: activeId.client_id,
+        branch_id: user.branch_id,
+        member_id: activeId.member_id,
         name: optometryRecordName,
         data: getSavedFromLocalStorage,
       };

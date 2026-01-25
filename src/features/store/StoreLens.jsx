@@ -19,12 +19,6 @@ function StoreLens() {
 
   const fieldsForStockInputMultiple = [
     {
-      varName: "id_supplier",
-      label: "Dodavatel",
-      options: { field: "brýle" },
-      required: true,
-    },
-    {
       varName: "date",
       label: "Datum příjmu",
       input: "date",
@@ -37,19 +31,20 @@ function StoreLens() {
       required: true,
     },
     {
-      varName: "plu",
-      label: "PLU kód",
-      input: "hidden",
-      required: false,
+      varName: "text01",
+      input: "message",
+      
+      hidden: true,
     },
     {
-      varName: "collection",
-      label: "Kolekce",
-      input: "text",
+      varName: "plu",
+      label: "PLU kód",
+      input: "number",
       required: false,
     },
-    { varName: "product", label: "Model", input: "text", required: false },
-    { varName: "color", label: "Barva", input: "text", required: false },
+    { varName: "sph", label: "SPH", input: "number", required: false },
+    { varName: "cyl", label: "CYL", input: "number", required: false },
+    { varName: "ax", label: "Osa", input: "number", required: false },
     {
       varName: "price_buy",
       label: "Nákupní cena [bez DPH]",
@@ -61,6 +56,7 @@ function StoreLens() {
       label: "Prodejní cena [Kč s DPH]",
       input: "number",
       required: false,
+      readOnly: true,
     },
     {
       varName: "quantity",
@@ -69,27 +65,9 @@ function StoreLens() {
       required: false,
     },
     {
-      varName: "size",
-      label: "Velikost",
+      varName: "code",
+      label: "Kód",
       input: "text",
-      required: false,
-    },
-    {
-      varName: "gender",
-      label: "Gender",
-      options: [`Pánská`, `Dámská`, `Uni`, `Dětská`],
-      required: false,
-    },
-    {
-      varName: "material",
-      label: "Materiál obruby",
-      options: [`plastová`, `kovová`, `kovová s klipem`, `ultem s klipem`],
-      required: false,
-    },
-    {
-      varName: "type",
-      label: "Typ obruby",
-      options: [`Dioptrická`, `Typ 2`, `Typ 3`, `Typ 4`],
       required: false,
     },
   ];
@@ -97,7 +75,7 @@ function StoreLens() {
   const fieldsForStockInput = [
     {
       varName: "plu",
-      input: "hidden",  // Skryté pole
+      input: "hidden", // Skryté pole
     },
     {
       varName: "text01",
@@ -108,9 +86,9 @@ function StoreLens() {
       input: "message",
     },
     {
-      varName: "id_supplier",
+      varName: "supplier_id",
       label: "Dodavatel",
-      options: { field: "brýle" },
+      options: { field: "brýlové čočky" },
       required: true,
       readOnly: true,
     },
@@ -148,9 +126,8 @@ function StoreLens() {
       readOnly: true,
     },
     {
-      varName: "id_supplier",
+      varName: "supplier_id",
       label: "Dodavatel",
-      options: { field: "brýle" },
       required: true,
       readOnly: true,
     },
@@ -160,9 +137,9 @@ function StoreLens() {
       input: "text",
       required: false,
     },
-    { varName: "product", label: "Model", input: "text", required: false },
-    { varName: "color", label: "Barva", input: "text", required: false },
-    { varName: "size", label: "Velikost", input: "text", required: false },
+    { varName: "sph", label: "SPH", input: "number", required: false },
+    { varName: "cyl", label: "CYL", input: "number", required: false },
+    { varName: "ax", label: "Osa", input: "number", required: false },
     {
       varName: "price",
       label: "Prodejní cena [Kč s DPH]",
@@ -177,21 +154,9 @@ function StoreLens() {
       readOnly: true,
     },
     {
-      varName: "gender",
-      label: "Gender",
-      options: [`Pánská`, `Dámská`, `Uni`, `Dětská`],
-      required: false,
-    },
-    {
-      varName: "material",
-      label: "Materiál obruby",
-      options: [`plastová`, `kovová`, `kovová s klipem`, `ultem s klipem`],
-      required: false,
-    },
-    {
-      varName: "type",
-      label: "Typ obruby",
-      options: [`Dioptrická`, `Typ 2`, `Typ 3`, `Typ 4`],
+      varName: "code",
+      label: "Kód",
+      input: "text",
       required: false,
     },
   ];
@@ -235,8 +200,9 @@ function StoreLens() {
   } = useStoreSearch(storeId);
   const { loading: updateLoading, updateItem } = useStoreUpdate(storeId);
   const { loading: putInLoading, putInItem } = useStorePutIn(storeId);
-  const { loading: putInMultipleLoading, putInMultipleItems } = useStorePutInMultipleItems(storeId);
-  const { suppliers } = useStoreGetSuppliers("brýle");
+  const { loading: putInMultipleLoading, putInMultipleItems } =
+    useStorePutInMultipleItems(storeId);
+  const { suppliers } = useStoreGetSuppliers("brýlové čočky");
 
   // Paginace
   const [page, setPage] = useState(1);
@@ -259,7 +225,7 @@ function StoreLens() {
     if (isPutInStore) {
       const putInData = {
         plu: Number(item.plu),
-        id_supplier: Number(item.id_supplier),
+        supplier_id: Number(item.supplier_id),
         delivery_note: item.delivery_note,
         quantity: Number(item.quantity),
         price_buy: Number(item.price_buy),
@@ -276,16 +242,14 @@ function StoreLens() {
     }
     const changedItem = {
       plu: item.plu,
-      collection: item.collection,
-      product: item.product,
-      color: item.color,
+      sph: item.sph,
+      cyl: item.cyl,
+      ax: item.ax,
       price: Number(item.price),
-      gender: item.gender,
-      material: item.material,
-      type: item.type,
-      id_supplier: Number(item.id_supplier) || null,
+      code: item.code,
+      supplier_id: Number(item.supplier_id) || null,
     };
-    
+
     const result = await updateItem(changedItem);
     if (result.success) {
       searchItems(page, limit, inputSearch);
@@ -320,7 +284,7 @@ function StoreLens() {
         " " +
         selectedItem.color,
       plu: selectedItem.plu,
-      id_supplier: selectedItem.id_supplier,
+      supplier_id: selectedItem.supplier_id,
       quantity: 1,
       price_buy: Math.floor(Math.random() * 10000),
       date: today.toISOString().split("T")[0],
@@ -341,7 +305,7 @@ function StoreLens() {
 
     const predefinedValues = [
       {
-        id_supplier: 146,
+        supplier_id: 146,
         date: new Date().toISOString().split("T")[0],
         delivery_note: "XL-654321",
       },
@@ -395,7 +359,9 @@ function StoreLens() {
           <button onClick={() => handleSearchInStore(inputSearch)}>
             Vyhledat
           </button>
-          <button onClick={() => handleOpenMultipleItemsModal()}>Nové zboží</button>
+          <button onClick={() => handleOpenMultipleItemsModal()}>
+            Nové zboží
+          </button>
         </div>
 
         <div className="show-items-panel">
@@ -422,7 +388,12 @@ function StoreLens() {
           <div className="items-list">
             {!items.length > 0 && (
               <PuffLoaderSpinnerLarge
-                active={searchLoading || updateLoading || putInLoading || putInMultipleLoading}
+                active={
+                  searchLoading ||
+                  updateLoading ||
+                  putInLoading ||
+                  putInMultipleLoading
+                }
               />
             )}
 
@@ -543,6 +514,7 @@ function StoreLens() {
             firstButton={"Připsat zboží"}
             secondButton={"Zavřít"}
             thirdButton={null}
+            storeName="StoreLens"
           />
         )}
       </div>

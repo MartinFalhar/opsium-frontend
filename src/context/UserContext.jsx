@@ -10,8 +10,8 @@ export function UserProvider({ children }) {
   const [headerClients, setHeaderClients] = useState([]);
   const [members, setMembers] = useState([]);
   const [activeId, setActiveId] = useState({
-    id_member: null,
-    id_client: null,
+    member_id: null,
+    client_id: null,
   });
   const [memory, setMemory] = useState([]);
   const [catalog_cl, setCatalog_cl] = useState([]);

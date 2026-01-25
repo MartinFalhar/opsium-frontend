@@ -6,7 +6,7 @@ export default function OptometryInfo(optometryItems, activeItem) {
     const { user, headerClients, activeId, memory, setMemory} = useUser();
      // console.log(activeItem);
     const activeClient = headerClients.map((c, index) =>
-    c.id === activeId.id_client ? index : null)
+    c.id === activeId.client_id ? index : null)
     
 function getAgeYearsAndDays(birthTimestamp) {
   const birthDate = new Date(birthTimestamp);

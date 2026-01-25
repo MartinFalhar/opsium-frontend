@@ -19,7 +19,7 @@ function StoreFrames() {
 
   const fieldsForStockInputMultiple = [
     {
-      varName: "id_supplier",
+      varName: "supplier_id",
       label: "Dodavatel",
       options: { field: "brýle" },
       required: true,
@@ -108,7 +108,7 @@ function StoreFrames() {
       input: "message",
     },
     {
-      varName: "id_supplier",
+      varName: "supplier_id",
       label: "Dodavatel",
       options: { field: "brýle" },
       required: true,
@@ -148,7 +148,7 @@ function StoreFrames() {
       readOnly: true,
     },
     {
-      varName: "id_supplier",
+      varName: "supplier_id",
       label: "Dodavatel",
       options: { field: "brýle" },
       required: true,
@@ -259,7 +259,7 @@ function StoreFrames() {
     if (isPutInStore) {
       const putInData = {
         plu: Number(item.plu),
-        id_supplier: Number(item.id_supplier),
+        supplier_id: Number(item.supplier_id),
         delivery_note: item.delivery_note,
         quantity: Number(item.quantity),
         price_buy: Number(item.price_buy),
@@ -283,7 +283,7 @@ function StoreFrames() {
       gender: item.gender,
       material: item.material,
       type: item.type,
-      id_supplier: Number(item.id_supplier) || null,
+      supplier_id: Number(item.supplier_id) || null,
     };
     
     const result = await updateItem(changedItem);
@@ -320,7 +320,7 @@ function StoreFrames() {
         " " +
         selectedItem.color,
       plu: selectedItem.plu,
-      id_supplier: selectedItem.id_supplier,
+      supplier_id: selectedItem.supplier_id,
       quantity: 1,
       price_buy: Math.floor(Math.random() * 10000),
       date: today.toISOString().split("T")[0],
@@ -341,7 +341,7 @@ function StoreFrames() {
 
     const predefinedValues = [
       {
-        id_supplier: 146,
+        supplier_id: 146,
         date: new Date().toISOString().split("T")[0],
         delivery_note: "XL-654321",
       },

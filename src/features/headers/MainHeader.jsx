@@ -24,8 +24,8 @@ function MainHeader() {
     //v globálním stavu zaznamená aktivního klienta
     setActiveId((prev) => ({
       ...prev,
-      id_client: clientID,
-      id_member: activeMember ? activeMember.id : prev.id_member,
+      client_id: clientID,
+      member_id: activeMember ? activeMember.id : prev.member_id,
     }));
 
     setActiveItemId(clientID);
@@ -42,10 +42,10 @@ function MainHeader() {
       const parsed = isNaN(Number(idFromUrl)) ? idFromUrl : Number(idFromUrl);
       setActiveItemId(parsed);
 
-      //musí být PREV, protože se eviduje ještě id_member
+      //musí být PREV, protože se eviduje ještě member_id
       setActiveId((prev) => ({
         ...prev,
-        id_client: parsed,
+        client_id: parsed,
       }));
     }
   }, [location.pathname, headerClients]);
@@ -57,7 +57,7 @@ function MainHeader() {
     setActiveMember(members[0]);
     setActiveId((prev) => ({
       ...prev,
-      id_member: members[0].id,
+      member_id: members[0].id,
     }));
     console.log("Members:", members);
     // Nastaví interval na 1 minutu (60 000 ms)
@@ -97,7 +97,7 @@ function MainHeader() {
   const handleMemberSelect = (member) => {
     setActiveId((prev) => ({
       ...prev,
-      id_member: member.id,
+      member_id: member.id,
     }));
 
     setActiveMember(member);
@@ -176,7 +176,7 @@ function MainHeader() {
                   <strong>{`${client.degree_before} ${client.name} ${client.surname}, ${client.degree_after}`}</strong>{" "}
                 </p>
 
-                <p>{`${client.street}, ${client.city} (${client.id}/${client.id_organizations})`}</p>
+                <p>{`${client.street}, ${client.city} (${client.id}/${client.organization_id})`}</p>
                 {/* <p>
                   {activeItemId === client.id
                     ? `nar.: ${new Date(client.birth_date).toLocaleDateString(

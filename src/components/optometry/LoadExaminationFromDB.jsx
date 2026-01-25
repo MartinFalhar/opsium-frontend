@@ -1,10 +1,10 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
-async function LoadExaminationFromDB(id_client, id_branch, id_name) {
+async function LoadExaminationFromDB(client_id, branch_id, name_id) {
   const loadInfo = {
-    id_clients: id_client,
-    id_branches: id_branch,
-    id_name: id_name,
+    client_id: client_id,
+    branch_id: branch_id,
+    name_id: name_id
   };
 
   try {

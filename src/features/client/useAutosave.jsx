@@ -48,9 +48,9 @@ export default function useAutosave({
         // const exportObject = convertFn(data);
 
         const payload = {
-          id_clients: clientId,
-          id_branches: branchId,
-          id_members: memberId,
+          client_id: clientId,
+          branch_id: branchId,
+          member_id: memberId,
           name,
           data: exportObject,
         };

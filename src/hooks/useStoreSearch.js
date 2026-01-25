@@ -19,7 +19,7 @@ export function useStoreSearch(storeId) {
       if (!storeId) return;
 
       setLoading(true);
-      setError(null);
+      setError(null); 
 
       try {
         const res = await fetch(

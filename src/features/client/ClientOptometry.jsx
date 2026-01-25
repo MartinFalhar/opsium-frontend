@@ -52,9 +52,9 @@ function ClientOptometry({ client }) {
   const { saveNow } = useAutosave({
     data: optometryItems,
     name: optometryRecordName,
-    clientId: activeId?.id_client,
+    clientId: activeId?.client_id,
     branchId: user.branch_id,
-    memberId: activeId?.id_member,
+    memberId: activeId?.member_id,
     convertFn: ConvertOptometryItems,
     saveToDBFn: SaveOptometryItemsToDB,
     headerClients,
@@ -76,16 +76,16 @@ function ClientOptometry({ client }) {
 
     // uložit jen do localStorage
     try {
-      localStorage.setItem(activeId?.id_client, JSON.stringify(ModulesDB()));
+      localStorage.setItem(activeId?.client_id, JSON.stringify(ModulesDB()));
     } catch (e) {
       console.warn("localStorage save failed", e);
     }
 
     // označit jako neuloženo
-    if (typeof setHeaderClients === "function" && activeId?.id_client) {
+    if (typeof setHeaderClients === "function" && activeId?.client_id) {
       setHeaderClients((prev) =>
         prev.map((c) =>
-          c.id === activeId.id_client ? { ...c, notSavedDetected: true } : c
+          c.id === activeId.client_id ? { ...c, notSavedDetected: true } : c
         )
       );
     }
@@ -93,7 +93,7 @@ function ClientOptometry({ client }) {
 
   // Uložit (ručně)
   const handleSave = async () => {
-    if (!activeId?.id_client) return;
+    if (!activeId?.client_id) return;
 
     setIsLoading(true);
     try {
@@ -124,8 +124,8 @@ function ClientOptometry({ client }) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              id_clients: client.id,
-              id_branches: user.branch_id,
+              client_id: client.id,
+              branch_id: user.branch_id,
               name: client.examName,
             }),
           });
@@ -172,7 +172,7 @@ function ClientOptometry({ client }) {
       const lines = doc.splitTextToSize(text, 180);
       doc.text(lines, 10, 20);
 
-      doc.save(`optometrie-${activeId?.id_client || "unknown"}.pdf`);
+      doc.save(`optometrie-${activeId?.client_id || "unknown"}.pdf`);
     } catch (e) {
       console.error("PDF export failed", e);
       // fallback: tisk stránky
@@ -229,10 +229,10 @@ function ClientOptometry({ client }) {
     );
 
     // označíme, že změna proběhla (autosave hook detekuje přes debounce)
-    if (typeof setHeaderClients === "function" && activeId?.id_client) {
+    if (typeof setHeaderClients === "function" && activeId?.client_id) {
       setHeaderClients((prev) =>
         prev.map((c) =>
-          c.id === activeId.id_client ? { ...c, notSavedDetected: true } : c
+          c.id === activeId.client_id ? { ...c, notSavedDetected: true } : c
         )
       );
     }

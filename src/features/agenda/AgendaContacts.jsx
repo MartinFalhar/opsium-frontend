@@ -18,7 +18,7 @@ function AgendaContacts() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id_organizations: user.id_organizations,
+          organization_id: user.organization_id,
           value: inputSearch,
         }),
       });

@@ -57,7 +57,7 @@ export async function apiCall(endpoint, method = "GET", body = null) {
  * // GET request
  * const vatRates = await apiCall("/agenda/vat/current", "GET");
  * 
- * // POST request bez dalších dat (id_branches se vezme z tokenu)
+ * // POST request bez dalších dat (branches_id se vezme z tokenu)
  * const clients = await apiCall("/client/clients_list", "POST");
  * 
  * // POST request s daty
@@ -67,10 +67,10 @@ export async function apiCall(endpoint, method = "GET", body = null) {
  *   birth_date: "1990-01-01"
  * });
  * 
- * // POST s více daty (id_branches už NEMUSÍTE posílat!)
+ * // POST s více daty (branches_id už NEMUSÍTE posílat!)
  * const exam = await apiCall("/client/save_examination", "POST", {
- *   id_clients: 123,
- *   id_members: 456,
+ *   client_id: 123,
+ *   member_id: 456,
  *   name: "Vyšetření 2024",
  *   data: { ... }
  * });

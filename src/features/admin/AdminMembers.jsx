@@ -31,7 +31,7 @@ function AdminMembers() {
         const res = await fetch(`${API_URL}/admin/members_list`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ organization: user?.id_organizations }),
+          body: JSON.stringify({ organization: user?.organization_id }),
         });
         const data = await res.json();
 
@@ -63,7 +63,7 @@ function AdminMembers() {
       nick: values.nick,
       pin: values.pin,
       //zde je USER organization z CONTEXTu, což je organization ADMINA, který uživatele vytváří
-      id_user: user.id,
+      user_id: user.id,
     };
     try {
       const res = await fetch(`${API_URL}/admin/create_member`, {
@@ -114,7 +114,7 @@ function AdminMembers() {
           members?.map((member) => (
             <div key={member.id} className="client-item" onClick={() => null}>
               <h1>{`${member.name} ${member.surname}`}</h1>
-              <p>{`Nick: ${member.nick} #${member.pin} | ID Organizace: ${member.id_organizations}`}</p>
+              <p>{`Nick: ${member.nick} #${member.pin} | ID Organizace: ${member.organization_id}`}</p>
             </div>
           ))}
       </div>

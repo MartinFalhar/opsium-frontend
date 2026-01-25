@@ -41,7 +41,7 @@ function Cashdesk() {
       const res = await fetch(`${API_URL}/client/clients_list`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_branch: user.branch_id }),
+        body: JSON.stringify({ branch_id: user.branch_id }),
       });
       const data = await res.json();
       if (res.ok) {

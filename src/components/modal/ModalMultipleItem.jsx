@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ConfirmDelete from "./ConfirmDelete";
+import useStoreGetLens from "../../hooks/useStoreGetLens";
 
 export default function ModalMultipleItem({
   fields,
@@ -12,11 +13,14 @@ export default function ModalMultipleItem({
   thirdButton,
   onClickThirdButton,
   suppliers = [],
+  storeName = "", // Přidáváme prop pro rozlišení skladu
 }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [values, setValues] = useState({});
   const [itemsList, setItemsList] = useState([]);
   const [dynamicFields, setDynamicFields] = useState([]);
+  
+  const { getLensInfo, isLoading: isLoadingLens } = useStoreGetLens();
 
   // Aktualizace values při změně predefinedValues nebo fields
   useEffect(() => {
@@ -42,6 +46,44 @@ export default function ModalMultipleItem({
   //libovolného elementu formuláře
   const handleChange = (varName, value) => {
     setValues((prev) => ({ ...prev, [varName]: value }));
+  };
+
+  // Handler pro ENTER v plu poli (pouze pro StoreLens)
+  const handleKeyDown = async (e, varName, groupIndex) => {
+    if (e.key === "Enter" && varName.startsWith("plu") && storeName === "StoreLens") {
+      e.preventDefault(); // Zabráníme odeslání formuláře
+      
+      const uniqueVarName = groupIndex > 0 ? `plu_${groupIndex}` : "plu";
+      const pluValue = values[uniqueVarName];
+      
+      if (pluValue) {
+        console.log("Fetching lens info for PLU:", pluValue);
+        const result = await getLensInfo(pluValue);
+        
+        if (result.success && result.data) {
+          // Vyplníme data do příslušného řádku
+          const lensData = result.data;
+          const updateValues = {};
+          
+          // Mapování sloupců z catalog_lens do formuláře
+          fields.slice(3).forEach((field) => {
+            const fieldVarName = groupIndex > 0 
+              ? `${field.varName}_${groupIndex}` 
+              : field.varName;
+            
+            // Mapování názvů sloupců
+            if (lensData[field.varName]) {
+              updateValues[fieldVarName] = lensData[field.varName];
+            }
+          });
+          
+          setValues((prev) => ({ ...prev, ...updateValues }));
+          window.showToast(`Čočka PLU ${pluValue} byla načtena z katalogu`);
+        } else {
+          window.showToast(`Čočka s PLU ${pluValue} nebyla nalezena v katalogu`, "error");
+        }
+      }
+    }
   };
 
   const handleClose = () => {
@@ -298,6 +340,7 @@ export default function ModalMultipleItem({
                         onChange={(e) =>
                           handleChange(uniqueVarName, e.target.value)
                         }
+                        onKeyDown={(e) => handleKeyDown(e, field.varName, groupIndex)}
                         required={field.required}
                         autoFocus={actualIndex === 0}
                         readOnly={field.readOnly}
