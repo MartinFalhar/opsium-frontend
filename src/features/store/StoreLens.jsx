@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Pagination from "../../components/pagination/Pagination.jsx";
 import Modal from "../../components/modal/Modal.jsx";
-import ModalMultipleItem from "../../components/modal/ModalMultipleItem.jsx";
+import ModalMultipleItemCatalog from "../../components/modal/ModalMultipleItemCatalog.jsx";
 import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
 import { useStoreSearch } from "../../hooks/useStoreSearch.js";
 import { useStoreUpdate } from "../../hooks/useStoreUpdate.js";
@@ -70,6 +70,10 @@ function StoreLens() {
       input: "text",
       required: false,
     },
+    { varName: "name", label: "Název čočky", input: "message", required: false },
+    { varName: "note", label: "Poznámka", input: "text", required: false },
+    { varName: "supplier_id", label: "Dodavatel", input: "text", required: false },
+    { varName: "range_dia", label: "Průměry", input: "text", required: false },
   ];
 
   const fieldsForStockInput = [
@@ -181,7 +185,7 @@ function StoreLens() {
 
   // Stavové hooky
   const [showModal, setShowModal] = useState(false);
-  const [showModalMultipleItem, setShowModalMultipleItem] = useState(false);
+  const [showModalMultipleItemCatalog, setShowModalMultipleItemCatalog] = useState(false);
   const [isNewItem, setIsNewItem] = useState(false);
   const [isPutInStore, setIsPutInStore] = useState(false);
   const [isPutInStoreMultiple, setIsPutInStoreMultiple] = useState(false);
@@ -307,26 +311,20 @@ function StoreLens() {
       {
         supplier_id: 146,
         date: new Date().toISOString().split("T")[0],
-        delivery_note: "XL-654321",
+        delivery_note: "XL-654456321",
       },
       {
         plu: "",
-        collection: "NOVA",
-        product: "OPTIC",
-        color: "Funny RED",
         quantity: 1,
         price_buy: 990,
         price_sold: 1990,
-        size: "54/18-140",
-        gender: "",
-        material: "",
         type: "",
       },
     ];
 
     setIsPutInStoreMultiple(true);
     setSelectedMultiItem(predefinedValues);
-    setShowModalMultipleItem(true);
+    setShowModalMultipleItemCatalog(true);
   };
 
   //Odeslání více položek na backend
@@ -335,7 +333,7 @@ function StoreLens() {
     const result = await putInMultipleItems(values);
     if (result.success) {
       searchItems(page, limit, inputSearch);
-      setShowModalMultipleItem(false);
+      setShowModalMultipleItemCatalog(false);
       setIsPutInStoreMultiple(false);
     }
   };
@@ -503,14 +501,14 @@ function StoreLens() {
             onClickThirdButton={handleClickOnThirdButton}
           />
         )}
-        {showModalMultipleItem && (
-          <ModalMultipleItem
+        {showModalMultipleItemCatalog && (
+          <ModalMultipleItemCatalog
             fields={fieldsForStockInputMultiple}
             predefinedValues={selectedMultiItem}
             suppliers={suppliers}
             onSubmit={handleSubmitMultipleItems}
-            onClose={() => setShowModalMultipleItem(false)}
-            onCancel={() => setShowModalMultipleItem(false)}
+            onClose={() => setShowModalMultipleItemCatalog(false)}
+            onCancel={() => setShowModalMultipleItemCatalog(false)}
             firstButton={"Připsat zboží"}
             secondButton={"Zavřít"}
             thirdButton={null}

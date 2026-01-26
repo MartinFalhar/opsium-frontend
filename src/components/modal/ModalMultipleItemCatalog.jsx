@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import ConfirmDelete from "./ConfirmDelete";
+import useStoreGetLens from "../../hooks/useStoreGetLens";
 
-export default function ModalMultipleItem({
+export default function ModalMultipleItemCatalog({
   fields,
   predefinedValues = [{}, {}],
   onSubmit,
@@ -12,11 +13,14 @@ export default function ModalMultipleItem({
   thirdButton,
   onClickThirdButton,
   suppliers = [],
+  storeName = "", // Přidáváme prop pro rozlišení skladu
 }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [values, setValues] = useState({});
   const [itemsList, setItemsList] = useState([]);
   const [dynamicFields, setDynamicFields] = useState([]);
+  
+  const { getLensInfo, isLoading: isLoadingLens } = useStoreGetLens();
 
   // Aktualizace values při změně predefinedValues nebo fields
   useEffect(() => {
@@ -42,6 +46,89 @@ export default function ModalMultipleItem({
   //libovolného elementu formuláře
   const handleChange = (varName, value) => {
     setValues((prev) => ({ ...prev, [varName]: value }));
+  };
+
+  // Handler pro ENTER v plu poli (pouze pro StoreLens)
+  const handleKeyDown = async (e, varName, groupIndex) => {
+    if (e.key === "Enter" && varName.startsWith("plu") && storeName === "StoreLens") {
+      e.preventDefault(); // Zabráníme odeslání formuláře
+      
+      const uniqueVarName = groupIndex > 0 ? `plu_${groupIndex}` : "plu";
+      const pluValue = Number(values[uniqueVarName]);
+      
+      if (pluValue) {
+        console.log("========== FETCHING LENS INFO ==========");
+        console.log("PLU:", pluValue);
+        console.log("Group index:", groupIndex);
+        console.log("Current values:", values);
+        const result = await getLensInfo(pluValue);
+        console.log("Full API result:", result);
+        
+        if (result.success && result.data) {
+          // Backend vrací { success: true, data: { success: true, data: {...actualData} } }
+          // Hook vrací result.data, což je celá response, takže potřebujeme result.data.data
+          const lensData = result.data.data || result.data;
+          const updateValues = {};
+          console.log("========== LENS DATA MAPPING ==========");
+          console.log("Full result:", result);
+          console.log("result.data:", result.data);
+          console.log("Lens data extracted:", lensData);
+          console.log("Data type:", typeof lensData);
+          console.log("Available fields from catalog_lens:", Object.keys(lensData));
+          console.log("Fields to map (from index 3):", fields.slice(3).map(f => f.varName));
+          console.log("Group index:", groupIndex);
+          
+          // Detailní kontrola klíčů
+          console.log("\n=== DETAILNÍ KONTROLA KLÍČŮ ===");
+          Object.keys(lensData).forEach(key => {
+            console.log(`DB key: "${key}" (length: ${key.length}, charCodes: ${[...key].map(c => c.charCodeAt(0)).join(',')})`);
+          });
+          console.log("\nHledám field 'name':");
+          console.log(`  "name" in lensData: ${"name" in lensData}`);
+          console.log(`  lensData.name: ${lensData.name}`);
+          console.log(`  lensData["name"]: ${lensData["name"]}`);
+          console.log(`  hasOwnProperty: ${lensData.hasOwnProperty("name")}`);
+          
+          // Mapování sloupců z catalog_lens do formuláře
+          fields.slice(3).forEach((field, idx) => {
+            const fieldVarName = groupIndex > 0 
+              ? `${field.varName}_${groupIndex}` 
+              : field.varName;
+            
+            console.log(`\n--- Field ${idx}: ${field.varName} ---`);
+            console.log(`  Target variable name: ${fieldVarName}`);
+            console.log(`  Exists in lensData: ${field.varName in lensData}`);
+            console.log(`  Value from DB: ${lensData[field.varName]}`);
+            console.log(`  Type: ${typeof lensData[field.varName]}`);
+            console.log(`  Is undefined: ${lensData[field.varName] === undefined}`);
+            console.log(`  Is null: ${lensData[field.varName] === null}`);
+            
+            // Správná kontrola - použití hasOwnProperty nebo in operátoru
+            // aby se naplnily i hodnoty 0, false, null, ""
+
+
+            if (field.varName in lensData && lensData[field.varName] !== undefined && lensData[field.varName] !== null) {
+              updateValues[fieldVarName] = lensData[field.varName];
+              console.log(`  ✓ MAPPED: ${field.varName} = "${lensData[field.varName]}" -> ${fieldVarName}`);
+            } else {
+              console.log(`  ✗ NOT MAPPED: ${field.varName} (reason: ${!(field.varName in lensData) ? 'not in object' : lensData[field.varName] === undefined ? 'undefined' : 'null'})`);
+            }
+          });
+          
+          console.log("\n========== FINAL UPDATE ==========");
+          console.log("Update values to apply:", updateValues);
+          console.log("Previous values:", values);
+          setValues((prev) => {
+            const newValues = { ...prev, ...updateValues };
+            console.log("New values after merge:", newValues);
+            return newValues;
+          });
+          window.showToast(`Čočka PLU ${pluValue} byla načtena z katalogu`);
+        } else {
+          window.showToast(`Čočka s PLU ${pluValue} nebyla nalezena v katalogu`, "error");
+        }
+      }
+    }
   };
 
   const handleClose = () => {
@@ -298,6 +385,7 @@ export default function ModalMultipleItem({
                         onChange={(e) =>
                           handleChange(uniqueVarName, e.target.value)
                         }
+                        onKeyDown={(e) => handleKeyDown(e, field.varName, groupIndex)}
                         required={field.required}
                         autoFocus={actualIndex === 0}
                         readOnly={field.readOnly}

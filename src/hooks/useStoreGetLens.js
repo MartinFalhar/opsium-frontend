@@ -13,9 +13,10 @@ export default function useStoreGetLens() {
     try {
       const res = await fetch(`${API_URL}/store/getlens`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
         body: JSON.stringify({ plu }),
       });
 
