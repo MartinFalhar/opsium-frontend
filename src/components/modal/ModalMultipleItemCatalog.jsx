@@ -19,7 +19,8 @@ export default function ModalMultipleItemCatalog({
   const [values, setValues] = useState({});
   const [itemsList, setItemsList] = useState([]);
   const [dynamicFields, setDynamicFields] = useState([]);
-  
+  const [showGroupDetails, setShowGroupDetails] = useState([]);
+
   const { getLensInfo, isLoading: isLoadingLens } = useStoreGetLens();
 
   // Aktualizace values při změně predefinedValues nebo fields
@@ -28,6 +29,7 @@ export default function ModalMultipleItemCatalog({
     setItemsList([{ ...predefinedValues[1] }]);
     // Inicializace dynamicFields se základními fields od indexu 3 dál
     setDynamicFields([fields.slice(3)]);
+    setShowGroupDetails([false]);
   }, []);
 
   // Aktualizace values při změně predefinedValues nebo fields
@@ -50,82 +52,56 @@ export default function ModalMultipleItemCatalog({
 
   // Handler pro ENTER v plu poli (pouze pro StoreLens)
   const handleKeyDown = async (e, varName, groupIndex) => {
-    if (e.key === "Enter" && varName.startsWith("plu") && storeName === "StoreLens") {
+    if (
+      e.key === "Enter" &&
+      varName.startsWith("plu") &&
+      storeName === "StoreLens"
+    ) {
       e.preventDefault(); // Zabráníme odeslání formuláře
-      
+
       const uniqueVarName = groupIndex > 0 ? `plu_${groupIndex}` : "plu";
       const pluValue = Number(values[uniqueVarName]);
-      
+
       if (pluValue) {
-        console.log("========== FETCHING LENS INFO ==========");
-        console.log("PLU:", pluValue);
-        console.log("Group index:", groupIndex);
-        console.log("Current values:", values);
         const result = await getLensInfo(pluValue);
-        console.log("Full API result:", result);
-        
+
         if (result.success && result.data) {
           // Backend vrací { success: true, data: { success: true, data: {...actualData} } }
           // Hook vrací result.data, což je celá response, takže potřebujeme result.data.data
           const lensData = result.data.data || result.data;
           const updateValues = {};
-          console.log("========== LENS DATA MAPPING ==========");
-          console.log("Full result:", result);
-          console.log("result.data:", result.data);
-          console.log("Lens data extracted:", lensData);
-          console.log("Data type:", typeof lensData);
-          console.log("Available fields from catalog_lens:", Object.keys(lensData));
-          console.log("Fields to map (from index 3):", fields.slice(3).map(f => f.varName));
-          console.log("Group index:", groupIndex);
-          
-          // Detailní kontrola klíčů
-          console.log("\n=== DETAILNÍ KONTROLA KLÍČŮ ===");
-          Object.keys(lensData).forEach(key => {
-            console.log(`DB key: "${key}" (length: ${key.length}, charCodes: ${[...key].map(c => c.charCodeAt(0)).join(',')})`);
-          });
-          console.log("\nHledám field 'name':");
-          console.log(`  "name" in lensData: ${"name" in lensData}`);
-          console.log(`  lensData.name: ${lensData.name}`);
-          console.log(`  lensData["name"]: ${lensData["name"]}`);
-          console.log(`  hasOwnProperty: ${lensData.hasOwnProperty("name")}`);
-          
+
           // Mapování sloupců z catalog_lens do formuláře
           fields.slice(3).forEach((field, idx) => {
-            const fieldVarName = groupIndex > 0 
-              ? `${field.varName}_${groupIndex}` 
-              : field.varName;
-            
-            console.log(`\n--- Field ${idx}: ${field.varName} ---`);
-            console.log(`  Target variable name: ${fieldVarName}`);
-            console.log(`  Exists in lensData: ${field.varName in lensData}`);
-            console.log(`  Value from DB: ${lensData[field.varName]}`);
-            console.log(`  Type: ${typeof lensData[field.varName]}`);
-            console.log(`  Is undefined: ${lensData[field.varName] === undefined}`);
-            console.log(`  Is null: ${lensData[field.varName] === null}`);
-            
+            const fieldVarName =
+              groupIndex > 0 ? `${field.varName}_${groupIndex}` : field.varName;
+
             // Správná kontrola - použití hasOwnProperty nebo in operátoru
             // aby se naplnily i hodnoty 0, false, null, ""
 
-
-            if (field.varName in lensData && lensData[field.varName] !== undefined && lensData[field.varName] !== null) {
+            if (
+              field.varName in lensData &&
+              lensData[field.varName] !== undefined &&
+              lensData[field.varName] !== null
+            ) {
               updateValues[fieldVarName] = lensData[field.varName];
-              console.log(`  ✓ MAPPED: ${field.varName} = "${lensData[field.varName]}" -> ${fieldVarName}`);
-            } else {
-              console.log(`  ✗ NOT MAPPED: ${field.varName} (reason: ${!(field.varName in lensData) ? 'not in object' : lensData[field.varName] === undefined ? 'undefined' : 'null'})`);
             }
           });
-          
-          console.log("\n========== FINAL UPDATE ==========");
-          console.log("Update values to apply:", updateValues);
-          console.log("Previous values:", values);
           setValues((prev) => {
             const newValues = { ...prev, ...updateValues };
-            console.log("New values after merge:", newValues);
             return newValues;
+          });
+          setShowGroupDetails((prev) => {
+            const next = [...prev];
+            next[groupIndex] = true;
+            return next;
           });
           window.showToast(`Čočka PLU ${pluValue} byla načtena z katalogu`);
         } else {
-          window.showToast(`Čočka s PLU ${pluValue} nebyla nalezena v katalogu`, "error");
+          window.showToast(
+            `Čočka s PLU ${pluValue} nebyla nalezena v katalogu`,
+            "error",
+          );
         }
       }
     }
@@ -174,6 +150,7 @@ export default function ModalMultipleItemCatalog({
     // Přidej nové fields se stejnou strukturou jako fields od indexu 3 dál
     const newGroupIndex = dynamicFields.length;
     setDynamicFields((prev) => [...prev, fields.slice(3)]);
+    setShowGroupDetails((prev) => [...prev, false]);
 
     // Nastav hodnoty pro nový řádek včetně quantity = 1
     const newValues = {};
@@ -189,6 +166,9 @@ export default function ModalMultipleItemCatalog({
     // Odebere prvek z obou polí
     setItemsList((prev) => prev.filter((_, index) => index !== groupIndex));
     setDynamicFields((prev) => prev.filter((_, index) => index !== groupIndex));
+    setShowGroupDetails((prev) =>
+      prev.filter((_, index) => index !== groupIndex),
+    );
   };
 
   if (showConfirm) {
@@ -298,12 +278,9 @@ export default function ModalMultipleItemCatalog({
           {dynamicFields.map((fieldGroup, groupIndex) => (
             <div
               key={groupIndex}
-              className={`modal-dynamic-row ${
+              className={`modal-dynamic-row modal-dynamic-row--two-rows ${
                 groupIndex > 0 ? "has-margin" : ""
               }`}
-              style={{
-                gridTemplateColumns: `repeat(${fieldGroup.length}, 1fr) auto`,
-              }}
             >
               {fieldGroup.map((field, index) => {
                 // Vytvoř unikátní varName pro každou skupinu (kromě první)
@@ -312,6 +289,8 @@ export default function ModalMultipleItemCatalog({
                     ? `${field.varName}_${groupIndex}`
                     : field.varName;
                 const actualIndex = index + 3;
+                const isHiddenField =
+                  index > 0 && !showGroupDetails[groupIndex];
                 const isDynamic =
                   field.options &&
                   typeof field.options === "object" &&
@@ -325,18 +304,19 @@ export default function ModalMultipleItemCatalog({
                 return (
                   <div
                     key={actualIndex}
+                    hidden={isHiddenField}
                     className={`modal-field ${
-                      field.input === "hidden" ? "modal-field-hidden" : ""
+                      field.input === "hidden" || isHiddenField
+                        ? "modal-field-hidden"
+                        : ""
                     }`}
                   >
-                    {groupIndex === 0 && (
-                      <label>
-                        {field.label}
-                        {field.required && (
-                          <span className="required-star"> *</span>
-                        )}
-                      </label>
-                    )}
+                    <label>
+                      {field.label}
+                      {field.required && (
+                        <span className="required-star"> *</span>
+                      )}
+                    </label>
                     {(field.options && Array.isArray(field.options)) ||
                     (field.options &&
                       typeof field.options === "object" &&
@@ -385,7 +365,9 @@ export default function ModalMultipleItemCatalog({
                         onChange={(e) =>
                           handleChange(uniqueVarName, e.target.value)
                         }
-                        onKeyDown={(e) => handleKeyDown(e, field.varName, groupIndex)}
+                        onKeyDown={(e) =>
+                          handleKeyDown(e, field.varName, groupIndex)
+                        }
                         required={field.required}
                         autoFocus={actualIndex === 0}
                         readOnly={field.readOnly}
@@ -407,6 +389,7 @@ export default function ModalMultipleItemCatalog({
               )}
             </div>
           ))}
+
           <div className="modal-button-add-container">
             <button type="button" onClick={handleAddItem}>
               +

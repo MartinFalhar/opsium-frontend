@@ -33,7 +33,6 @@ function StoreLens() {
     {
       varName: "text01",
       input: "message",
-      
       hidden: true,
     },
     {
@@ -42,14 +41,30 @@ function StoreLens() {
       input: "number",
       required: false,
     },
-    { varName: "sph", label: "SPH", input: "number", required: false },
-    { varName: "cyl", label: "CYL", input: "number", required: false },
-    { varName: "ax", label: "Osa", input: "number", required: false },
+    {
+      varName: "code",
+      label: "Kód",
+      input: "input",
+      required: false,
+    },
+    {
+      varName: "name",
+      label: "Název čočky",
+      input: "message",
+      required: false,
+    },
+    {
+      varName: "supplier_id",
+      label: "Dodavatel",
+      input: "message",
+      required: false,
+    },
     {
       varName: "price_buy",
       label: "Nákupní cena [bez DPH]",
       input: "number",
       required: false,
+      readOnly: true,
     },
     {
       varName: "price_sold",
@@ -59,21 +74,29 @@ function StoreLens() {
       readOnly: true,
     },
     {
+      varName: "sph",
+      label: "SPH",
+      input: "number",
+      required: false,
+    },
+    {
+      varName: "cyl",
+      label: "CYL",
+      input: "number",
+      required: false,
+    },
+    {
+      varName: "ax",
+      label: "Osa",
+      input: "number",
+      required: false,
+    },
+    {
       varName: "quantity",
       label: "Množství",
       input: "number",
       required: false,
     },
-    {
-      varName: "code",
-      label: "Kód",
-      input: "text",
-      required: false,
-    },
-    { varName: "name", label: "Název čočky", input: "message", required: false },
-    { varName: "note", label: "Poznámka", input: "text", required: false },
-    { varName: "supplier_id", label: "Dodavatel", input: "text", required: false },
-    { varName: "range_dia", label: "Průměry", input: "text", required: false },
   ];
 
   const fieldsForStockInput = [
@@ -185,7 +208,8 @@ function StoreLens() {
 
   // Stavové hooky
   const [showModal, setShowModal] = useState(false);
-  const [showModalMultipleItemCatalog, setShowModalMultipleItemCatalog] = useState(false);
+  const [showModalMultipleItemCatalog, setShowModalMultipleItemCatalog] =
+    useState(false);
   const [isNewItem, setIsNewItem] = useState(false);
   const [isPutInStore, setIsPutInStore] = useState(false);
   const [isPutInStoreMultiple, setIsPutInStoreMultiple] = useState(false);
