@@ -9,7 +9,6 @@ export default function useStoreGetLens() {
   const getLensInfo = async (plu) => {
     setIsLoading(true);
     setError(null);
-
     try {
       const res = await fetch(`${API_URL}/store/getlens`, {
         method: "POST",
@@ -19,8 +18,8 @@ export default function useStoreGetLens() {
           },
         body: JSON.stringify({ plu }),
       });
-
       const data = await res.json();
+
 
       if (res.ok) {
         setIsLoading(false);

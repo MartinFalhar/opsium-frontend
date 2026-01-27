@@ -29,6 +29,7 @@ export default function ModalMultipleItemCatalog({
     setItemsList([{ ...predefinedValues[1] }]);
     // Inicializace dynamicFields se základními fields od indexu 3 dál
     setDynamicFields([fields.slice(3)]);
+
     setShowGroupDetails([false]);
   }, []);
 

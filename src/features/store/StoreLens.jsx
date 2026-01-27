@@ -71,7 +71,6 @@ function StoreLens() {
       label: "Prodejní cena [Kč s DPH]",
       input: "number",
       required: false,
-      readOnly: true,
     },
     {
       varName: "sph",
@@ -96,6 +95,13 @@ function StoreLens() {
       label: "Množství",
       input: "number",
       required: false,
+    },
+    {
+      varName: "id",
+      label: "ID katalogové položky",
+      input: "number",
+      required: false,
+      hidden: "true",
     },
   ];
 
@@ -343,6 +349,12 @@ function StoreLens() {
         price_buy: 990,
         price_sold: 1990,
         type: "",
+        sph: 300,
+        cyl:  -100,
+        ax: 90,
+        code: "",
+        name: "",
+        catalog_lens_id: "",
       },
     ];
 
@@ -400,10 +412,10 @@ function StoreLens() {
           </div>
           <div className="items-panel-table-header six-columns">
             <h3>PLU</h3>
-            <h3>Model obruby</h3>
-            <h3>Barva</h3>
             <h3>Dodavatel</h3>
-            <h3>Množství (ks)</h3>
+            <h3>Typ čočky</h3>
+            <h3>Dioptrie</h3>
+            <h3>Kód</h3>
             <h3>Prodejní cena</h3>
           </div>
 
@@ -433,16 +445,16 @@ function StoreLens() {
                   <div className="item-plu">{item.plu}</div>
 
                   <div className="item-name label">
-                    <h1>{`${item.collection} ${item.product}`}</h1>
+                    <h1>{`${item.supplier_nick} ${item.name}`}</h1>
                   </div>
                   <div className="item-name">
-                    <h2>{`${item.color}`}</h2>
+                    <h2>{`${item.name}`}</h2>
                   </div>
                   <div className="item-name">
-                    <h2>{`${item.supplier_nick}`}</h2>
+                    <h2>{`${Math.floor(item.sph / 100, 2)}`}</h2>
                   </div>
                   <div className="item-name">
-                    <h2>{`${item.quantity_available}`}</h2>
+                    <h2>{`${Math.floor(item.cyl / 100, 2)}`}</h2>
                   </div>
                   <div className="item-name">
                     <h2>{`${Math.round(item.price)} Kč`}</h2>
