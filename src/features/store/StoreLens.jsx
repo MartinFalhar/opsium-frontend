@@ -8,6 +8,7 @@ import { useStoreUpdate } from "../../hooks/useStoreUpdate.js";
 import { useStorePutIn } from "../../hooks/useStorePutIn.js";
 import { useStorePutInMultipleItems } from "../../hooks/useStorePutInMultipleItems.js";
 import { useStoreGetSuppliers } from "../../hooks/useStoreGetSuppliers.js";
+import { formatValue } from "../../hooks/useFormatValue.js";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -101,7 +102,7 @@ function StoreLens() {
       label: "ID katalogové položky",
       input: "number",
       required: false,
-      hidden: "true",
+      hidden: true,
     },
   ];
 
@@ -350,7 +351,7 @@ function StoreLens() {
         price_sold: 1990,
         type: "",
         sph: 300,
-        cyl:  -100,
+        cyl: -100,
         ax: 90,
         code: "",
         name: "",
@@ -412,10 +413,10 @@ function StoreLens() {
           </div>
           <div className="items-panel-table-header six-columns">
             <h3>PLU</h3>
-            <h3>Dodavatel</h3>
-            <h3>Typ čočky</h3>
-            <h3>Dioptrie</h3>
-            <h3>Kód</h3>
+            <h3>Brýlová čočka</h3>
+            <h3>SPH</h3>
+            <h3>CYL</h3>
+            <h3>OSA</h3>
             <h3>Prodejní cena</h3>
           </div>
 
@@ -445,29 +446,31 @@ function StoreLens() {
                   <div className="item-plu">{item.plu}</div>
 
                   <div className="item-name label">
-                    <h1>{`${item.supplier_nick} ${item.name}`}</h1>
+                    <h2>{`${item.catalog_lens_name}`}</h2>
                   </div>
                   <div className="item-name">
-                    <h2>{`${item.name}`}</h2>
+                    <h2>{`${formatValue(item.sph)}`}</h2>
                   </div>
                   <div className="item-name">
-                    <h2>{`${Math.floor(item.sph / 100, 2)}`}</h2>
+                    <h2>{`${formatValue(item.cyl)}`}</h2>
                   </div>
                   <div className="item-name">
-                    <h2>{`${Math.floor(item.cyl / 100, 2)}`}</h2>
+                    <h2>{`${item.ax}°`}</h2>
                   </div>
                   <div className="item-name">
                     <h2>{`${Math.round(item.price)} Kč`}</h2>
                   </div>
                   {/* Druhý řádek s kategoriemi */}
                   <div className="item-note">
-                    {item.size && (
+                    {item.sph && (
                       <div
                         className="item-category"
                         style={{
                           background: "var(--color-grd-g11)",
                         }}
-                      >{`${item.size}`}</div>
+                      >
+                        <h3>{`${item.supplier_nick}`}</h3>
+                      </div>
                     )}
                     {item.gender && (
                       <div
