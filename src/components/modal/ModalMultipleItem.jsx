@@ -12,6 +12,7 @@ export default function ModalMultipleItem({
   thirdButton,
   onClickThirdButton,
   suppliers = [],
+  vatRates = [],
 }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [values, setValues] = useState({});
@@ -170,7 +171,7 @@ export default function ModalMultipleItem({
                           typeof option === "object" && option !== null;
                         return (
                           <option key={i} value={isObject ? option.id : option}>
-                            {isObject ? option.nick : option}
+                            {isObject ? (option.nick || option.rate) : option}
                           </option>
                         );
                       })}
@@ -230,7 +231,7 @@ export default function ModalMultipleItem({
                   typeof field.options === "object" &&
                   !Array.isArray(field.options);
                 const optionsList = isDynamic
-                  ? suppliers
+                  ? vatRates
                   : Array.isArray(field.options)
                     ? field.options
                     : [];
@@ -273,7 +274,7 @@ export default function ModalMultipleItem({
                               key={i}
                               value={isObject ? option.id : option}
                             >
-                              {isObject ? option.nick : option}
+                              {isObject ? (option.nick || option.rate) : option}
                             </option>
                           );
                         })}

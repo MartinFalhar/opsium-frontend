@@ -4,7 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 /**
  * Custom hook pro načtení seznamu dodavatelů
- * @param {string} field - Typ pole (např. "brýle")
+ * @param {string} field - Typ pole (např. "brýle") nebo null pro všechny dodavatele
  * @returns {Object} - { suppliers }
  */
 export function useStoreGetSuppliers(field) {
@@ -12,12 +12,12 @@ export function useStoreGetSuppliers(field) {
 
 
   useEffect(() => {
-    if (!field) return;
-
     const fetchSuppliers = async () => {
 
       try {
-        const res = await fetch(`${API_URL}/store/suppliers-list?field=${field}`, {
+        // Pokud je field null nebo undefined, pošleme prázdný parametr pro načtení všech dodavatelů
+        const fieldParam = field || '';
+        const res = await fetch(`${API_URL}/store/suppliers-list?field=${fieldParam}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

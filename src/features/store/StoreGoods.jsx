@@ -8,6 +8,7 @@ import { useStoreUpdate } from "../../hooks/useStoreUpdate.js";
 import { useStorePutIn } from "../../hooks/useStorePutIn.js";
 import { useStorePutInMultipleItems } from "../../hooks/useStorePutInMultipleItems.js";
 import { useStoreGetSuppliers } from "../../hooks/useStoreGetSuppliers.js";
+import { useStoreGetVat } from "../../hooks/useStoreGetVat.js";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -21,7 +22,7 @@ function StoreGoods() {
     {
       varName: "supplier_id",
       label: "Dodavatel",
-      options: { field: "brýle" },
+      options: {},
       required: true,
     },
     {
@@ -42,14 +43,10 @@ function StoreGoods() {
       input: "hidden",
       required: false,
     },
-    {
-      varName: "collection",
-      label: "Kolekce",
-      input: "text",
-      required: false,
-    },
-    { varName: "product", label: "Model", input: "text", required: false },
+    { varName: "model", label: "Model", input: "text", required: false },
+    { varName: "size", label: "Velikost", input: "text", required: false },
     { varName: "color", label: "Barva", input: "text", required: false },
+    { varName: "param", label: "Parametry", input: "text", required: false },
     {
       varName: "price_buy",
       label: "Nákupní cena [bez DPH]",
@@ -57,11 +54,12 @@ function StoreGoods() {
       required: false,
     },
     {
-      varName: "price_sold",
+      varName: "price",
       label: "Prodejní cena [Kč s DPH]",
       input: "number",
       required: false,
     },
+    { varName: "vat_rate", label: "Sazba DPH", options: {}, required: false },
     {
       varName: "quantity",
       label: "Množství",
@@ -69,35 +67,18 @@ function StoreGoods() {
       required: false,
     },
     {
-      varName: "size",
-      label: "Velikost",
+      varName: "uom",
+      label: "Jednotka množství",
       input: "text",
       required: false,
     },
-    {
-      varName: "gender",
-      label: "Gender",
-      options: [`Pánská`, `Dámská`, `Uni`, `Dětská`],
-      required: false,
-    },
-    {
-      varName: "material",
-      label: "Materiál obruby",
-      options: [`plastová`, `kovová`, `kovová s klipem`, `ultem s klipem`],
-      required: false,
-    },
-    {
-      varName: "type",
-      label: "Typ obruby",
-      options: [`Dioptrická`, `Typ 2`, `Typ 3`, `Typ 4`],
-      required: false,
-    },
+
   ];
 
   const fieldsForStockInput = [
     {
       varName: "plu",
-      input: "hidden",  // Skryté pole
+      input: "hidden", // Skryté pole
     },
     {
       varName: "text01",
@@ -160,7 +141,7 @@ function StoreGoods() {
       input: "text",
       required: false,
     },
-    { varName: "product", label: "Model", input: "text", required: false },
+    { varName: "model", label: "Model", input: "text", required: false },
     { varName: "color", label: "Barva", input: "text", required: false },
     { varName: "size", label: "Velikost", input: "text", required: false },
     {
@@ -236,7 +217,8 @@ function StoreGoods() {
   const { loading: updateLoading, updateItem } = useStoreUpdate(storeId);
   const { loading: putInLoading, putInItem } = useStorePutIn(storeId);
   const { loading: putInMultipleLoading, putInMultipleItems } = useStorePutInMultipleItems(storeId);
-  const { suppliers } = useStoreGetSuppliers("brýle");
+  const { suppliers } = useStoreGetSuppliers(null);
+  const { vatRates } = useStoreGetVat();
 
   // Paginace
   const [page, setPage] = useState(1);
@@ -347,15 +329,14 @@ function StoreGoods() {
       },
       {
         plu: "",
-        collection: "NOVA",
-        product: "OPTIC",
-        color: "Funny RED",
-        quantity: 1,
-        price_buy: 990,
-        price_sold: 1990,
+        model: "NOVA",
         size: "54/18-140",
-        gender: "",
-        material: "",
+        color: "Funny RED",
+        param: "12*12*12",
+        quantity: 1,
+        uom: "ks",
+        price_buy: 99,
+        price_sold: 190,
         type: "",
       },
     ];
@@ -400,7 +381,7 @@ function StoreGoods() {
 
         <div className="show-items-panel">
           <div className="items-panel-label">
-            <h2>Brýlové obruby</h2>
+            <h2>Hotové zboží</h2>
             <Pagination
               currentPage={page}
               totalPages={totalPages}
@@ -412,15 +393,15 @@ function StoreGoods() {
           </div>
           <div className="items-panel-table-header six-columns">
             <h3>PLU</h3>
-            <h3>Model obruby</h3>
+            <h3>Model</h3>
+            <h3>Velikost</h3>
             <h3>Barva</h3>
-            <h3>Dodavatel</h3>
-            <h3>Množství (ks)</h3>
+            <h3>Množství</h3>
             <h3>Prodejní cena</h3>
           </div>
 
           <div className="items-list">
-            {!items.length > 0 && (
+            {!items?.length > 0 && (
               <PuffLoaderSpinnerLarge
                 active={searchLoading || updateLoading || putInLoading || putInMultipleLoading}
               />
@@ -440,13 +421,13 @@ function StoreGoods() {
                   <div className="item-plu">{item.plu}</div>
 
                   <div className="item-name label">
-                    <h1>{`${item.collection} ${item.product}`}</h1>
+                    <h1>{`${item.model}`}</h1>
+                  </div>
+                  <div className="item-name">
+                    <h2>{`${item.size}`}</h2>
                   </div>
                   <div className="item-name">
                     <h2>{`${item.color}`}</h2>
-                  </div>
-                  <div className="item-name">
-                    <h2>{`${item.supplier_nick}`}</h2>
                   </div>
                   <div className="item-name">
                     <h2>{`${item.quantity_available}`}</h2>
@@ -456,13 +437,13 @@ function StoreGoods() {
                   </div>
                   {/* Druhý řádek s kategoriemi */}
                   <div className="item-note">
-                    {item.size && (
+                    {item.supplier_nick && (
                       <div
                         className="item-category"
                         style={{
                           background: "var(--color-grd-g11)",
                         }}
-                      >{`${item.size}`}</div>
+                      >{`${item.supplier_nick}`}</div>
                     )}
                     {item.gender && (
                       <div
@@ -537,6 +518,7 @@ function StoreGoods() {
             fields={fieldsForStockInputMultiple}
             predefinedValues={selectedMultiItem}
             suppliers={suppliers}
+            vatRates={vatRates}
             onSubmit={handleSubmitMultipleItems}
             onClose={() => setShowModalMultipleItem(false)}
             onCancel={() => setShowModalMultipleItem(false)}

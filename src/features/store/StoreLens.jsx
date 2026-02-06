@@ -165,12 +165,7 @@ function StoreLens() {
       required: true,
       readOnly: true,
     },
-    {
-      varName: "collection",
-      label: "Kolekce",
-      input: "text",
-      required: false,
-    },
+
     { varName: "sph", label: "SPH", input: "number", required: false },
     { varName: "cyl", label: "CYL", input: "number", required: false },
     { varName: "ax", label: "Osa", input: "number", required: false },
@@ -401,7 +396,7 @@ function StoreLens() {
 
         <div className="show-items-panel">
           <div className="items-panel-label">
-            <h2>Brýlové obruby</h2>
+            <h2>Brýlové čočky</h2>
             <Pagination
               currentPage={page}
               totalPages={totalPages}
@@ -411,12 +406,11 @@ function StoreLens() {
               Položek: {items?.length} ks (strana {page}/{totalPages})
             </p>
           </div>
-          <div className="items-panel-table-header six-columns">
+          <div className="items-panel-table-header five-columns">
             <h3>PLU</h3>
             <h3>Brýlová čočka</h3>
-            <h3>SPH</h3>
-            <h3>CYL</h3>
-            <h3>OSA</h3>
+            <h3>SPH / CYL @ AX</h3>
+            <h3>Množství</h3>
             <h3>Prodejní cena</h3>
           </div>
 
@@ -436,7 +430,7 @@ function StoreLens() {
               items.map((item) => (
                 <div
                   key={item.id}
-                  className="item six-columns"
+                  className="item five-columns"
                   // onMouseEnter={() => setHoveredItemId(item.id)}
                   // onMouseLeave={() => setHoveredItemId(null)}
                   onClick={() => {
@@ -449,13 +443,11 @@ function StoreLens() {
                     <h2>{`${item.catalog_lens_name}`}</h2>
                   </div>
                   <div className="item-name">
-                    <h2>{`${formatValue(item.sph)}`}</h2>
+                    <h2>{`${formatValue(item.sph)} / ${formatValue(item.cyl)} @ ${item.ax}°`}</h2>
                   </div>
+
                   <div className="item-name">
-                    <h2>{`${formatValue(item.cyl)}`}</h2>
-                  </div>
-                  <div className="item-name">
-                    <h2>{`${item.ax}°`}</h2>
+                    <h2>{`${item.quantity_available} ks`}</h2>
                   </div>
                   <div className="item-name">
                     <h2>{`${Math.round(item.price)} Kč`}</h2>

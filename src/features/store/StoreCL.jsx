@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import Pagination from "../../components/pagination/Pagination.jsx";
 import Modal from "../../components/modal/Modal.jsx";
-import ModalMultipleItem from "../../components/modal/ModalMultipleItem.jsx";
+import ModalMultipleItemCatalog from "../../components/modal/ModalMultipleItemCatalog.jsx";
 import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
 import { useStoreSearch } from "../../hooks/useStoreSearch.js";
 import { useStoreUpdate } from "../../hooks/useStoreUpdate.js";
 import { useStorePutIn } from "../../hooks/useStorePutIn.js";
 import { useStorePutInMultipleItems } from "../../hooks/useStorePutInMultipleItems.js";
 import { useStoreGetSuppliers } from "../../hooks/useStoreGetSuppliers.js";
+import { formatValue } from "../../hooks/useFormatValue.js";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -18,12 +19,6 @@ function StoreCL() {
   //******************************
 
   const fieldsForStockInputMultiple = [
-    {
-      varName: "supplier_id",
-      label: "Dodavatel",
-      options: { field: "brýle" },
-      required: true,
-    },
     {
       varName: "date",
       label: "Datum příjmu",
@@ -37,28 +32,62 @@ function StoreCL() {
       required: true,
     },
     {
+      varName: "text01",
+      input: "message",
+      hidden: true,
+    },
+    {
       varName: "plu",
       label: "PLU kód",
-      input: "hidden",
+      input: "number",
       required: false,
     },
     {
-      varName: "collection",
-      label: "Kolekce",
-      input: "text",
+      varName: "code",
+      label: "Kód",
+      input: "input",
       required: false,
     },
-    { varName: "product", label: "Model", input: "text", required: false },
-    { varName: "color", label: "Barva", input: "text", required: false },
+    {
+      varName: "name",
+      label: "Název čočky",
+      input: "message",
+      required: false,
+    },
+    {
+      varName: "supplier_id",
+      label: "Dodavatel",
+      input: "message",
+      required: false,
+    },
     {
       varName: "price_buy",
       label: "Nákupní cena [bez DPH]",
       input: "number",
       required: false,
+      readOnly: true,
     },
     {
       varName: "price_sold",
       label: "Prodejní cena [Kč s DPH]",
+      input: "number",
+      required: false,
+    },
+    {
+      varName: "sph",
+      label: "SPH",
+      input: "number",
+      required: false,
+    },
+    {
+      varName: "cyl",
+      label: "CYL",
+      input: "number",
+      required: false,
+    },
+    {
+      varName: "ax",
+      label: "Osa",
       input: "number",
       required: false,
     },
@@ -69,35 +98,18 @@ function StoreCL() {
       required: false,
     },
     {
-      varName: "size",
-      label: "Velikost",
-      input: "text",
+      varName: "id",
+      label: "ID katalogové položky",
+      input: "number",
       required: false,
-    },
-    {
-      varName: "gender",
-      label: "Gender",
-      options: [`Pánská`, `Dámská`, `Uni`, `Dětská`],
-      required: false,
-    },
-    {
-      varName: "material",
-      label: "Materiál obruby",
-      options: [`plastová`, `kovová`, `kovová s klipem`, `ultem s klipem`],
-      required: false,
-    },
-    {
-      varName: "type",
-      label: "Typ obruby",
-      options: [`Dioptrická`, `Typ 2`, `Typ 3`, `Typ 4`],
-      required: false,
+      hidden: true,
     },
   ];
 
   const fieldsForStockInput = [
     {
       varName: "plu",
-      input: "hidden",  // Skryté pole
+      input: "hidden", // Skryté pole
     },
     {
       varName: "text01",
@@ -110,7 +122,7 @@ function StoreCL() {
     {
       varName: "supplier_id",
       label: "Dodavatel",
-      options: { field: "brýle" },
+      options: { field: "brýlové čočky" },
       required: true,
       readOnly: true,
     },
@@ -150,19 +162,13 @@ function StoreCL() {
     {
       varName: "supplier_id",
       label: "Dodavatel",
-      options: { field: "brýle" },
       required: true,
       readOnly: true,
     },
-    {
-      varName: "collection",
-      label: "Kolekce",
-      input: "text",
-      required: false,
-    },
-    { varName: "product", label: "Model", input: "text", required: false },
-    { varName: "color", label: "Barva", input: "text", required: false },
-    { varName: "size", label: "Velikost", input: "text", required: false },
+
+    { varName: "sph", label: "SPH", input: "number", required: false },
+    { varName: "cyl", label: "CYL", input: "number", required: false },
+    { varName: "ax", label: "Osa", input: "number", required: false },
     {
       varName: "price",
       label: "Prodejní cena [Kč s DPH]",
@@ -177,21 +183,9 @@ function StoreCL() {
       readOnly: true,
     },
     {
-      varName: "gender",
-      label: "Gender",
-      options: [`Pánská`, `Dámská`, `Uni`, `Dětská`],
-      required: false,
-    },
-    {
-      varName: "material",
-      label: "Materiál obruby",
-      options: [`plastová`, `kovová`, `kovová s klipem`, `ultem s klipem`],
-      required: false,
-    },
-    {
-      varName: "type",
-      label: "Typ obruby",
-      options: [`Dioptrická`, `Typ 2`, `Typ 3`, `Typ 4`],
+      varName: "code",
+      label: "Kód",
+      input: "text",
       required: false,
     },
   ];
@@ -216,7 +210,8 @@ function StoreCL() {
 
   // Stavové hooky
   const [showModal, setShowModal] = useState(false);
-  const [showModalMultipleItem, setShowModalMultipleItem] = useState(false);
+  const [showModalMultipleItemCatalog, setShowModalMultipleItemCatalog] =
+    useState(false);
   const [isNewItem, setIsNewItem] = useState(false);
   const [isPutInStore, setIsPutInStore] = useState(false);
   const [isPutInStoreMultiple, setIsPutInStoreMultiple] = useState(false);
@@ -235,8 +230,9 @@ function StoreCL() {
   } = useStoreSearch(storeId);
   const { loading: updateLoading, updateItem } = useStoreUpdate(storeId);
   const { loading: putInLoading, putInItem } = useStorePutIn(storeId);
-  const { loading: putInMultipleLoading, putInMultipleItems } = useStorePutInMultipleItems(storeId);
-  const { suppliers } = useStoreGetSuppliers("brýle");
+  const { loading: putInMultipleLoading, putInMultipleItems } =
+    useStorePutInMultipleItems(storeId);
+  const { suppliers } = useStoreGetSuppliers("brýlové čočky");
 
   // Paginace
   const [page, setPage] = useState(1);
@@ -276,16 +272,14 @@ function StoreCL() {
     }
     const changedItem = {
       plu: item.plu,
-      collection: item.collection,
-      product: item.product,
-      color: item.color,
+      sph: item.sph,
+      cyl: item.cyl,
+      ax: item.ax,
       price: Number(item.price),
-      gender: item.gender,
-      material: item.material,
-      type: item.type,
+      code: item.code,
       supplier_id: Number(item.supplier_id) || null,
     };
-    
+
     const result = await updateItem(changedItem);
     if (result.success) {
       searchItems(page, limit, inputSearch);
@@ -343,26 +337,26 @@ function StoreCL() {
       {
         supplier_id: 146,
         date: new Date().toISOString().split("T")[0],
-        delivery_note: "XL-654321",
+        delivery_note: "XL-654456321",
       },
       {
         plu: "",
-        collection: "NOVA",
-        product: "OPTIC",
-        color: "Funny RED",
         quantity: 1,
         price_buy: 990,
         price_sold: 1990,
-        size: "54/18-140",
-        gender: "",
-        material: "",
         type: "",
+        sph: 300,
+        cyl: -100,
+        ax: 90,
+        code: "",
+        name: "",
+        catalog_lens_id: "",
       },
     ];
 
     setIsPutInStoreMultiple(true);
     setSelectedMultiItem(predefinedValues);
-    setShowModalMultipleItem(true);
+    setShowModalMultipleItemCatalog(true);
   };
 
   //Odeslání více položek na backend
@@ -371,7 +365,7 @@ function StoreCL() {
     const result = await putInMultipleItems(values);
     if (result.success) {
       searchItems(page, limit, inputSearch);
-      setShowModalMultipleItem(false);
+      setShowModalMultipleItemCatalog(false);
       setIsPutInStoreMultiple(false);
     }
   };
@@ -395,12 +389,14 @@ function StoreCL() {
           <button onClick={() => handleSearchInStore(inputSearch)}>
             Vyhledat
           </button>
-          <button onClick={() => handleOpenMultipleItemsModal()}>Nové zboží</button>
+          <button onClick={() => handleOpenMultipleItemsModal()}>
+            Nové zboží
+          </button>
         </div>
 
         <div className="show-items-panel">
           <div className="items-panel-label">
-            <h2>Brýlové obruby</h2>
+            <h2>Brýlové čočky</h2>
             <Pagination
               currentPage={page}
               totalPages={totalPages}
@@ -410,19 +406,23 @@ function StoreCL() {
               Položek: {items?.length} ks (strana {page}/{totalPages})
             </p>
           </div>
-          <div className="items-panel-table-header six-columns">
+          <div className="items-panel-table-header five-columns">
             <h3>PLU</h3>
-            <h3>Model obruby</h3>
-            <h3>Barva</h3>
-            <h3>Dodavatel</h3>
-            <h3>Množství (ks)</h3>
+            <h3>Brýlová čočka</h3>
+            <h3>SPH / CYL @ AX</h3>
+            <h3>Množství</h3>
             <h3>Prodejní cena</h3>
           </div>
 
           <div className="items-list">
             {!items.length > 0 && (
               <PuffLoaderSpinnerLarge
-                active={searchLoading || updateLoading || putInLoading || putInMultipleLoading}
+                active={
+                  searchLoading ||
+                  updateLoading ||
+                  putInLoading ||
+                  putInMultipleLoading
+                }
               />
             )}
 
@@ -430,7 +430,7 @@ function StoreCL() {
               items.map((item) => (
                 <div
                   key={item.id}
-                  className="item six-columns"
+                  className="item five-columns"
                   // onMouseEnter={() => setHoveredItemId(item.id)}
                   // onMouseLeave={() => setHoveredItemId(null)}
                   onClick={() => {
@@ -440,29 +440,29 @@ function StoreCL() {
                   <div className="item-plu">{item.plu}</div>
 
                   <div className="item-name label">
-                    <h1>{`${item.collection} ${item.product}`}</h1>
+                    <h2>{`${item.catalog_lens_name}`}</h2>
                   </div>
                   <div className="item-name">
-                    <h2>{`${item.color}`}</h2>
+                    <h2>{`${formatValue(item.sph)} / ${formatValue(item.cyl)} @ ${item.ax}°`}</h2>
                   </div>
+
                   <div className="item-name">
-                    <h2>{`${item.supplier_nick}`}</h2>
-                  </div>
-                  <div className="item-name">
-                    <h2>{`${item.quantity_available}`}</h2>
+                    <h2>{`${item.quantity_available} ks`}</h2>
                   </div>
                   <div className="item-name">
                     <h2>{`${Math.round(item.price)} Kč`}</h2>
                   </div>
                   {/* Druhý řádek s kategoriemi */}
                   <div className="item-note">
-                    {item.size && (
+                    {item.sph && (
                       <div
                         className="item-category"
                         style={{
                           background: "var(--color-grd-g11)",
                         }}
-                      >{`${item.size}`}</div>
+                      >
+                        <h3>{`${item.supplier_nick}`}</h3>
+                      </div>
                     )}
                     {item.gender && (
                       <div
@@ -532,17 +532,18 @@ function StoreCL() {
             onClickThirdButton={handleClickOnThirdButton}
           />
         )}
-        {showModalMultipleItem && (
-          <ModalMultipleItem
+        {showModalMultipleItemCatalog && (
+          <ModalMultipleItemCatalog
             fields={fieldsForStockInputMultiple}
             predefinedValues={selectedMultiItem}
             suppliers={suppliers}
             onSubmit={handleSubmitMultipleItems}
-            onClose={() => setShowModalMultipleItem(false)}
-            onCancel={() => setShowModalMultipleItem(false)}
+            onClose={() => setShowModalMultipleItemCatalog(false)}
+            onCancel={() => setShowModalMultipleItemCatalog(false)}
             firstButton={"Připsat zboží"}
             secondButton={"Zavřít"}
             thirdButton={null}
+            storeName="StoreLens"
           />
         )}
       </div>
