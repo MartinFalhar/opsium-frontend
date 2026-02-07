@@ -135,12 +135,6 @@ function StoreGoods() {
       required: true,
       readOnly: true,
     },
-    {
-      varName: "collection",
-      label: "Kolekce",
-      input: "text",
-      required: false,
-    },
     { varName: "model", label: "Model", input: "text", required: false },
     { varName: "color", label: "Barva", input: "text", required: false },
     { varName: "size", label: "Velikost", input: "text", required: false },
@@ -158,22 +152,10 @@ function StoreGoods() {
       readOnly: true,
     },
     {
-      varName: "gender",
-      label: "Gender",
-      options: [`Pánská`, `Dámská`, `Uni`, `Dětská`],
-      required: false,
-    },
-    {
-      varName: "material",
-      label: "Materiál obruby",
-      options: [`plastová`, `kovová`, `kovová s klipem`, `ultem s klipem`],
-      required: false,
-    },
-    {
-      varName: "type",
-      label: "Typ obruby",
-      options: [`Dioptrická`, `Typ 2`, `Typ 3`, `Typ 4`],
-      required: false,
+      varName: "vat_rate",
+      label: "Sazba DPH [%]",
+      input: "number",
+      required: false,      
     },
   ];
 

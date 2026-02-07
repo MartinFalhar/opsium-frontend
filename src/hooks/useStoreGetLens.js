@@ -2,11 +2,11 @@ import { useState } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function useStoreGetLens() {
+export default function useStoreGetCatalog() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const getLensInfo = async (plu) => {
+  const getCatalogInfo = async (plu, catalogType) => {
     setIsLoading(true);
     setError(null);
     try {
@@ -16,7 +16,7 @@ export default function useStoreGetLens() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
-        body: JSON.stringify({ plu }),
+        body: JSON.stringify({ plu, catalogType }),
       });
       const data = await res.json();
 
@@ -25,17 +25,18 @@ export default function useStoreGetLens() {
         setIsLoading(false);
         return { success: true, data };
       } else {
+        // Backend vrátil error status (404, 500, atd.)
         setError(data.message || "Chyba při načítání informací o čočce");
         setIsLoading(false);
-        return { success: false, message: data.message };
+        return { success: false, message: data.message, data };
       }
     } catch (err) {
-      console.error("Chyba při volání getLensInfo:", err);
+      console.error("Chyba při volání getCatalogInfo:", err);
       setError("Chyba sítě nebo serveru");
       setIsLoading(false);
       return { success: false, message: err.message };
     }
   };
 
-  return { getLensInfo, isLoading, error };
+  return { getCatalogInfo, isLoading, error };
 }

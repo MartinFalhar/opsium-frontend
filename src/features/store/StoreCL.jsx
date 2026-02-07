@@ -43,19 +43,13 @@ function StoreCL() {
       required: false,
     },
     {
-      varName: "code",
-      label: "Kód",
-      input: "input",
-      required: false,
-    },
-    {
       varName: "name",
       label: "Název čočky",
       input: "message",
       required: false,
     },
     {
-      varName: "supplier_id",
+      varName: "supplier_nick",
       label: "Dodavatel",
       input: "message",
       required: false,
@@ -104,6 +98,14 @@ function StoreCL() {
       required: false,
       hidden: true,
     },
+    {
+      varName: "vat_type_id",
+      label: "ID typu DPH",
+      input: "number",
+      required: false,
+      hidden: true,
+    },
+    
   ];
 
   const fieldsForStockInput = [
@@ -345,9 +347,9 @@ function StoreCL() {
         price_buy: 990,
         price_sold: 1990,
         type: "",
-        sph: 300,
-        cyl: -100,
-        ax: 90,
+        sph: 800,
+        cyl: -175,
+        ax: 30,
         code: "",
         name: "",
         catalog_lens_id: "",
@@ -406,10 +408,11 @@ function StoreCL() {
               Položek: {items?.length} ks (strana {page}/{totalPages})
             </p>
           </div>
-          <div className="items-panel-table-header five-columns">
+          <div className="items-panel-table-header six-columns">
             <h3>PLU</h3>
-            <h3>Brýlová čočka</h3>
+            <h3>Typ</h3>
             <h3>SPH / CYL @ AX</h3>
+            <h3>BC</h3>
             <h3>Množství</h3>
             <h3>Prodejní cena</h3>
           </div>
@@ -430,7 +433,7 @@ function StoreCL() {
               items.map((item) => (
                 <div
                   key={item.id}
-                  className="item five-columns"
+                  className="item six-columns"
                   // onMouseEnter={() => setHoveredItemId(item.id)}
                   // onMouseLeave={() => setHoveredItemId(null)}
                   onClick={() => {
@@ -440,7 +443,7 @@ function StoreCL() {
                   <div className="item-plu">{item.plu}</div>
 
                   <div className="item-name label">
-                    <h2>{`${item.catalog_lens_name}`}</h2>
+                    <h2>{`${item.catalog_cl_name}`}</h2>
                   </div>
                   <div className="item-name">
                     <h2>{`${formatValue(item.sph)} / ${formatValue(item.cyl)} @ ${item.ax}°`}</h2>
@@ -543,7 +546,7 @@ function StoreCL() {
             firstButton={"Připsat zboží"}
             secondButton={"Zavřít"}
             thirdButton={null}
-            storeName="StoreLens"
+            storeName="StoreCL"
           />
         )}
       </div>

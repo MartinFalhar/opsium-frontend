@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ConfirmDelete from "./ConfirmDelete";
-import useStoreGetLens from "../../hooks/useStoreGetLens";
+import useStoreGetCatalog from "../../hooks/useStoreGetLens";
 
 export default function ModalMultipleItemCatalog({
   fields,
@@ -21,7 +21,7 @@ export default function ModalMultipleItemCatalog({
   const [dynamicFields, setDynamicFields] = useState([]);
   const [showGroupDetails, setShowGroupDetails] = useState([]);
 
-  const { getLensInfo, isLoading: isLoadingLens } = useStoreGetLens();
+  const { getCatalogInfo, isLoading: isLoadingLens } = useStoreGetCatalog();
 
   // Aktualizace values při změně predefinedValues nebo fields
   useEffect(() => {
@@ -51,12 +51,12 @@ export default function ModalMultipleItemCatalog({
     setValues((prev) => ({ ...prev, [varName]: value }));
   };
 
-  // Handler pro ENTER v plu poli (pouze pro StoreLens)
+  // Handler pro ENTER v plu poli (pro StoreLens, StoreCL, StoreSoldrops)
   const handleKeyDown = async (e, varName, groupIndex) => {
     if (
       e.key === "Enter" &&
       varName.startsWith("plu") &&
-      storeName === "StoreLens"
+      (storeName === "StoreLens" || storeName === "StoreCL" || storeName === "StoreSoldrops")
     ) {
       e.preventDefault(); // Zabráníme odeslání formuláře
 
@@ -64,15 +64,16 @@ export default function ModalMultipleItemCatalog({
       const pluValue = Number(values[uniqueVarName]);
 
       if (pluValue) {
-        const result = await getLensInfo(pluValue);
+        const result = await getCatalogInfo(pluValue, storeName);
 
         if (result.success && result.data) {
-          // Backend vrací { success: true, data: { success: true, data: {...actualData} } }
-          // Hook vrací result.data, což je celá response, takže potřebujeme result.data.data
-          const lensData = result.data.data || result.data;
-          const updateValues = {};
+          // Backend vrací { success: true, data: lensInfo }
+          // Hook vrací { success: true, data: lensInfo }
 
-          // Mapování sloupců z catalog_lens do formuláře
+          const data = result.data.data;
+          const updateValues = {};
+          console.log("Načtené informace z katalogu:", data);
+          // Mapování sloupců z catalogu do formuláře
           fields.slice(3).forEach((field, idx) => {
             const fieldVarName =
               groupIndex > 0 ? `${field.varName}_${groupIndex}` : field.varName;
@@ -81,11 +82,11 @@ export default function ModalMultipleItemCatalog({
             // aby se naplnily i hodnoty 0, false, null, ""
 
             if (
-              field.varName in lensData &&
-              lensData[field.varName] !== undefined &&
-              lensData[field.varName] !== null
+              field.varName in data &&
+              data[field.varName] !== undefined &&
+              data[field.varName] !== null
             ) {
-              updateValues[fieldVarName] = lensData[field.varName];
+              updateValues[fieldVarName] = data[field.varName];
             }
           });
           setValues((prev) => {
@@ -97,10 +98,16 @@ export default function ModalMultipleItemCatalog({
             next[groupIndex] = true;
             return next;
           });
-          window.showToast(`Čočka PLU ${pluValue} byla načtena z katalogu`);
+          window.showToast(`Položka PLU ${pluValue} byla načtena z katalogu`);
         } else {
+          // Skryjeme detail elementy pokud PLU neexistuje
+          setShowGroupDetails((prev) => {
+            const next = [...prev];
+            next[groupIndex] = false;
+            return next;
+          });
           window.showToast(
-            `Čočka s PLU ${pluValue} nebyla nalezena v katalogu`,
+            `Položka s PLU ${pluValue} nebyla nalezena v katalogu`,
             "error",
           );
         }
