@@ -9,6 +9,7 @@ export default function useStoreGetCatalog() {
   const getCatalogInfo = async (plu, catalogType) => {
     setIsLoading(true);
     setError(null);
+    console.log("Volám getCatalogInfo s PLU:", plu, "a typem katalogu:", catalogType);
     try {
       const res = await fetch(`${API_URL}/store/getlens`, {
         method: "POST",

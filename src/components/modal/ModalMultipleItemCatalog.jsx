@@ -13,6 +13,7 @@ export default function ModalMultipleItemCatalog({
   thirdButton,
   onClickThirdButton,
   suppliers = [],
+  vatRates = [],
   storeName = "", // Přidáváme prop pro rozlišení skladu
 }) {
   const [showConfirm, setShowConfirm] = useState(false);
@@ -27,23 +28,32 @@ export default function ModalMultipleItemCatalog({
   useEffect(() => {
     // Inicializace itemsList s jedním prázdným prvkem
     setItemsList([{ ...predefinedValues[1] }]);
-    // Inicializace dynamicFields se základními fields od indexu 3 dál
-    setDynamicFields([fields.slice(3)]);
+    // Inicializace dynamicFields se základními fields od indexu 4 dál
+    setDynamicFields([fields.slice(4)]);
 
     setShowGroupDetails([false]);
-  }, []);
 
-  // Aktualizace values při změně predefinedValues nebo fields
-  useEffect(() => {
+    // Inicializace values
     const init = {};
     fields.forEach((f, index) => {
       // První 3 položky berou hodnoty z predefinedValues[0], zbytek z predefinedValues[1]
       const sourceIndex = index < 3 ? 0 : 1;
       const val = predefinedValues?.[sourceIndex]?.[f.varName];
-      init[f.varName] = val !== undefined && val !== null ? val : "";
+      
+      // Pokud pole používá vatRates a nemá předdefinovanou hodnotu, nastav na druhý prvek
+      if (f.options && typeof f.options === "object" && !Array.isArray(f.options)) {
+        if ((val === undefined || val === null || val === "") && vatRates.length > 1) {
+          init[f.varName] = vatRates[1].id;
+        } else {
+          init[f.varName] = val !== undefined && val !== null ? val : "";
+        }
+      } else {
+        init[f.varName] = val !== undefined && val !== null ? val : "";
+      }
     });
     setValues(init);
-  }, [fields, predefinedValues]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   //Univerzální handler pro změnu hodnoty pole
   //libovolného elementu formuláře
@@ -164,8 +174,18 @@ export default function ModalMultipleItemCatalog({
     const newValues = {};
     fields.slice(3).forEach((field) => {
       const uniqueVarName = `${field.varName}_${newGroupIndex}`;
-      newValues[uniqueVarName] =
-        field.varName === "quantity" ? 1 : (newItem[field.varName] ?? "");
+      
+      // Pokud pole používá vatRates a nemá předdefinovanou hodnotu, nastav na druhý prvek
+      if (field.options && typeof field.options === "object" && !Array.isArray(field.options)) {
+        const val = newItem[field.varName];
+        if ((val === undefined || val === null || val === "") && vatRates.length > 1) {
+          newValues[uniqueVarName] = vatRates[1].id;
+        } else {
+          newValues[uniqueVarName] = field.varName === "quantity" ? 1 : (val ?? "");
+        }
+      } else {
+        newValues[uniqueVarName] = field.varName === "quantity" ? 1 : (newItem[field.varName] ?? "");
+      }
     });
     setValues((prev) => ({ ...prev, ...newValues }));
   };
@@ -245,7 +265,7 @@ export default function ModalMultipleItemCatalog({
                           typeof option === "object" && option !== null;
                         return (
                           <option key={i} value={isObject ? option.id : option}>
-                            {isObject ? option.nick : option}
+                            {isObject ? option.nick || option.rate: option}
                           </option>
                         );
                       })}
@@ -304,7 +324,7 @@ export default function ModalMultipleItemCatalog({
                   typeof field.options === "object" &&
                   !Array.isArray(field.options);
                 const optionsList = isDynamic
-                  ? suppliers
+                  ? vatRates
                   : Array.isArray(field.options)
                     ? field.options
                     : [];
@@ -348,7 +368,7 @@ export default function ModalMultipleItemCatalog({
                               key={i}
                               value={isObject ? option.id : option}
                             >
-                              {isObject ? option.nick : option}
+                              {isObject ? option.nick || option.rate: option}
                             </option>
                           );
                         })}

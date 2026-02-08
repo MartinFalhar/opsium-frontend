@@ -9,6 +9,7 @@ import { useStorePutIn } from "../../hooks/useStorePutIn.js";
 import { useStorePutInMultipleItems } from "../../hooks/useStorePutInMultipleItems.js";
 import { useStoreGetSuppliers } from "../../hooks/useStoreGetSuppliers.js";
 import { formatValue } from "../../hooks/useFormatValue.js";
+import { useStoreGetVat } from "../../hooks/useStoreGetVat.js";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -19,6 +20,12 @@ function StoreCL() {
   //******************************
 
   const fieldsForStockInputMultiple = [
+        {
+      varName: "supplier_id",
+      label: "Dodavatel",
+      options: {},
+      required: true,
+    },
     {
       varName: "date",
       label: "Datum příjmu",
@@ -62,7 +69,7 @@ function StoreCL() {
       readOnly: true,
     },
     {
-      varName: "price_sold",
+      varName: "price",
       label: "Prodejní cena [Kč s DPH]",
       input: "number",
       required: false,
@@ -98,14 +105,7 @@ function StoreCL() {
       required: false,
       hidden: true,
     },
-    {
-      varName: "vat_type_id",
-      label: "ID typu DPH",
-      input: "number",
-      required: false,
-      hidden: true,
-    },
-    
+    { varName: "vat_type_id", label: "Sazba DPH", options: {}, required: false },
   ];
 
   const fieldsForStockInput = [
@@ -190,6 +190,12 @@ function StoreCL() {
       input: "text",
       required: false,
     },
+        {
+      varName: "vat_type_id",
+      label: "Sazba DPH [%]",
+      input: "number",
+      required: false,      
+    },
   ];
 
   const categoryColorsGender = {
@@ -234,7 +240,8 @@ function StoreCL() {
   const { loading: putInLoading, putInItem } = useStorePutIn(storeId);
   const { loading: putInMultipleLoading, putInMultipleItems } =
     useStorePutInMultipleItems(storeId);
-  const { suppliers } = useStoreGetSuppliers("brýlové čočky");
+  const { suppliers } = useStoreGetSuppliers("kontaktní čočky");
+  const { vatRates } = useStoreGetVat();
 
   // Paginace
   const [page, setPage] = useState(1);
@@ -345,14 +352,14 @@ function StoreCL() {
         plu: "",
         quantity: 1,
         price_buy: 990,
-        price_sold: 1990,
+        price: 1990,
         type: "",
         sph: 800,
         cyl: -175,
         ax: 30,
         code: "",
         name: "",
-        catalog_lens_id: "",
+        catalog_lens_id: "",        
       },
     ];
 
@@ -448,7 +455,9 @@ function StoreCL() {
                   <div className="item-name">
                     <h2>{`${formatValue(item.sph)} / ${formatValue(item.cyl)} @ ${item.ax}°`}</h2>
                   </div>
-
+                  <div className="item-name">
+                    <h2>BC</h2>
+                  </div>
                   <div className="item-name">
                     <h2>{`${item.quantity_available} ks`}</h2>
                   </div>
@@ -540,6 +549,7 @@ function StoreCL() {
             fields={fieldsForStockInputMultiple}
             predefinedValues={selectedMultiItem}
             suppliers={suppliers}
+            vatRates={vatRates}
             onSubmit={handleSubmitMultipleItems}
             onClose={() => setShowModalMultipleItemCatalog(false)}
             onCancel={() => setShowModalMultipleItemCatalog(false)}

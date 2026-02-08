@@ -19,6 +19,12 @@ function StoreLens() {
   //******************************
 
   const fieldsForStockInputMultiple = [
+            {
+      varName: "supplier_id",
+      label: "Dodavatel",
+      options: {},
+      required: true,
+    },
     {
       varName: "date",
       label: "Datum příjmu",
@@ -68,7 +74,7 @@ function StoreLens() {
       readOnly: true,
     },
     {
-      varName: "price_sold",
+      varName: "price",
       label: "Prodejní cena [Kč s DPH]",
       input: "number",
       required: false,
@@ -343,7 +349,7 @@ function StoreLens() {
         plu: "",
         quantity: 1,
         price_buy: 990,
-        price_sold: 1990,
+        price: 1990,
         type: "",
         sph: 300,
         cyl: -100,

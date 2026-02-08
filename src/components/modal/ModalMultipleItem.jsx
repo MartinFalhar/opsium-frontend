@@ -270,7 +270,7 @@ export default function ModalMultipleItem({
                           const isObject =
                             typeof option === "object" && option !== null;
                           return (
-                            <option
+                            <option 
                               key={i}
                               value={isObject ? option.id : option}
                             >

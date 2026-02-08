@@ -59,7 +59,7 @@ function StoreGoods() {
       input: "number",
       required: false,
     },
-    { varName: "vat_rate", label: "Sazba DPH", options: {}, required: false },
+    { varName: "vat_type_id", label: "Sazba DPH", options: {}, required: false },
     {
       varName: "quantity",
       label: "Množství",
@@ -152,7 +152,7 @@ function StoreGoods() {
       readOnly: true,
     },
     {
-      varName: "vat_rate",
+      varName: "vat_type_id",
       label: "Sazba DPH [%]",
       input: "number",
       required: false,      
@@ -318,7 +318,7 @@ function StoreGoods() {
         quantity: 1,
         uom: "ks",
         price_buy: 99,
-        price_sold: 190,
+        price: 190,
         type: "",
       },
     ];
