@@ -12,8 +12,8 @@ import VistrainingLayout from "./layouts/VistrainingLayout";
 
 import Dashboard from "./features/dashboard/Dashboard";
 import Clients from "./features/clients/Clients";
-import Orders from "./features/invoices/Orders";
-import OrderNew from "./features/invoices/OrderNew";
+import Orders from "./features/orders/Orders";
+import OrderNew from "./features/orders/OrderNew";
 import Cashdesk from "./features/cashdesk/Cashdesk";
 import Assistant from "./features/assistant/Assistant";
 import Store from "./features/store/Store";
