@@ -8,7 +8,6 @@ import { useStoreUpdate } from "../../hooks/useStoreUpdate.js";
 import { useStorePutIn } from "../../hooks/useStorePutIn.js";
 import { useStorePutInMultipleItems } from "../../hooks/useStorePutInMultipleItems.js";
 import { useStoreGetSuppliers } from "../../hooks/useStoreGetSuppliers.js";
-import { formatValue } from "../../hooks/useFormatValue.js";
 import { useStoreGetVat } from "../../hooks/useStoreGetVat.js";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -20,7 +19,7 @@ function StoreSoldrops() {
   //******************************
 
   const fieldsForStockInputMultiple = [
-        {
+    {
       varName: "supplier_id",
       label: "Dodavatel",
       options: {},
@@ -57,7 +56,7 @@ function StoreSoldrops() {
     },
     {
       varName: "supplier_nick",
-      label: "Dodavatel",
+      label: "Výrobce",
       input: "message",
       required: false,
     },
@@ -75,29 +74,19 @@ function StoreSoldrops() {
       required: false,
     },
     {
-      varName: "sph",
-      label: "SPH",
-      input: "number",
-      required: false,
-    },
-    {
-      varName: "cyl",
-      label: "CYL",
-      input: "number",
-      required: false,
-    },
-    {
-      varName: "ax",
-      label: "Osa",
-      input: "number",
-      required: false,
-    },
-    {
       varName: "quantity",
       label: "Množství",
       input: "number",
       required: false,
     },
+    {
+      varName: "uom",
+      label: "Jednotka",
+      input: "text",
+      required: false,
+      readOnly: true,
+    },
+
     {
       varName: "id",
       label: "ID katalogové položky",
@@ -105,7 +94,13 @@ function StoreSoldrops() {
       required: false,
       hidden: true,
     },
-    { varName: "vat_type_id", label: "Sazba DPH", options: {}, required: false },
+    {
+      varName: "vat_type_id",
+      label: "Sazba DPH",
+      options: {},
+      required: false,
+      readOnly: true,
+    },
   ];
 
   const fieldsForStockInput = [
@@ -190,31 +185,15 @@ function StoreSoldrops() {
       input: "text",
       required: false,
     },
-        {
+    {
       varName: "vat_type_id",
       label: "Sazba DPH [%]",
       input: "number",
-      required: false,      
+      required: false,
     },
   ];
 
-  const categoryColorsGender = {
-    Pánská: "var(--color-grd-g2)",
-    Dámská: "var(--color-grd-g3)",
-    Uni: "var(--color-grd-g4)",
-    Dětská: "var(--color-grd-g5)",
-  };
 
-  const categoryColorsMaterial = {
-    plastová: "var(--color-grd-g6)",
-    kovová: "var(--color-grd-g7)",
-    "kovová s klipem": "var(--color-grd-g8)",
-    "ultem s klipem": "var(--color-grd-g9)",
-  };
-
-  const categoryColorsType = {
-    Dioptrická: "var(--color-grd-g10)",
-  };
 
   // Stavové hooky
   const [showModal, setShowModal] = useState(false);
@@ -359,7 +338,7 @@ function StoreSoldrops() {
         ax: 30,
         code: "",
         name: "",
-        catalog_lens_id: "",        
+        catalog_lens_id: "",
       },
     ];
 
@@ -405,7 +384,7 @@ function StoreSoldrops() {
 
         <div className="show-items-panel">
           <div className="items-panel-label">
-            <h2>Brýlové čočky</h2>
+            <h2>Roztoky a kapky</h2>
             <Pagination
               currentPage={page}
               totalPages={totalPages}
@@ -415,12 +394,10 @@ function StoreSoldrops() {
               Položek: {items?.length} ks (strana {page}/{totalPages})
             </p>
           </div>
-          <div className="items-panel-table-header six-columns">
+          <div className="items-panel-table-header four-columns">
             <h3>PLU</h3>
-            <h3>Typ</h3>
-            <h3>SPH / CYL @ AX</h3>
-            <h3>BC</h3>
-            <h3>Množství</h3>
+            <h3>Název</h3>
+            <h3>Množství</h3>            
             <h3>Prodejní cena</h3>
           </div>
 
@@ -440,7 +417,7 @@ function StoreSoldrops() {
               items.map((item) => (
                 <div
                   key={item.id}
-                  className="item six-columns"
+                  className="item one-row four-columns"
                   // onMouseEnter={() => setHoveredItemId(item.id)}
                   // onMouseLeave={() => setHoveredItemId(null)}
                   onClick={() => {
@@ -450,69 +427,15 @@ function StoreSoldrops() {
                   <div className="item-plu">{item.plu}</div>
 
                   <div className="item-name label">
-                    <h2>{`${item.catalog_cl_name}`}</h2>
+                    <h2>{`${item.catalog_soldrops_name}`}</h2>
                   </div>
                   <div className="item-name">
-                    <h2>{`${formatValue(item.sph)} / ${formatValue(item.cyl)} @ ${item.ax}°`}</h2>
-                  </div>
-                  <div className="item-name">
-                    <h2>BC</h2>
-                  </div>
-                  <div className="item-name">
-                    <h2>{`${item.quantity_available} ks`}</h2>
+                    <h2>{`${item.quantity_available}`}</h2>
                   </div>
                   <div className="item-name">
                     <h2>{`${Math.round(item.price)} Kč`}</h2>
                   </div>
-                  {/* Druhý řádek s kategoriemi */}
-                  <div className="item-note">
-                    {item.sph && (
-                      <div
-                        className="item-category"
-                        style={{
-                          background: "var(--color-grd-g11)",
-                        }}
-                      >
-                        <h3>{`${item.supplier_nick}`}</h3>
-                      </div>
-                    )}
-                    {item.gender && (
-                      <div
-                        className="item-category"
-                        style={{
-                          background:
-                            categoryColorsGender[item.gender] || "#95a5a6",
-                        }}
-                      >{`${item.gender}`}</div>
-                    )}
-                    {item.material && (
-                      <div
-                        className="item-category"
-                        style={{
-                          background:
-                            categoryColorsMaterial[item.material] || "#95a5a6",
-                        }}
-                      >{`${item.material}`}</div>
-                    )}
 
-                    {item.type && (
-                      <div
-                        className="item-category"
-                        style={{
-                          background:
-                            categoryColorsType[item.type] || "#95a5a6",
-                        }}
-                      >{`${item.type}`}</div>
-                    )}
-                    {item.note && (
-                      <div
-                        className="item-category"
-                        style={{
-                          background: "var(--color-grd-g16)",
-                        }}
-                      >{`ID ${item.note}`}</div>
-                    )}
-                  </div>
                 </div>
               ))}
           </div>

@@ -80,7 +80,10 @@ function AgendaServices() {
     try {
       const res = await fetch(`${API_URL}/agenda/services-search`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
         body: JSON.stringify({ branch_id: user.branch_id }),
       });
       const data = await res.json();
@@ -142,7 +145,10 @@ function AgendaServices() {
     try {
       const res = await fetch(`${API_URL}/agenda/services-update`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
         body: JSON.stringify({ changedItem }),
       });
       const data = await res.json();
@@ -166,8 +172,14 @@ function AgendaServices() {
     try {
       const res = await fetch(`${API_URL}/agenda/services-delete`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: selectedItem.id, branch_id: user.branch_id }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+        body: JSON.stringify({
+          id: selectedItem.id,
+          branch_id: user.branch_id,
+        }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -199,29 +211,28 @@ function AgendaServices() {
 
     setSelectedItem(newItem);
     setShowModal(true);
-
   };
 
   return (
     <div className="container">
       <div className="left-container-2">
         <div className="input-panel">
-          <div className="search-input-container">
-            <input
-              type="text"
-              value={inputSearch}
-              onChange={(e) => setInputSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSearchInCatalog(inputSearch);
-                }
-              }}
-              placeholder="Zadej hledaný text"
-            />
-            <button onClick={() => handleSearchInCatalog(inputSearch)}>
-              Vyhledat
-            </button>
-          </div>
+          <input
+            className="search-input-container"
+            type="text"
+            value={inputSearch}
+            onChange={(e) => setInputSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearchInCatalog(inputSearch);
+              }
+            }}
+            placeholder="Zadej hledaný text"
+          />
+          <button onClick={() => handleSearchInCatalog(inputSearch)}>
+            Vyhledat
+          </button>
+
           <SegmentedControl
             items={categoryFilter}
             selectedValue={selectedCategory}
@@ -235,7 +246,7 @@ function AgendaServices() {
             <h2>Výkony a služby</h2>
             <p>Nalezeno {items.length} položek</p>
           </div>
-          <div className="items-panel-header-4-columns">
+          <div className="items-panel-table-header four-columns">
             <h3>PLU</h3>
             <h3>Název služby</h3>
             <h3>Množství/Kategorie</h3>
@@ -251,11 +262,10 @@ function AgendaServices() {
                     item.category === selectedCategory) && (
                     <div
                       key={item.id}
-                      className="item"
+                      className="item one-row four-columns"
                       onClick={() => handleClick(item.id)}
                     >
-                      <div className="item-header">
-                        
+               
                         <div className="item-plu">{item.plu}</div>
 
                         <div className="item-name">
@@ -270,7 +280,7 @@ function AgendaServices() {
                           <h2>{`${Math.round(item.price)} Kč`}</h2>
 
                           <p className="vat_info">{`DPH ${Math.round(
-                            vat[item.vat_type].rate
+                            vat[item.vat_type].rate,
                           )}% `}</p>
                         </div>
 
@@ -287,8 +297,7 @@ function AgendaServices() {
                         >
                           {item.category}
                         </div>
-
-                      </div>
+                      
 
                       {/* {hoveredItemId === item.id && (
                     <div className="item-actions">
@@ -301,7 +310,7 @@ function AgendaServices() {
                     </div>
                   )} */}
                     </div>
-                  )
+                  ),
               )}
           </div>
         </div>

@@ -61,7 +61,8 @@ function Clients() {
       try {
         const res = await fetch(`${API_URL}/client/clients_list`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,},
           body: JSON.stringify({ branch_id: user.branch_id }),
         });
         const data = await res.json();
@@ -93,7 +94,8 @@ function Clients() {
     try {
       const res = await fetch(`${API_URL}/client/create_client`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,},
         body: JSON.stringify(newClient),
       });
 

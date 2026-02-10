@@ -1,8 +1,8 @@
 import React from "react";
 import { useState } from "react";
-import "./Invoices.css";
+import "./Orders.css";
 import Modal from "../../components/modal/Modal.jsx";
-import { useUser } from "../../context/UserContext";
+import { useUser } from "../../context/UserContext.jsx";
 import { useNavigate, Navigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
