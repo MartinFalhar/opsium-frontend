@@ -26,8 +26,8 @@
 }
 
 .order-container .box {
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.9);
-  /* border: 1px solid var(--color-el-g); */
+  /* box-shadow: 0 1px 5px rgba(0, 0, 0, 0.9); */
+  border: 1px solid var(--color-bg-b8);
   border-radius: 10px;
 }
 
@@ -61,7 +61,7 @@
   gap: 10px;
   flex: 1;
   padding: 15px;
-  background-color: var(--color-bg-b12);
+  background-color: var(--color-bg-b11);
 }
 
 .data-box {
@@ -75,7 +75,7 @@
   gap: 10px;
   flex: 1;
   padding: 15px;
-  background-color: var(--color-bg-b12);
+  background-color: var(--color-bg-b11);
 }
 
 /* PAYMENT INFORMATION */

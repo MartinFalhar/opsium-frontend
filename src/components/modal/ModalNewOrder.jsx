@@ -44,6 +44,7 @@ export default function ModalNewOrder({
   const [hoveredGlassesIndex, setHoveredGlassesIndex] = useState(null);
   const [expandedCentration, setExpandedCentration] = useState([]);
   const [expandedDioptrie, setExpandedDioptrie] = useState([]);
+  const [collapsedGlasses, setCollapsedGlasses] = useState([]);
   const [glassesType, setGlassesType] = useState([]);
   const [glassesFrameData, setGlassesFrameData] = useState([]);
 
@@ -93,6 +94,7 @@ export default function ModalNewOrder({
     setGlassesItems((prev) => [...prev, newGlasses]);
     setExpandedCentration((prev) => [...prev, false]);
     setExpandedDioptrie((prev) => [...prev, false]);
+    setCollapsedGlasses((prev) => [...prev, false]);
     setGlassesType((prev) => [...prev, 'DÁLKA']);
     setGlassesFrameData((prev) => [...prev, null]);
   };
@@ -102,6 +104,7 @@ export default function ModalNewOrder({
     setGlassesItems((prev) => prev.filter((_, i) => i !== index));
     setExpandedCentration((prev) => prev.filter((_, i) => i !== index));
     setExpandedDioptrie((prev) => prev.filter((_, i) => i !== index));
+    setCollapsedGlasses((prev) => prev.filter((_, i) => i !== index));
     setGlassesType((prev) => prev.filter((_, i) => i !== index));
     setGlassesFrameData((prev) => prev.filter((_, i) => i !== index));
     
@@ -134,6 +137,15 @@ export default function ModalNewOrder({
   // Toggle rozšířených dioptrií
   const toggleDioptrie = (index) => {
     setExpandedDioptrie((prev) => {
+      const updated = [...prev];
+      updated[index] = !updated[index];
+      return updated;
+    });
+  };
+
+  // Toggle sbaleného bloku brýlí
+  const toggleGlassesCollapse = (index) => {
+    setCollapsedGlasses((prev) => {
       const updated = [...prev];
       updated[index] = !updated[index];
       return updated;
@@ -424,41 +436,54 @@ export default function ModalNewOrder({
                   </div>
                 )}
           </div>
-          <h1>Brýle</h1>
+          {glassesItems.length > 0 && <h1>Brýle</h1>}
           <div className="order-items">
             {glassesItems.length > 0 && (
               <div style={{ marginTop: '20px' }}>
-                {glassesItems.map((glasses, index) => (
-                  <div 
-                    key={index}
-                    style={{ 
-                      padding: '15px', 
-                      border: '1px solid #ccc', 
-                      marginBottom: '10px', 
-                      borderRadius: '5px',
-                      position: 'relative'
-                    }}
-                    onMouseEnter={() => setHoveredGlassesIndex(index)}
-                    onMouseLeave={() => setHoveredGlassesIndex(null)}
-                  >
-                    {/* SegmentedControl pro typ brýlí */}
-                    <div style={{ marginBottom: '15px' }}>
-                      <SegmentedControl
-                        items={["DÁLKA", "BLÍZKO", "POČÍTAČ", "ÚLEVOVÉ", "KANCELÁŘSKÉ", "MULTIFOKÁLNÍ", "SLUNEČNÍ"]}
-                        selectedValue={glassesType[index] || "DÁLKA"}
-                        onClick={(value) => {
-                          const newTypes = [...glassesType];
-                          newTypes[index] = value;
-                          setGlassesType(newTypes);
-                        }}
-                        width="fit-content"
-                      />
-                    </div>
-                    <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                      {/* Dioptrie */}
-                      <div>
+                {glassesItems.map((glasses, index) => {
+                  const glassesTotal = paymentItems
+                    .filter((item) => item.glassesIndex === index)
+                    .reduce((sum, item) => sum + (item.price || 0), 0);
+                  const isCollapsed = collapsedGlasses[index];
+
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        padding: '15px',
+                        border: '1px solid #ccc',
+                        marginBottom: '10px',
+                        borderRadius: '5px',
+                        position: 'relative'
+                      }}
+                      onMouseEnter={() => setHoveredGlassesIndex(index)}
+                      onMouseLeave={() => setHoveredGlassesIndex(null)}
+                    >
+                      {isCollapsed ? (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontWeight: 'bold' }}>{glassesType[index] || 'DÁLKA'}</span>
+                          <span style={{ fontWeight: 'bold' }}>{glassesTotal.toFixed(2)} Kč</span>
+                        </div>
+                      ) : (
+                        <>
+                          {/* SegmentedControl pro typ brýlí */}
+                          <div style={{ marginBottom: '15px' }}>
+                            <SegmentedControl
+                              items={["DÁLKA", "BLÍZKO", "POČÍTAČ", "ÚLEVOVÉ", "KANCELÁŘSKÉ", "MULTIFOKÁLNÍ", "SLUNEČNÍ"]}
+                              selectedValue={glassesType[index] || "DÁLKA"}
+                              onClick={(value) => {
+                                const newTypes = [...glassesType];
+                                newTypes[index] = value;
+                                setGlassesType(newTypes);
+                              }}
+                              width="fit-content"
+                            />
+                          </div>
+                          <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                            {/* Dioptrie */}
+                            <div>
                         <div style={{ fontSize: '0.8em', marginBottom: '3px', color: '#666', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                          Dioptrie
+                          <h2>Dioptrie</h2>
                           <button
                             type="button"
                             onClick={() => toggleDioptrie(index)}
@@ -582,13 +607,13 @@ export default function ModalNewOrder({
                       </div>
 
                       {/* Oddělovač */}
-                      <div style={{ width: '1px', height: '60px', backgroundColor: '#ccc', margin: '20px 5px 0 5px' }}></div>
+                      <div style={{ width: '1px', height: '130px', backgroundColor: '#ccc', margin: '20px 5px 0 5px' }}></div>
 
                       {/* Centrační údaje */}
                       <div style={{ display: 'grid', gridTemplateColumns: expandedCentration[index] ? '1fr auto' : '1fr', gap: '10px' }}>
                         <div>
                           <div style={{ fontSize: '0.8em', marginBottom: '3px', color: '#666', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            Centrační údaje
+                            <h2>Centrační údaje</h2>
                             <button
                               type="button"
                               onClick={() => toggleCentration(index)}
@@ -691,95 +716,127 @@ export default function ModalNewOrder({
                           </div>
                         )}
                       </div>
-                    </div>
-
-                    {/* Obruby, Zábrus, Brýlové čočky */}
-                    <div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      <div>
-                        <input
-                          type="text"
-                          value={glasses.obruby}
-                          onChange={(e) => handleGlassesChange(index, 'shared', 'obruby', e.target.value)}
-                          onKeyPress={(e) => handleFramePluKeyPress(e, index)}
-                          placeholder="OBRUBA"
-                          style={{ fontSize: '0.9em', fontWeight: 'bold', padding: '5px', width: '100%' }}
-                        />
-                        {glassesFrameData[index] && (
-                          <div style={{ marginTop: '5px', padding: '10px', background: 'var(--color-bg-b11)', borderRadius: '5px', fontSize: '0.85em' }}>
-                            <div><strong>Kolekce:</strong> {glassesFrameData[index].collection}</div>
-                            <div><strong>Produkt:</strong> {glassesFrameData[index].product}</div>
-                            <div><strong>Barva:</strong> {glassesFrameData[index].color}</div>
-                            <div><strong>Velikost:</strong> {glassesFrameData[index].size}</div>
-                            <div><strong>Pohlaví:</strong> {glassesFrameData[index].gender}</div>
-                            <div><strong>Materiál:</strong> {glassesFrameData[index].material}</div>
-                            <div><strong>Typ:</strong> {glassesFrameData[index].type}</div>
-                            <div><strong>Cena:</strong> {glassesFrameData[index].price} Kč</div>
-                            <div><strong>Sazba DPH:</strong> {glassesFrameData[index].rate}%</div>
-                            {glassesFrameData[index].supplier_nick && (
-                              <div><strong>Dodavatel:</strong> {glassesFrameData[index].supplier_nick}</div>
-                            )}
                           </div>
-                        )}
-                      </div>
-                      <input
-                        type="text"
-                        value={glasses.zabrus}
-                        onChange={(e) => handleGlassesChange(index, 'shared', 'zabrus', e.target.value)}
-                        placeholder="ZÁBRUS"
-                        style={{ fontSize: '0.9em', fontWeight: 'bold', padding: '5px' }}
-                      />
-                      <input
-                        type="text"
-                        value={glasses.brylove_cocky}
-                        onChange={(e) => handleGlassesChange(index, 'shared', 'brylove_cocky', e.target.value)}
-                        placeholder="BRÝLOVÉ ČOČKY"
-                        style={{ fontSize: '0.9em', fontWeight: 'bold', padding: '5px' }}
-                      />
+
+                          {/* Obruby, Zábrus, Brýlové čočky */}
+                          <div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <div>
+                              <input
+                                type="text"
+                                value={glasses.obruby}
+                                onChange={(e) => handleGlassesChange(index, 'shared', 'obruby', e.target.value)}
+                                onKeyPress={(e) => handleFramePluKeyPress(e, index)}
+                                placeholder="OBRUBA"
+                                style={{ fontSize: '0.9em', fontWeight: 'bold', padding: '5px', width: '100%' }}
+                              />
+                              {glassesFrameData[index] && (
+                                <div style={{ marginTop: '5px', padding: '10px', background: 'var(--color-bg-b11)', borderRadius: '5px', fontSize: '0.85em' }}>
+                                  <div><strong>Kolekce:</strong> {glassesFrameData[index].collection}</div>
+                                  <div><strong>Produkt:</strong> {glassesFrameData[index].product}</div>
+                                  <div><strong>Barva:</strong> {glassesFrameData[index].color}</div>
+                                  <div><strong>Velikost:</strong> {glassesFrameData[index].size}</div>
+                                  <div><strong>Pohlaví:</strong> {glassesFrameData[index].gender}</div>
+                                  <div><strong>Materiál:</strong> {glassesFrameData[index].material}</div>
+                                  <div><strong>Typ:</strong> {glassesFrameData[index].type}</div>
+                                  <div><strong>Cena:</strong> {glassesFrameData[index].price} Kč</div>
+                                  <div><strong>Sazba DPH:</strong> {glassesFrameData[index].rate}%</div>
+                                  {glassesFrameData[index].supplier_nick && (
+                                    <div><strong>Dodavatel:</strong> {glassesFrameData[index].supplier_nick}</div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            <input
+                              type="text"
+                              value={glasses.zabrus}
+                              onChange={(e) => handleGlassesChange(index, 'shared', 'zabrus', e.target.value)}
+                              placeholder="ZÁBRUS"
+                              style={{ fontSize: '0.9em', fontWeight: 'bold', padding: '5px' }}
+                            />
+                            <input
+                              type="text"
+                              value={glasses.brylove_cocky}
+                              onChange={(e) => handleGlassesChange(index, 'shared', 'brylove_cocky', e.target.value)}
+                              placeholder="BRÝLOVÉ ČOČKY"
+                              style={{ fontSize: '0.9em', fontWeight: 'bold', padding: '5px' }}
+                            />
+                          </div>
+                        </>
+                      )}
+                      {hoveredGlassesIndex === index && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => toggleGlassesCollapse(index)}
+                            style={{
+                              position: 'absolute',
+                              right: '44px',
+                              top: '10px',
+                              background: '#666',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '24px',
+                              height: '24px',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: 0
+                            }}
+                          >
+                            {isCollapsed ? '^' : 'v'}
+                          </button>
+                          <button
+                            onClick={() => handleRemoveGlasses(index)}
+                            style={{
+                              position: 'absolute',
+                              right: '10px',
+                              top: '10px',
+                              background: 'red',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '24px',
+                              height: '24px',
+                              cursor: 'pointer',
+                              fontSize: '18px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: 0
+                            }}
+                          >
+                            −
+                          </button>
+                        </>
+                      )}
                     </div>
-                    {hoveredGlassesIndex === index && (
-                      <button
-                        onClick={() => handleRemoveGlasses(index)}
-                        style={{
-                          position: 'absolute',
-                          right: '10px',
-                          top: '10px',
-                          background: 'red',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '50%',
-                          width: '24px',
-                          height: '24px',
-                          cursor: 'pointer',
-                          fontSize: '18px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: 0
-                        }}
-                      >
-                        −
-                      </button>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
         </div>
         <div className="payment-container">
-          <h1>Platby</h1>
+          <h2
+          style={{
+            color:"var(--color-bg-b13)"
+          }}
+          >Platby</h2>
 
           {/* Seznam položek k platbě */}
           <div className="payment-information" style={{ width: '100%' }}>
             {paymentItems.length > 0 && (
               <>
                 {paymentItems.map((item, index) => (
-                  <div key={index} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid var(--color-el-g)' }}>
+                  <div key={index} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid var(--color-el-e)' }}>
                     <span>{item.model}</span>
                     <span>{item.price.toFixed(2)} Kč <span style={{ fontSize: '0.7em' }}>(DPH: {item.rate}%)</span></span>
                   </div>
                 ))}
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', marginTop: '10px', fontWeight: 'bold', fontSize: '1.2em', borderTop: '2px solid var(--color-el-g)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', marginTop: '10px', fontWeight: 'bold', fontSize: '1.2em', borderTop: '2px solid var(--color-el-i)' }}>
                   <span>Celkem:</span>
                   <span>{paymentItems.reduce((sum, item) => sum + item.price, 0).toFixed(2)} Kč</span>
                 </div>
