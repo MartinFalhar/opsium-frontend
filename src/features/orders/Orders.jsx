@@ -10,11 +10,23 @@ import SegmentedControl from "../../components/controls/SegmentedControl.jsx";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Invoices() {
+  const [orderInformation, setOrderInformation] = useState({});
   const [searchInvoice, setSearchInvoices] = useState("");
   const [showModal, setShowModal] = useState(false);
   const { activeId } = useUser();
   const [daysOldSelection, setDaysOldSelection] = useState("vše");
   const [statusSelection, setStatusSelection] = useState("");
+
+  const initialValues = {
+    client_id: activeId?.client_id ?? "",
+    member_id: activeId?.member_id ?? "", 
+    // name: activeId?.name ?? "",
+    surname: activeId?.surname ?? "",
+    date: new Date().toLocaleDateString("cs-CZ"),
+    name: "Pepa",
+  };
+
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const daysOldOptions = [
     "dnes",
@@ -24,8 +36,8 @@ function Invoices() {
     "14 dnů",
     "měsíc",
     "vše",
-  ];
-  const statusOptions = ["open", "paid", "canceled", "issued"];
+  ];  
+  
   const daysOldMap = {
     dnes: 1,
     včera: 2,
@@ -35,9 +47,19 @@ function Invoices() {
     měsíc: 30,
     vše: null,
   };
+  const statusOptions = ["otevřeno", "zaplaceno", "zrušeno", "vydáno", "vše"];
+
+  const statusMap = {
+    otevřeno: "open",
+    zaplaceno: "paid",
+    zrušeno: "canceled",
+    vydáno: "issued",
+    vše: "",
+  };
+
 
   const daysOldFilter = daysOldMap[daysOldSelection] ?? null;
-  const statusFilter = statusSelection;
+  const statusFilter = statusMap[statusSelection] ?? "";
   const clientIdFilter = null;
   const {
     orders: invoices,
@@ -232,8 +254,8 @@ function Invoices() {
       <div>
         {showModal && (
           <ModalNewOrder
-            fields={orderFields}
-            initialValues={orderInitialValues}
+            orderInformation={orderInformation}
+            initialValues={initialValues}
             onSubmit={handleSubmitNewOrder}
             onClose={() => setShowModal(false)}
             onCancel={() => setShowModal(false)}

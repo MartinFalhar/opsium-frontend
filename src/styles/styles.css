@@ -36,6 +36,7 @@
   --color-bg-b10: #d9dcde;
   --color-bg-b11: #e0e7f0;
   --color-bg-b12: #f3f4f6;
+  --color-bg-b13: #ffffff;
   --color-grd-g1: linear-gradient(45deg, rgb(255, 175, 3), rgb(255, 0, 0));
   --color-grd-g2: linear-gradient(
     45deg,
@@ -200,7 +201,7 @@ textarea {
 
 h1 {
   font-size: clamp(var(--font-size-small), 2.5vw, var(--font-size-xlarge));
-  color: var(--color-bg-b11);
+  color: var(--color-bg-b3);
   text-align: left;
   font-weight: 800;
   letter-spacing: 1px;

@@ -1,0 +1,113 @@
+.modal.new-order-modal {
+  width: 80%;
+  height: 90%;
+  max-width: 95%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+  margin: 0 auto;
+  gap: 10px;
+  background-color: var(--color-bg-b11);
+}
+
+/* ORDER  */
+.order-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 4;
+  /* border: 1px solid var(--color-el-g); */
+  scroll-behavior: auto;
+  overflow-y: auto;
+  height: 100%;
+  max-height: 100%;
+  padding: 10px;
+  
+}
+
+.order-container .box {
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.9);
+  /* border: 1px solid var(--color-el-g); */
+  border-radius: 10px;
+}
+
+.order-container input {
+  background: var(--color-bg-b13);
+  border: none;
+  font-size: medium;
+  height: none;
+  width: none;
+  padding: none;
+  margin: none;
+}
+
+.order-container input.tiny-input {
+  padding: 0 5px;
+  width: 50px;
+  font-size: small;
+  background-color: var(--color-bg-b11);
+  text-align: center;
+}
+
+.order-information {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+}
+
+.order-information-client {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  padding: 15px;
+  background-color: var(--color-bg-b12);
+}
+
+.data-box {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+.order-information-attributes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  padding: 15px;
+  background-color: var(--color-bg-b12);
+}
+
+/* PAYMENT INFORMATION */
+.payment-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+  background: var(--color-bg-b3);
+  padding: 10px;
+  height: 100%;
+  border-radius: 10px;
+  color: var(--color-bg-b13);
+}
+
+.payment-information {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+}
+
+.order-obligatory-items {
+  border-top: 1px solid var(--color-el-e);
+  display: flex;
+  flex-direction: column;
+ 
+}
+
+.order-items {
+  border-top: 1px solid var(--color-el-e);
+  display: flex;
+  flex-direction: column;
+}
