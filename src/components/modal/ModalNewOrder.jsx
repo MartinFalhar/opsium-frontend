@@ -48,6 +48,16 @@ export default function ModalNewOrder({
     "E-mail",
   ]);
 
+  const glassesTypeOptions = [
+    "DÁLKA",
+    "BLÍZKO",
+    "POČÍTAČ",
+    "ÚLEVOVÉ",
+    "KANCELÁŘSKÉ",
+    "MULTIFOKÁLNÍ",
+    "SLUNEČNÍ",
+  ];
+
   // Seznam povinných položek zakázky
   const [obligatoryItems, setObligatoryItems] = useState([]);
   const [hoveredItemIndex, setHoveredItemIndex] = useState(null);
@@ -58,6 +68,8 @@ export default function ModalNewOrder({
   const [expandedDioptrie, setExpandedDioptrie] = useState([]);
   const [collapsedGlasses, setCollapsedGlasses] = useState([]);
   const [glassesType, setGlassesType] = useState([]);
+  const [glassesTypeCustomMode, setGlassesTypeCustomMode] = useState([]);
+  const [glassesTypeCustomValue, setGlassesTypeCustomValue] = useState([]);
   const [glassesFrameData, setGlassesFrameData] = useState([]);
 
   // Položky k platbě
@@ -128,6 +140,8 @@ export default function ModalNewOrder({
     setExpandedDioptrie((prev) => [...prev, false]);
     setCollapsedGlasses((prev) => [...prev, false]);
     setGlassesType((prev) => [...prev, "DÁLKA"]);
+    setGlassesTypeCustomMode((prev) => [...prev, false]);
+    setGlassesTypeCustomValue((prev) => [...prev, ""]);
     setGlassesFrameData((prev) => [...prev, null]);
   };
 
@@ -138,6 +152,8 @@ export default function ModalNewOrder({
     setExpandedDioptrie((prev) => prev.filter((_, i) => i !== index));
     setCollapsedGlasses((prev) => prev.filter((_, i) => i !== index));
     setGlassesType((prev) => prev.filter((_, i) => i !== index));
+    setGlassesTypeCustomMode((prev) => prev.filter((_, i) => i !== index));
+    setGlassesTypeCustomValue((prev) => prev.filter((_, i) => i !== index));
     setGlassesFrameData((prev) => prev.filter((_, i) => i !== index));
 
     // Odebrat z paymentItems položku spojenou s tímto indexem brýlí
@@ -534,6 +550,8 @@ export default function ModalNewOrder({
                     .filter((item) => item.glassesIndex === index)
                     .reduce((sum, item) => sum + (item.price || 0), 0);
                   const isCollapsed = collapsedGlasses[index];
+                  const currentSelection = glassesType[index] || "DÁLKA";
+                  const isCustomMode = glassesTypeCustomMode[index];
 
                   return (
                     <div
@@ -545,53 +563,128 @@ export default function ModalNewOrder({
                         position: "relative",
                       }}
                     >
-                      <div className="header">
+                      <div
+                        className={`header${
+                          isCollapsed ? " header-compact" : ""
+                        }`}
+                        onClick={() => toggleGlassesCollapse(index)}
+                      >
                         <span className="header-title">
-                          {glassesType[index] || "DÁLKA"}
+                          {isCustomMode ? (
+                            <input
+                              type="text"
+                              value={glassesTypeCustomValue[index] || ""}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => {
+                                const customValue = e.target.value;
+                                const newCustomValues = [
+                                  ...glassesTypeCustomValue,
+                                ];
+                                const newTypes = [...glassesType];
+
+                                newCustomValues[index] = customValue;
+                                newTypes[index] = customValue;
+
+                                setGlassesTypeCustomValue(newCustomValues);
+                                setGlassesType(newTypes);
+                              }}
+                              placeholder="Dálka"
+                            />
+                          ) : (
+                            <select
+                              value={
+                                glassesTypeOptions.includes(currentSelection)
+                                  ? currentSelection
+                                  : "DÁLKA"
+                              }
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => {
+                                const newTypes = [...glassesType];
+
+                                newTypes[index] = e.target.value;
+                                setGlassesType(newTypes);
+                              }}
+                            >
+                              {glassesTypeOptions.map((option) => (
+                                <option key={option} value={option}>
+                                  {option}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setGlassesTypeCustomMode((prev) => {
+                                const updated = [...prev];
+                                const nextMode = !updated[index];
+                                updated[index] = nextMode;
+
+                                if (!nextMode) {
+                                  setGlassesType((prevTypes) => {
+                                    const nextTypes = [...prevTypes];
+                                    nextTypes[index] =
+                                      glassesTypeOptions.includes(
+                                        nextTypes[index],
+                                      )
+                                        ? nextTypes[index]
+                                        : "DÁLKA";
+                                    return nextTypes;
+                                  });
+                                } else {
+                                  setGlassesTypeCustomValue((prevValues) => {
+                                    const nextValues = [...prevValues];
+                                    nextValues[index] =
+                                      prevValues[index] || currentSelection;
+                                    return nextValues;
+                                  });
+                                }
+
+                                return updated;
+                              });
+                            }}
+                            style={{
+                              width: "16px",
+                              height: "16px",
+                              padding: 0,
+                              border: "1px solid var(--color-bg-g13)",
+                              background: "transparent",
+                              cursor: "pointer",
+                              fontSize: "19px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              borderRadius: "3px",
+                              marginLeft: "6px",
+                              color: "var(--color-bg-g13)",
+                            }}
+                          >
+                            ...
+                          </button>
                         </span>
                         <span className="header-total">
-                          {glassesTotal.toFixed(2)} Kč
+                          <h1
+                            style={{
+                              color: "var(--color-bg-g13)",
+                            }}
+                          >
+                            {glassesTotal.toFixed(2)} Kč
+                          </h1>
                         </span>
-                        <div className="header-actions">
-                          <button
-                            type="button"
-                            className="header-action"
-                            onClick={() => toggleGlassesCollapse(index)}
-                          >
-                            {isCollapsed ? "^" : "v"}
-                          </button>
-                          <button
-                            type="button"
-                            className="header-action header-action-delete"
-                            onClick={() => handleRemoveGlasses(index)}
-                          >
-                            −
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          className="header-action-delete"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveGlasses(index);
+                          }}
+                        >
+                          −
+                        </button>
                       </div>
                       {!isCollapsed && (
                         <div className="glasses-content">
-                          {/* SegmentedControl pro typ brýlí */}
-                          <div style={{ marginBottom: "15px" }}>
-                            <SegmentedControl
-                              items={[
-                                "DÁLKA",
-                                "BLÍZKO",
-                                "POČÍTAČ",
-                                "ÚLEVOVÉ",
-                                "KANCELÁŘSKÉ",
-                                "MULTIFOKÁLNÍ",
-                                "SLUNEČNÍ",
-                              ]}
-                              selectedValue={glassesType[index] || "DÁLKA"}
-                              onClick={(value) => {
-                                const newTypes = [...glassesType];
-                                newTypes[index] = value;
-                                setGlassesType(newTypes);
-                              }}
-                              width="fit-content"
-                            />
-                          </div>
                           <div
                             style={{
                               display: "flex",
