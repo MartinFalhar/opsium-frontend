@@ -98,6 +98,11 @@
   padding: 20px;
 }
 
+.payment-items-scroll {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
 .order-obligatory-items {
   border-top: 1px solid var(--color-el-e);
   display: flex;
@@ -192,4 +197,248 @@
 
 .order-items .glasses-content {
   padding: 25px;
+}
+
+/* Specific width inputs */
+.input-post-code {
+  width: 90px;
+}
+
+/* PLU and buttons container */
+.plu-buttons-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.btn-add-item {
+  padding: 8px 12px;
+  white-space: nowrap;
+  width: auto;
+  height: fit-content;
+}
+
+/* Error message */
+.error-message {
+  color: red;
+}
+
+/* Obligatory items list */
+.obligatory-items-list {
+  margin-top: 20px;
+}
+
+.obligatory-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  position: relative;
+  align-items: center;
+}
+
+.obligatory-item-rate {
+  font-size: 0.7em;
+}
+
+.btn-remove-item {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Glasses items list */
+.glasses-items-list {
+  margin-top: 20px;
+}
+
+.glasses-item-wrapper {
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  border-radius: 15px;
+  position: relative;
+}
+
+.glasses-total-h1 {
+  color: var(--color-bg-g13);
+}
+
+/* Button for custom/select toggle */
+.btn-glasses-type-toggle {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 1px solid var(--color-bg-g13);
+  background: transparent;
+  cursor: pointer;
+  font-size: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  margin-left: 6px;
+  color: var(--color-bg-g13);
+}
+
+/* Glasses content layout */
+.glasses-main-content {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+/* Dioptrie section */
+.dioptrie-header {
+  font-size: 0.8em;
+  margin-bottom: 3px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-toggle-expand {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 1px solid #666;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+}
+
+.dioptrie-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.eyes-label {
+  width: 80px;
+}
+
+.eyes-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.eyes-inputs-mb {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.input-dioptrie {
+  width: 80px;
+  font-size: 0.9em;
+  font-weight: bold;
+  padding: 0 5px;
+}
+
+/* Vertical separator */
+.separator-vertical {
+  width: 1px;
+  height: 130px;
+  background-color: #ccc;
+  margin: 20px 5px 0 5px;
+}
+
+/* Centration section */
+.centration-container {
+  display: grid;
+  gap: 10px;
+}
+
+.centration-container-expanded {
+  grid-template-columns: 1fr auto;
+}
+
+.centration-container-normal {
+  grid-template-columns: 1fr;
+}
+
+.pbs-container {
+  display: flex;
+  align-items: center;
+}
+
+/* Frame, grinding, lenses section */
+.frame-section {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-frame-item {
+  font-size: 0.9em;
+  font-weight: bold;
+  padding: 5px;
+}
+
+.input-frame-full {
+  font-size: 0.9em;
+  font-weight: bold;
+  padding: 5px;
+  width: 100%;
+}
+
+.frame-data-display {
+  margin-top: 5px;
+  padding: 10px;
+  background: var(--color-bg-b11);
+  border-radius: 5px;
+  font-size: 0.85em;
+}
+
+/* Payment section */
+.payment-header-title {
+  color: var(--color-bg-b13);
+}
+
+.payment-information-full {
+  width: 100%;
+}
+
+.payment-item-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--color-el-e);
+}
+
+.payment-item-rate {
+  font-size: 0.7em;
+}
+
+.payment-total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 1.2em;
+  border-top: 2px solid var(--color-el-i);
 }
