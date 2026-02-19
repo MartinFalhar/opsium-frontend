@@ -9,6 +9,26 @@ import { useUser } from "../../context/UserContext";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Clients() {
+  const formatContactValue = (value) => {
+    if (value === null || value === undefined || value === "") return "—";
+
+    if (Array.isArray(value)) {
+      return value.filter(Boolean).join(", ") || "—";
+    }
+
+    if (typeof value === "object") {
+      return (
+        Object.entries(value)
+          .filter(([, itemValue]) => itemValue !== null && itemValue !== "")
+          // .map(([key, itemValue]) => `${key}: ${itemValue}`)
+          .map(([key, itemValue]) => `${itemValue}`)
+          .join(", ") || "—"
+      );
+    }
+
+    return String(value);
+  };
+
   const fields = [
     {
       varName: "degree_before",
@@ -37,7 +57,7 @@ function Clients() {
   const [searchClient, setSearchClient] = useState("");
   const [clients, setClients] = useState([]);
   const [showModal, setShowModal] = useState(false);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const addClient = (newClient) => {
     setHeaderClients((prev) => {
@@ -53,7 +73,7 @@ function Clients() {
       ];
     });
 
-    navigate(`/client/${newClient.id}`)
+    navigate(`/client/${newClient.id}`);
   };
 
   useEffect(() => {
@@ -61,8 +81,10 @@ function Clients() {
       try {
         const res = await fetch(`${API_URL}/client/clients_list`, {
           method: "POST",
-          headers: { "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,},
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
           body: JSON.stringify({ branch_id: user.branch_id }),
         });
         const data = await res.json();
@@ -94,8 +116,10 @@ function Clients() {
     try {
       const res = await fetch(`${API_URL}/client/create_client`, {
         method: "POST",
-        headers: { "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,},
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
         body: JSON.stringify(newClient),
       });
 
@@ -111,38 +135,76 @@ function Clients() {
   };
 
   return (
-    <div className="clients-container">
-      <div className="clients-left-column">
-        <div className="clients-search-container">
-          <div className="client-search">
-            <input
-              className="client-search-input"
-              type="text"
-              value={searchClient}
-              onChange={(e) => setSearchClient(e.target.value)}
-              placeholder="Hledej klienta"
-            />
-            <button type="submit">Hledej</button>
+    <div className="container">
+      <div className="left-container-2">
+        <div className="input-panel">
+          <input
+            className="search-input-container"
+            type="text"
+            value={searchClient}
+            onChange={(e) => setSearchClient(e.target.value)}
+            placeholder="Hledej klienta"
+          />
+          <button type="submit">Hledej</button>
           <button onClick={() => setShowModal(true)}>Přidat klienta</button>
+        </div>
+        <div className="show-items-panel">
+          <div className="items-panel-label">
+            <h1>Nalezeno {clients.length} klientů</h1>
+          </div>
+          <div className="items-panel-table-header five-columns">
+            <h3>ID</h3>
+            <h3>Jméno / Adresa</h3>
+            <h3>Telefon</h3>
+            <h3>Email</h3>
+            <h3>Zakázka</h3>
+          </div>
+          <div className="items-list">
+            {clients.length > 0 &&
+              clients.map((client) => (
+                <div
+                  key={client.id}
+                  className="item five-columns"
+                  onClick={() => addClient(client)}
+                >
+                  <div className="item-plu">
+                    <h1>{`${client.id}`}</h1>
+                  </div>
+                  <div className="item-name">
+                    <h1>
+                      {`${client.degree_before} ${client.name} ${client.surname}, ${client.degree_after}`}{" "}
+                    </h1>
+                  </div>
+                  <div className="item-name">
+                    <p
+                      style={{
+                        fontSize: "14px",
+                      }}
+                    >
+                      {formatContactValue(client.phone)}
+                    </p>
+                  </div>
+                  <div className="item-name">
+                    <p
+                      style={{
+                        fontSize: "14px",
+                      }}
+                    >
+                      {formatContactValue(client.email)}
+                    </p>
+                  </div>
+                  <div className="item-amount">číslo zakázky</div>
+
+                  <div className="item-name">
+                    <p>
+                      {`${client.street}, ${client.city}, ${client.post_code}`}{" "}
+                    </p>
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
-        <div className="clients-list-container">
-          <h1>Nalezeno {clients.length} klientů</h1>
-          {clients.length > 0 &&
-            clients.map((client) => (
-              <div
-                key={client.id}
-                className="client-item"
-                onClick={() => addClient(client)}
-              >
-                <h1>
-                  {`${client.degree_before} ${client.name} ${client.surname}, ${client.degree_after}`}{" "}
-                </h1>
-                <p>{`${client.street} ${client.city} ${client.post_code} DB ID: ${client.id}`}</p>
-              </div>
-            ))}
-        </div>
-      </div>{" "}
+      </div>
       <div>
         {showModal && (
           <Modal
@@ -151,9 +213,6 @@ function Clients() {
             onClose={() => setShowModal(false)}
           />
         )}
-      </div>
-      <div className="clients-right-column">
-        <h1>Filtry</h1>
       </div>
     </div>
   );

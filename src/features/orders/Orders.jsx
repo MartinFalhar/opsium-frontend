@@ -6,27 +6,42 @@ import { useUser } from "../../context/UserContext.jsx";
 import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
 import Pagination from "../../components/pagination/Pagination.jsx";
 import { useOrdersGetList } from "../../hooks/useOrdersGetList.js";
+import { useOrdersNew } from "../../hooks/useOrdersNew.js";
 import SegmentedControl from "../../components/controls/SegmentedControl.jsx";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Invoices() {
-  const [orderInformation, setOrderInformation] = useState({});
+  const [orderInformation] = useState({});
   const [searchInvoice, setSearchInvoices] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const { activeId } = useUser();
+  const [newOrderNumberFormatted, setNewOrderNumberFormatted] = useState("");
+  const { user, activeId } = useUser();
   const [daysOldSelection, setDaysOldSelection] = useState("vše");
   const [statusSelection, setStatusSelection] = useState("");
 
   const initialValues = {
     client_id: activeId?.client_id ?? "",
-    member_id: activeId?.member_id ?? "", 
+    member_id: activeId?.member_id ?? "",
     // name: activeId?.name ?? "",
-    surname: activeId?.surname ?? "",
     date: new Date().toLocaleDateString("cs-CZ"),
-    name: "Pepa",
+    degree_before: "Ing.",
+    name: "Robert",
+    surname: "Okulla",
+    degree_after: "Ph.D.",
+    street: "Hlavní 123",
+    city: "Praha",
+    post_code: "11000",
+    email: "robert.okulla@example.com",
+    phone: "+420123456789",
   };
 
-  const [showConfirm, setShowConfirm] = useState(false);
+
+  const formatInvoiceNumber = (invoice) => {
+    const yearShort = String(invoice?.year ?? "").slice(-2).padStart(2, "0");
+    const branch = String(invoice?.branch_id ?? "").padStart(2, "0");
+    const number = String(invoice?.number ?? "").padStart(5, "0");
+    return `${yearShort}${branch}${number}`;
+  };
 
   const daysOldOptions = [
     "dnes",
@@ -36,8 +51,8 @@ function Invoices() {
     "14 dnů",
     "měsíc",
     "vše",
-  ];  
-  
+  ];
+
   const daysOldMap = {
     dnes: 1,
     včera: 2,
@@ -57,7 +72,6 @@ function Invoices() {
     vše: "",
   };
 
-
   const daysOldFilter = daysOldMap[daysOldSelection] ?? null;
   const statusFilter = statusMap[statusSelection] ?? "";
   const clientIdFilter = null;
@@ -71,6 +85,7 @@ function Invoices() {
     status: statusFilter,
     clientId: clientIdFilter,
   });
+  const { createOrder, loading: creatingOrder } = useOrdersNew();
 
   // Paginace
   const [page, setPage] = useState(1);
@@ -78,84 +93,39 @@ function Invoices() {
   const [totalPages, setTotalPages] = useState(1);
   const paginatedInvoices = invoices.slice((page - 1) * limit, page * limit);
 
-  const orderFields = [
-    {
-      varName: "client_id",
-      label: "ID klienta",
-      input: "number",
-      required: true,
-    },
-    {
-      varName: "member_id",
-      label: "ID člena",
-      input: "number",
-      required: true,
-    },
-    {
-      varName: "attrib",
-      label: "Atributy (JSON)",
-      input: "textarea",
-      required: false,
-      rows: 3,
-    },
-    {
-      varName: "content",
-      label: "Obsah (JSON)",
-      input: "textarea",
-      required: false,
-      rows: 3,
-    },
-    {
-      varName: "note",
-      label: "Poznámka",
-      input: "textarea",
-      required: false,
-      rows: 3,
-    },
-  ];
-
-  const orderInitialValues = {
-    client_id: activeId?.client_id ?? "",
-    member_id: activeId?.member_id ?? "",
-    attrib: "",
-    content: "",
-    note: "",
-  };
-
   function handlePrintInvoice(invoice) {
     console.log("Tisk zakázky:", invoice.id);
     window.open(`${API_URL}/pdf/invoice/${invoice.id}`, "_blank");
   }
 
-  const handleSubmitNewOrder = async (values) => {
-    const newOrder = {
-      client_id: values.client_id,
-      member_id: values.member_id,
-      attrib: values.attrib,
-      content: values.content,
-      note: values.note,
-    };
+  const handleOpenNewOrder = async () => {
+    console.log("Active ID:", activeId);
+    console.log("User:", user);
+
+
+    if (!activeId?.client_id || !activeId?.member_id || !user?.branch_id) {
+      alert("Chybí client_id, member_id nebo branch_id.");
+      return;
+    }
 
     try {
-      const res = await fetch(`${API_URL}/store/new-order`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-        body: JSON.stringify(newOrder),
+      const createdOrder = await createOrder({
+        client_id: activeId.client_id,
+        branch_id: user.branch_id,
+        member_id: activeId.member_id,
       });
 
-      if (res.ok) {
-        alert("Úspěšně odesláno!");
-        refresh();
-      } else {
-        alert("Chyba při odesílání.");
-      }
+      setNewOrderNumberFormatted(formatInvoiceNumber(createdOrder));
+      setShowModal(true);
+      refresh();
     } catch (error) {
       console.error(error);
-      alert("Server je nedostupný.");
+      alert("Chyba při vytváření zakázky.");
     }
+  };
+
+  const handleSubmitNewOrder = async () => {
+    refresh();
   };
 
   useEffect(() => {
@@ -199,7 +169,9 @@ function Invoices() {
               />
             </div>
           </div>
-          <button onClick={() => setShowModal(true)}>Přidat</button>
+          <button onClick={handleOpenNewOrder} disabled={creatingOrder}>
+            {creatingOrder ? "Vytvářím..." : "Nová zakázka"}
+          </button>
           <button onClick={() => handlePrintInvoice(invoices[0])}>Tisk</button>
         </div>
         <div className="show-items-panel">
@@ -215,7 +187,7 @@ function Invoices() {
           <div className="items-panel-table-header"></div>
           <div className="items-panel-table-header five-columns">
             <h3>Datum</h3>
-            <h3>Zákazník</h3>
+            <h3>Číslo zakázky | Zákazník</h3>
             <h3>Poslední aktualizace</h3>
             <h3>Stav</h3>
             <h3>Platby</h3>
@@ -234,7 +206,7 @@ function Invoices() {
                       // minute: '2-digit'
                     })}
                   </p>
-                  <h1>{`${invoice.name} ${invoice.surname}`}</h1>
+                  <h1>{`${formatInvoiceNumber(invoice)} | ${invoice.name} ${invoice.surname}`}</h1>
                   <p>
                     {new Date(invoice.updated_at).toLocaleString("cs-CZ", {
                       year: "numeric",
@@ -245,6 +217,8 @@ function Invoices() {
                     })}
                   </p>
                   <p>{`${invoice.status}`} </p>
+                  
+
                   <p>{`${invoice.total_amount} Kč / ${invoice.paid_amount} Kč`}</p>
                 </div>
               ))}
@@ -262,6 +236,7 @@ function Invoices() {
             firstButton="Uložit"
             secondButton="Zavřít"
             thirdButton={null}
+            formattedInvoiceNumber={newOrderNumberFormatted}
           />
         )}
       </div>

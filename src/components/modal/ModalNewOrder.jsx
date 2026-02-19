@@ -12,6 +12,7 @@ import "./ModalNewOrder.css";
 export default function ModalNewOrder({
   fields,
   initialValues = {},
+  formattedInvoiceNumber = "",
   onSubmit,
   onClose,
   onCancel,
@@ -112,7 +113,6 @@ export default function ModalNewOrder({
   // Handler pro přidání položky do obligatoryItems
   const handleAddObligatoryItem = async () => {
     if (!values.plu || values.plu.trim() === "") return;
-
     await getPluItem(values.plu);
   };
 
@@ -488,6 +488,7 @@ export default function ModalNewOrder({
 
             <div className="order-information-attributes box">
               <h2>Nastavení zakázky</h2>
+              <h3>Číslo zakázky: {formattedInvoiceNumber || "—"}</h3>
               <SegmentedControl
                 items={orderDates}
                 selectedValue={orderDatesSelection}
@@ -509,7 +510,7 @@ export default function ModalNewOrder({
               />
             </div>
           </div>
-          <h1>Položky zakázky</h1>
+
           <div className="order-obligatory-items">
             <div className="plu-buttons-container">
               <input
@@ -531,22 +532,18 @@ export default function ModalNewOrder({
               >
                 + BRÝLE
               </button>
-              <button
-                type="button"
-                className="btn-add-item"
-              >
+              <button type="button" className="btn-add-item">
                 + KONTAKTNÍ ČOČKY
               </button>
-              <button
-                type="button"
-                className="btn-add-item"
-              >
+              <button type="button" className="btn-add-item">
                 + SERVIS
               </button>
             </div>
+            <h1>Položky zakázky</h1>
+            
             {pluLoading && <span>Načítám...</span>}
             {pluError && <span className="error-message">{pluError}</span>}
-
+            {obligatoryItems.length === 0 && <span>Nejsou žádné položky</span>}
             {/* Seznam přidaných položek */}
             {obligatoryItems.length > 0 && (
               <div className="obligatory-items-list">
@@ -596,19 +593,19 @@ export default function ModalNewOrder({
             {glassesItems.length > 0 && (
               <div className="glasses-items-list">
                 {glassesItems.map((glasses, index) => {
-                  const framePrice = parseFloat(glassesFrameData[index]?.price) || 0;
-                  const servicePrice = parseFloat(glassesServiceData[index]?.price) || 0;
-                  const lensesPrice = parseFloat(glassesLensesData[index]?.price) || 0;
+                  const framePrice =
+                    parseFloat(glassesFrameData[index]?.price) || 0;
+                  const servicePrice =
+                    parseFloat(glassesServiceData[index]?.price) || 0;
+                  const lensesPrice =
+                    parseFloat(glassesLensesData[index]?.price) || 0;
                   const glassesTotal = framePrice + servicePrice + lensesPrice;
                   const isCollapsed = collapsedGlasses[index];
                   const currentSelection = glassesType[index] || "DÁLKA";
                   const isCustomMode = glassesTypeCustomMode[index];
 
                   return (
-                    <div
-                      key={index}
-                      className="glasses-item-wrapper"
-                    >
+                    <div key={index} className="glasses-item-wrapper">
                       <div
                         className={`header${
                           isCollapsed ? " header-compact" : ""
@@ -1171,33 +1168,42 @@ export default function ModalNewOrder({
                             />
                             {serviceLoading && <span>Načítám službu...</span>}
                             {serviceError && (
-                              <span className="error-message">{serviceError}</span>
+                              <span className="error-message">
+                                {serviceError}
+                              </span>
                             )}
                             {glassesServiceData[index] && (
                               <div className="frame-data-display">
                                 <div>
-                                  <strong>Název:</strong> {glassesServiceData[index].name}
+                                  <strong>Název:</strong>{" "}
+                                  {glassesServiceData[index].name}
                                 </div>
                                 <div>
-                                  <strong>Množství:</strong> {glassesServiceData[index].amount}
+                                  <strong>Množství:</strong>{" "}
+                                  {glassesServiceData[index].amount}
                                 </div>
                                 <div>
-                                  <strong>MJ:</strong> {glassesServiceData[index].uom}
+                                  <strong>MJ:</strong>{" "}
+                                  {glassesServiceData[index].uom}
                                 </div>
                                 <div>
-                                  <strong>Cena:</strong> {glassesServiceData[index].price} Kč
+                                  <strong>Cena:</strong>{" "}
+                                  {glassesServiceData[index].price} Kč
                                 </div>
                                 <div>
-                                  <strong>Sazba DPH:</strong> {glassesServiceData[index].rate}%
+                                  <strong>Sazba DPH:</strong>{" "}
+                                  {glassesServiceData[index].rate}%
                                 </div>
                                 {glassesServiceData[index].category && (
                                   <div>
-                                    <strong>Kategorie:</strong> {glassesServiceData[index].category}
+                                    <strong>Kategorie:</strong>{" "}
+                                    {glassesServiceData[index].category}
                                   </div>
                                 )}
                                 {glassesServiceData[index].note && (
                                   <div>
-                                    <strong>Poznámka:</strong> {glassesServiceData[index].note}
+                                    <strong>Poznámka:</strong>{" "}
+                                    {glassesServiceData[index].note}
                                   </div>
                                 )}
                               </div>
@@ -1219,32 +1225,43 @@ export default function ModalNewOrder({
                               placeholder="BRÝLOVÉ ČOČKY"
                               className="input-frame-item"
                             />
-                            {lensesLoading && <span>Načítám brýlové čočky...</span>}
+                            {lensesLoading && (
+                              <span>Načítám brýlové čočky...</span>
+                            )}
                             {lensesError && (
-                              <span className="error-message">{lensesError}</span>
+                              <span className="error-message">
+                                {lensesError}
+                              </span>
                             )}
                             {glassesLensesData[index] && (
                               <div className="frame-data-display">
                                 <div>
-                                  <strong>PLU:</strong> {glassesLensesData[index].plu}
+                                  <strong>PLU:</strong>{" "}
+                                  {glassesLensesData[index].plu}
                                 </div>
                                 <div>
-                                  <strong>Kód:</strong> {glassesLensesData[index].code}
+                                  <strong>Kód:</strong>{" "}
+                                  {glassesLensesData[index].code}
                                 </div>
                                 <div>
-                                  <strong>SPH:</strong> {glassesLensesData[index].sph}
+                                  <strong>SPH:</strong>{" "}
+                                  {glassesLensesData[index].sph}
                                 </div>
                                 <div>
-                                  <strong>CYL:</strong> {glassesLensesData[index].cyl}
+                                  <strong>CYL:</strong>{" "}
+                                  {glassesLensesData[index].cyl}
                                 </div>
                                 <div>
-                                  <strong>AX:</strong> {glassesLensesData[index].ax}
+                                  <strong>AX:</strong>{" "}
+                                  {glassesLensesData[index].ax}
                                 </div>
                                 <div>
-                                  <strong>Cena:</strong> {glassesLensesData[index].price} Kč
+                                  <strong>Cena:</strong>{" "}
+                                  {glassesLensesData[index].price} Kč
                                 </div>
                                 <div>
-                                  <strong>Sazba DPH:</strong> {glassesLensesData[index].rate}%
+                                  <strong>Sazba DPH:</strong>{" "}
+                                  {glassesLensesData[index].rate}%
                                 </div>
                               </div>
                             )}
