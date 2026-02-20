@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import ConfirmDelete from "./ConfirmDelete";
 import "./Modal.css";
 
 export default function Modal({
   fields,
-  initialValues = {},
+  initialValues,
   onSubmit,
   onClose,
   onCancel,
@@ -16,16 +16,28 @@ export default function Modal({
 }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [values, setValues] = useState({});
+  const fieldsSignature = useMemo(
+    () =>
+      fields
+        .map((field) => `${field.varName}:${field.input || "text"}`)
+        .join("|"),
+    [fields],
+  );
+  const initialValuesSignature = useMemo(
+    () => JSON.stringify(initialValues ?? {}),
+    [initialValues],
+  );
 
   // Aktualizace values při změně initialValues nebo fields
   useEffect(() => {
     const init = {};
+    const sourceInitialValues = initialValues ?? {};
     fields.forEach((f) => {
-      const val = initialValues?.[f.varName];
+      const val = sourceInitialValues[f.varName];
       init[f.varName] = val !== undefined && val !== null ? val : "";
     });
     setValues(init);
-  }, [fields, initialValues]);
+  }, [fields, fieldsSignature, initialValuesSignature]);
 
   //Univerzální handler pro změnu hodnoty pole
   //libovolného elementu formuláře

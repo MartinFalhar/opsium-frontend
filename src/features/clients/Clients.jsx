@@ -9,13 +9,12 @@ import { useUser } from "../../context/UserContext";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Clients() {
+  //Z JSON formátu, který nám přijde z backendu, uděláme hezky čitelný řetězec pro zobrazení kontaktů klienta
   const formatContactValue = (value) => {
     if (value === null || value === undefined || value === "") return "—";
-
     if (Array.isArray(value)) {
       return value.filter(Boolean).join(", ") || "—";
     }
-
     if (typeof value === "object") {
       return (
         Object.entries(value)
@@ -211,6 +210,9 @@ function Clients() {
             fields={fields}
             onSubmit={handleSubmit}
             onClose={() => setShowModal(false)}
+            firstButton={"Přidat klienta"}
+            secondButton={"Zrušit"}
+            thirdButton={null}
           />
         )}
       </div>
