@@ -17,24 +17,27 @@ function Invoices() {
   const [showModal, setShowModal] = useState(false);
   const [showFindClientModal, setShowFindClientModal] = useState(false);
   const [newOrderNumberFormatted, setNewOrderNumberFormatted] = useState("");
-  const { user, activeId } = useUser();
+  const [createdOrderId, setCreatedOrderId] = useState("");
+  const [selectedClientForOrder, setSelectedClientForOrder] = useState(null);
+  const { user, activeId, setActiveId } = useUser();
   const [daysOldSelection, setDaysOldSelection] = useState("vše");
   const [statusSelection, setStatusSelection] = useState("");
 
   const initialValues = {
-    client_id: activeId?.client_id ?? "",
+    client_id: selectedClientForOrder?.id ?? activeId?.client_id ?? "",
+    order_id: createdOrderId,
     member_id: activeId?.member_id ?? "",
     // name: activeId?.name ?? "",
     date: new Date().toLocaleDateString("cs-CZ"),
-    degree_before: "Ing.",
-    name: "Robert",
-    surname: "Okulla",
-    degree_after: "Ph.D.",
-    street: "Hlavní 123",
-    city: "Praha",
-    post_code: "11000",
-    email: "robert.okulla@example.com",
-    phone: "+420123456789",
+    degree_before: selectedClientForOrder?.degree_before ?? "",
+    name: selectedClientForOrder?.name ?? "",
+    surname: selectedClientForOrder?.surname ?? "",
+    degree_after: selectedClientForOrder?.degree_after ?? "",
+    street: selectedClientForOrder?.street ?? "",
+    city: selectedClientForOrder?.city ?? "",
+    post_code: selectedClientForOrder?.post_code ?? "",
+    email: selectedClientForOrder?.email ?? "",
+    phone: selectedClientForOrder?.phone ?? "",
   };
 
   const formatInvoiceNumber = (invoice) => {
@@ -101,22 +104,25 @@ function Invoices() {
     window.open(`${API_URL}/pdf/invoice/${invoice.id}`, "_blank");
   }
 
-  const handleOpenNewOrder = async () => {
+  const handleOpenNewOrder = async (selectedClientId = null) => {
     console.log("Active ID:", activeId);
     console.log("User:", user);
 
-    if (!activeId?.client_id || !activeId?.member_id || !user?.branch_id) {
+    const resolvedClientId = selectedClientId ?? activeId?.client_id;
+
+    if (!resolvedClientId || !activeId?.member_id || !user?.branch_id) {
       alert("Chybí client_id, member_id nebo branch_id.");
       return;
     }
 
     try {
       const createdOrder = await createOrder({
-        client_id: activeId.client_id,
+        client_id: resolvedClientId,
         branch_id: user.branch_id,
         member_id: activeId.member_id,
       });
 
+      setCreatedOrderId(createdOrder?.id ?? "");
       setNewOrderNumberFormatted(formatInvoiceNumber(createdOrder));
       setShowModal(true);
       refresh();
@@ -129,6 +135,50 @@ function Invoices() {
   const handleFindClient = async () => {
     console.log("Otevírám modal pro hledání klienta");
     setShowFindClientModal(true);
+  };
+
+  const handleClientSelectedForOrder = async (client) => {
+    setSelectedClientForOrder(client);
+
+    if (client?.id) {
+      setActiveId((prev) => ({
+        ...prev,
+        client_id: client.id,
+      }));
+    }
+
+    setShowFindClientModal(false);
+    await handleOpenNewOrder(client?.id ?? null);
+  };
+
+  const handleOpenExistingOrder = (invoice) => {
+    if (!invoice?.id) {
+      return;
+    }
+
+    setCreatedOrderId(invoice.id);
+    setNewOrderNumberFormatted(formatInvoiceNumber(invoice));
+    setSelectedClientForOrder({
+      id: invoice.client_id,
+      degree_before: invoice.degree_before || "",
+      name: invoice.name || "",
+      surname: invoice.surname || "",
+      degree_after: invoice.degree_after || "",
+      street: invoice.street || "",
+      city: invoice.city || "",
+      post_code: invoice.post_code || "",
+      email: invoice.email || "",
+      phone: invoice.phone || "",
+    });
+
+    if (invoice.client_id) {
+      setActiveId((prev) => ({
+        ...prev,
+        client_id: invoice.client_id,
+      }));
+    }
+
+    setShowModal(true);
   };
 
   const handleSubmitNewOrder = async () => {
@@ -203,7 +253,11 @@ function Invoices() {
             {loading && <PuffLoaderSpinnerLarge active={loading} />}
             {paginatedInvoices.length > 0 &&
               paginatedInvoices.map((invoice) => (
-                <div key={invoice.id} className="item one-row five-columns">
+                <div
+                  key={invoice.id}
+                  className="item one-row five-columns"
+                  onClick={() => handleOpenExistingOrder(invoice)}
+                >
                   <p>
                     {new Date(invoice.created_at).toLocaleString("cs-CZ", {
                       year: "numeric",
@@ -249,6 +303,7 @@ function Invoices() {
           <ModalFindClient
             onClose={() => setShowFindClientModal(false)}
             onCancel={() => setShowFindClientModal(false)}
+            onClientSelected={handleClientSelectedForOrder}
           />
         )}
       </div>

@@ -103,6 +103,49 @@
   margin-top: 10px;
 }
 
+.modal-client-preview {
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-top: 4px;
+  background-color: #ffffff;
+}
+
+.modal-client-preview-item {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  cursor: pointer;
+}
+
+.modal-client-preview-item:last-child {
+  border-bottom: none;
+}
+
+.modal-client-preview-item.active,
+.modal-client-preview-item:hover {
+  background-color: #f3f4f6;
+}
+
+.modal-client-preview-item p {
+  margin: 2px 0;
+}
+
+.modal-client-preview-name {
+  font-weight: 600;
+}
+
+.modal-selected-client {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 8px;
+}
+
+.modal-selected-client p {
+  margin: 4px 0;
+}
+
 /* ---- MODÁL PRO VÍCE POLOŽEK ---- */
 .modal-wide {
   max-width: 2000px;

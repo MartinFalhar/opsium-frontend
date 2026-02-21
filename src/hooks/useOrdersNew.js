@@ -11,7 +11,7 @@ export function useOrdersNew() {
     setError(null);
 
     try {
-
+      console.log("Creating order with payload:", { client_id, branch_id, member_id });
       const res = await fetch(`${API_URL}/store/new-order`, {
         method: "POST",
         headers: {
@@ -29,6 +29,10 @@ export function useOrdersNew() {
       const data = await res.json();
 
       if (!res.ok) {
+        throw new Error(data?.message || "Nepodařilo se vytvořit novou zakázku.");
+      }
+
+      if (!data?.id || !data?.year || !data?.number) {
         throw new Error(data?.message || "Nepodařilo se vytvořit novou zakázku.");
       }
 

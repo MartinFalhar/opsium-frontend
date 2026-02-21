@@ -12,7 +12,7 @@ export function useStoreGetPluLenses() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const getPluLenses = useCallback(async (plu) => {
+  const getPluLenses = useCallback(async (plu, payload = null) => {
     if (!plu || plu.trim() === "") {
       setLenses(null);
       return null;
@@ -22,12 +22,18 @@ export function useStoreGetPluLenses() {
     setError(null);
 
     try {
-      const res = await fetch(`${API_URL}/store/plu-lenses?plu=${plu}`, {
-        method: "GET",
+      const requestBody = {
+        plu: plu.trim(),
+        ...(payload || {}),
+      };
+
+      const res = await fetch(`${API_URL}/store/plu-lenses`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
+        body: JSON.stringify(requestBody),
       });
 
       const data = await res.json();

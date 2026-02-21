@@ -5,6 +5,7 @@ import Modal from "../../components/modal/Modal.jsx";
 import { useNavigate, Navigate } from "react-router-dom";
 
 import { useUser } from "../../context/UserContext";
+import { useClientCreate } from "../../hooks/useClientCreate.js";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -57,6 +58,7 @@ function Clients() {
   const [clients, setClients] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+  const { createClient } = useClientCreate();
 
   const addClient = (newClient) => {
     setHeaderClients((prev) => {
@@ -113,22 +115,10 @@ function Clients() {
     console.log("New client to add:", newClient);
 
     try {
-      const res = await fetch(`${API_URL}/client/create_client`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-        body: JSON.stringify(newClient),
-      });
-
-      if (res.ok) {
-        alert("Úspěšně odesláno!");
-      } else {
-        alert("Chyba při odesílání.");
-      }
-    } catch (error) {
-      console.error(error);
+      await createClient(newClient);
+      alert("Úspěšně odesláno!");
+    } catch (err) {
+      console.error(err);
       alert("Server je nedostupný.");
     }
   };

@@ -12,7 +12,7 @@ export function useStoreGetPluService() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const getPluService = useCallback(async (plu) => {
+  const getPluService = useCallback(async (plu, payload = null) => {
     if (!plu || plu.trim() === "") {
       setService(null);
       return null;
@@ -22,12 +22,18 @@ export function useStoreGetPluService() {
     setError(null);
 
     try {
-      const res = await fetch(`${API_URL}/store/plu-service?plu=${plu}`, {
-        method: "GET",
+      const requestBody = {
+        plu: plu.trim(),
+        ...(payload || {}),
+      };
+
+      const res = await fetch(`${API_URL}/store/plu-service`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
+        body: JSON.stringify(requestBody),
       });
 
       const data = await res.json();

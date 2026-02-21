@@ -12,7 +12,7 @@ export function useStoreGetPluFrame() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const getPluFrame = useCallback(async (plu) => {
+  const getPluFrame = useCallback(async (plu, payload = null) => {
     if (!plu || plu.trim() === "") {
       setFrame(null);
       return;
@@ -22,12 +22,18 @@ export function useStoreGetPluFrame() {
     setError(null);
 
     try {
-      const res = await fetch(`${API_URL}/store/plu-frame?plu=${plu}`, {
-        method: "GET",
+      const requestBody = {
+        plu: plu.trim(),
+        ...(payload || {}),
+      };
+
+      const res = await fetch(`${API_URL}/store/plu-frame`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
+        body: JSON.stringify(requestBody),
       });
 
       const data = await res.json();

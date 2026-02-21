@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ConfirmDelete from "./ConfirmDelete";
 import SegmentedControl from "../../components/controls/SegmentedControl.jsx";
 import SegmentedControlMulti from "../../components/controls/SegmentedControlMulti.jsx";
@@ -6,11 +6,11 @@ import { useStoreGetPluItem } from "../../hooks/useStoreGetPluItem.js";
 import { useStoreGetPluFrame } from "../../hooks/useStoreGetPluFrame.js";
 import { useStoreGetPluService } from "../../hooks/useStoreGetPluService.js";
 import { useStoreGetPluLenses } from "../../hooks/useStoreGetPluLenses.js";
+import { useOrdersLoadItems } from "../../hooks/useOrdersLoadItems.js";
 import "./Modal.css";
 import "./ModalNewOrder.css";
 
 export default function ModalNewOrder({
-  fields,
   initialValues = {},
   formattedInvoiceNumber = "",
   onSubmit,
@@ -20,14 +20,12 @@ export default function ModalNewOrder({
   secondButton,
   thirdButton,
   onClickThirdButton,
-  suppliers = [],
 }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [values, setValues] = useState(initialValues);
 
   // Hook pro načtení položky podle PLU
   const {
-    item: pluItem,
     loading: pluLoading,
     error: pluError,
     getPluItem,
@@ -35,9 +33,9 @@ export default function ModalNewOrder({
 
   // Hook pro načtení obruby podle PLU
   const {
-    frame: pluFrame,
-    loading: frameLoading,
-    error: frameError,
+    frame: _pluFrame,
+    loading: _frameLoading,
+    error: _frameError,
     getPluFrame,
   } = useStoreGetPluFrame();
 
@@ -54,6 +52,12 @@ export default function ModalNewOrder({
     error: lensesError,
     getPluLenses,
   } = useStoreGetPluLenses();
+
+  const {
+    loadOrderItems,
+    loading: orderItemsLoading,
+    error: orderItemsError,
+  } = useOrdersLoadItems();
 
   //Nastavení zakázky
   const orderDates = ["SPĚCHÁ", "zítra", "3 dny", "týden", "2-3 týdny", "..."];
@@ -78,6 +82,10 @@ export default function ModalNewOrder({
   // Seznam povinných položek zakázky
   const [obligatoryItems, setObligatoryItems] = useState([]);
   const [hoveredItemIndex, setHoveredItemIndex] = useState(null);
+  const isAddingObligatoryItemRef = useRef(false);
+  const frameRequestLocksRef = useRef({});
+  const serviceRequestLocksRef = useRef({});
+  const lensesRequestLocksRef = useRef({});
 
   // Seznam položek brýlí
   const [glassesItems, setGlassesItems] = useState([]);
@@ -93,15 +101,27 @@ export default function ModalNewOrder({
 
   // Položky k platbě
   const [paymentItems, setPaymentItems] = useState([]);
+  const [loadedOrderItemsId, setLoadedOrderItemsId] = useState(null);
 
   // Aktualizace values při změně initialValues
   useEffect(() => {
-    const init = {};
-    Object.keys(values).forEach((key) => {
-      const val = initialValues?.[key];
-      init[key] = val !== undefined && val !== null ? val : "";
+    setValues((prev) => {
+      const init = { ...prev };
+
+      Object.keys(prev).forEach((key) => {
+        const val = initialValues?.[key];
+        init[key] = val !== undefined && val !== null ? val : "";
+      });
+
+      Object.keys(initialValues || {}).forEach((key) => {
+        if (!(key in init)) {
+          const val = initialValues?.[key];
+          init[key] = val !== undefined && val !== null ? val : "";
+        }
+      });
+
+      return init;
     });
-    setValues(init);
   }, [initialValues]);
 
   //Univerzální handler pro změnu hodnoty pole
@@ -110,10 +130,53 @@ export default function ModalNewOrder({
     setValues((prev) => ({ ...prev, [varName]: value }));
   };
 
+  const buildGlassesSpecification = (index) => {
+    const glasses = glassesItems[index];
+    if (!glasses) {
+      return null;
+    }
+
+    return {
+      glasses_type: glassesType[index] || null,
+      right: glasses.right,
+      left: glasses.left,
+      pbs: glasses.pbs,
+      entered_plu: {
+        frame: glasses.obruby,
+        service: glasses.zabrus,
+        lenses: glasses.brylove_cocky,
+      },
+    };
+  };
+
   // Handler pro přidání položky do obligatoryItems
   const handleAddObligatoryItem = async () => {
+    if (isAddingObligatoryItemRef.current || pluLoading) return;
     if (!values.plu || values.plu.trim() === "") return;
-    await getPluItem(values.plu);
+
+    isAddingObligatoryItemRef.current = true;
+    const enteredPlu = values.plu.trim();
+    try {
+      const fetchedItem = await getPluItem(enteredPlu, values.order_id, {
+        quantity: 1,
+        item_type: "goods",
+        group: 0,
+        specification_id: null,
+        movement_type: "SALE",
+        item_status: "ON_STOCK",
+      });
+
+      if (fetchedItem) {
+        const newItem = {
+          plu: enteredPlu,
+          ...fetchedItem,
+        };
+        setObligatoryItems((prev) => [...prev, newItem]);
+        handleChange("plu", "");
+      }
+    } finally {
+      isAddingObligatoryItemRef.current = false;
+    }
   };
 
   // Handler pro odstranění položky z obligatoryItems
@@ -226,39 +289,57 @@ export default function ModalNewOrder({
 
   // Handler pro načtení obruby podle PLU
   const handleFramePluKeyDown = async (e, index) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.repeat) {
+      e.preventDefault();
+      if (frameRequestLocksRef.current[index] || _frameLoading) {
+        return;
+      }
+
       const plu = e.target.value.trim();
       if (plu) {
-        const frameData = await getPluFrame(plu);
-        if (frameData) {
-          // Uložit data obruby
-          setGlassesFrameData((prev) => {
-            const updated = [...prev];
-            updated[index] = frameData;
-            return updated;
+        frameRequestLocksRef.current[index] = true;
+        try {
+          const frameData = await getPluFrame(plu, {
+            order_id: values.order_id,
+            quantity: 1,
+            group: index + 1,
+            specification_id: null,
+            specification: buildGlassesSpecification(index),
+            movement_type: "SALE",
+            item_status: "ON_STOCK",
           });
+          if (frameData) {
+            // Uložit data obruby
+            setGlassesFrameData((prev) => {
+              const updated = [...prev];
+              updated[index] = frameData;
+              return updated;
+            });
 
-          // Přidat/aktualizovat paymentItems
-          setPaymentItems((prev) => {
-            // Odebrat předchozí položku obruby pro tento index, pokud existuje
-            const filtered = prev.filter(
-              (item) =>
-                !(item.glassesIndex === index && item.source === "frame"),
-            );
+            // Přidat/aktualizovat paymentItems
+            setPaymentItems((prev) => {
+              // Odebrat předchozí položku obruby pro tento index, pokud existuje
+              const filtered = prev.filter(
+                (item) =>
+                  !(item.glassesIndex === index && item.source === "frame"),
+              );
 
-            // Přidat novou položku
-            const glassesTypeName = glassesType[index] || "DÁLKA";
-            return [
-              ...filtered,
-              {
-                glassesIndex: index,
-                model: glassesTypeName,
-                price: parseFloat(frameData.price) || 0,
-                rate: parseFloat(frameData.rate) || 0,
-                source: "frame",
-              },
-            ];
-          });
+              // Přidat novou položku
+              const glassesTypeName = glassesType[index] || "DÁLKA";
+              return [
+                ...filtered,
+                {
+                  glassesIndex: index,
+                  model: glassesTypeName,
+                  price: parseFloat(frameData.price) || 0,
+                  rate: parseFloat(frameData.rate) || 0,
+                  source: "frame",
+                },
+              ];
+            });
+          }
+        } finally {
+          frameRequestLocksRef.current[index] = false;
         }
       }
     }
@@ -266,36 +347,54 @@ export default function ModalNewOrder({
 
   // Handler pro načtení služby podle PLU (ZÁBRUS)
   const handleServicePluKeyDown = async (e, index) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.repeat) {
+      e.preventDefault();
+      if (serviceRequestLocksRef.current[index] || serviceLoading) {
+        return;
+      }
+
       const plu = e.target.value.trim();
       if (plu) {
-        const serviceData = await getPluService(plu);
-        if (serviceData) {
-          // Uložit data služby
-          setGlassesServiceData((prev) => {
-            const updated = [...prev];
-            updated[index] = serviceData;
-            return updated;
+        serviceRequestLocksRef.current[index] = true;
+        try {
+          const serviceData = await getPluService(plu, {
+            order_id: values.order_id,
+            quantity: 1,
+            group: index + 1,
+            specification_id: null,
+            specification: buildGlassesSpecification(index),
+            movement_type: "SALE",
+            item_status: "ON_STOCK",
           });
+          if (serviceData) {
+            // Uložit data služby
+            setGlassesServiceData((prev) => {
+              const updated = [...prev];
+              updated[index] = serviceData;
+              return updated;
+            });
 
-          // Přidat/aktualizovat paymentItems pro službu
-          setPaymentItems((prev) => {
-            const filtered = prev.filter(
-              (item) =>
-                !(item.glassesIndex === index && item.source === "service"),
-            );
+            // Přidat/aktualizovat paymentItems pro službu
+            setPaymentItems((prev) => {
+              const filtered = prev.filter(
+                (item) =>
+                  !(item.glassesIndex === index && item.source === "service"),
+              );
 
-            return [
-              ...filtered,
-              {
-                glassesIndex: index,
-                model: serviceData.name || "Služba",
-                price: parseFloat(serviceData.price) || 0,
-                rate: parseFloat(serviceData.rate) || 0,
-                source: "service",
-              },
-            ];
-          });
+              return [
+                ...filtered,
+                {
+                  glassesIndex: index,
+                  model: serviceData.name || "Služba",
+                  price: parseFloat(serviceData.price) || 0,
+                  rate: parseFloat(serviceData.rate) || 0,
+                  source: "service",
+                },
+              ];
+            });
+          }
+        } finally {
+          serviceRequestLocksRef.current[index] = false;
         }
       }
     }
@@ -303,52 +402,58 @@ export default function ModalNewOrder({
 
   // Handler pro načtení brýlových čoček podle PLU
   const handleLensesPluKeyDown = async (e, index) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.repeat) {
+      e.preventDefault();
+      if (lensesRequestLocksRef.current[index] || lensesLoading) {
+        return;
+      }
+
       const plu = e.target.value.trim();
       if (plu) {
-        const lensesData = await getPluLenses(plu);
-        if (lensesData) {
-          // Uložit data brýlových čoček
-          setGlassesLensesData((prev) => {
-            const updated = [...prev];
-            updated[index] = lensesData;
-            return updated;
+        lensesRequestLocksRef.current[index] = true;
+        try {
+          const lensesData = await getPluLenses(plu, {
+            order_id: values.order_id,
+            quantity: 1,
+            group: index + 1,
+            specification_id: null,
+            specification: buildGlassesSpecification(index),
+            movement_type: "SALE",
+            item_status: "ON_STOCK",
           });
+          if (lensesData) {
+            // Uložit data brýlových čoček
+            setGlassesLensesData((prev) => {
+              const updated = [...prev];
+              updated[index] = lensesData;
+              return updated;
+            });
 
-          // Přidat/aktualizovat paymentItems pro brýlové čočky
-          setPaymentItems((prev) => {
-            const filtered = prev.filter(
-              (item) =>
-                !(item.glassesIndex === index && item.source === "lenses"),
-            );
+            // Přidat/aktualizovat paymentItems pro brýlové čočky
+            setPaymentItems((prev) => {
+              const filtered = prev.filter(
+                (item) =>
+                  !(item.glassesIndex === index && item.source === "lenses"),
+              );
 
-            return [
-              ...filtered,
-              {
-                glassesIndex: index,
-                model: lensesData.code || "Brýlové čočky",
-                price: parseFloat(lensesData.price) || 0,
-                rate: parseFloat(lensesData.rate) || 0,
-                source: "lenses",
-              },
-            ];
-          });
+              return [
+                ...filtered,
+                {
+                  glassesIndex: index,
+                  model: lensesData.code || "Brýlové čočky",
+                  price: parseFloat(lensesData.price) || 0,
+                  rate: parseFloat(lensesData.rate) || 0,
+                  source: "lenses",
+                },
+              ];
+            });
+          }
+        } finally {
+          lensesRequestLocksRef.current[index] = false;
         }
       }
     }
   };
-
-  // UseEffect pro přidání položky po načtení
-  useEffect(() => {
-    if (pluItem && values.plu) {
-      const newItem = {
-        plu: values.plu,
-        ...pluItem,
-      };
-      setObligatoryItems((prev) => [...prev, newItem]);
-      handleChange("plu", ""); // Vyčistit PLU input
-    }
-  }, [pluItem]);
 
   // UseEffect pro aktualizaci paymentItems ze obligatoryItems
   useEffect(() => {
@@ -366,6 +471,171 @@ export default function ModalNewOrder({
       return [...items, ...glassesPayments];
     });
   }, [obligatoryItems]);
+
+  useEffect(() => {
+    const orderId = values?.order_id;
+    if (!orderId) {
+      return;
+    }
+
+    if (loadedOrderItemsId === orderId) {
+      return;
+    }
+
+    const reconstructOrderItems = async () => {
+      try {
+        const rows = await loadOrderItems(orderId);
+
+        const obligatory = [];
+        const glassesByGroup = new Map();
+
+        const emptyEye = {
+          sph: "",
+          cyl: "",
+          osa: "",
+          add: "",
+          prizma: "",
+          baze: "",
+          pd: "",
+          vyska: "",
+          vertex: "",
+          panto: "",
+        };
+
+        const normalizeEye = (eye) => ({
+          sph: eye?.sph ?? "",
+          cyl: eye?.cyl ?? "",
+          osa: eye?.osa ?? "",
+          add: eye?.add ?? "",
+          prizma: eye?.prizma ?? "",
+          baze: eye?.baze ?? "",
+          pd: eye?.pd ?? "",
+          vyska: eye?.vyska ?? "",
+          vertex: eye?.vertex ?? "",
+          panto: eye?.panto ?? "",
+        });
+
+        const ensureGroup = (groupNumber) => {
+          if (!glassesByGroup.has(groupNumber)) {
+            glassesByGroup.set(groupNumber, {
+              glasses: {
+                right: { ...emptyEye },
+                left: { ...emptyEye },
+                pbs: "",
+                obruby: "",
+                zabrus: "",
+                brylove_cocky: "",
+              },
+              frameData: null,
+              serviceData: null,
+              lensesData: null,
+              type: "DÁLKA",
+            });
+          }
+
+          return glassesByGroup.get(groupNumber);
+        };
+
+        for (const row of rows) {
+          const groupNumber = Number(row.group || 0);
+          const specs = row.specs || null;
+
+          if (groupNumber === 0 && row.item_type === "goods") {
+            obligatory.push({
+              plu: row.goods_plu ?? "",
+              model: row.goods_model ?? "",
+              size: row.goods_size ?? "",
+              color: row.goods_color ?? "",
+              uom: row.goods_uom ?? "",
+              price: Number(row.unit_sale_price ?? row.goods_price ?? 0),
+              rate: Number(row.goods_rate ?? 0),
+              store_item_id: row.store_item_id,
+              order_item_id: row.id,
+              store_batch_id: row.store_batch_id,
+            });
+            continue;
+          }
+
+          if (groupNumber > 0) {
+            const bucket = ensureGroup(groupNumber);
+
+            if (specs) {
+              bucket.type = specs.glasses_type || bucket.type;
+              bucket.glasses.right = normalizeEye(specs.right);
+              bucket.glasses.left = normalizeEye(specs.left);
+              bucket.glasses.pbs = specs.pbs || bucket.glasses.pbs;
+              bucket.glasses.obruby =
+                specs?.entered_plu?.frame || bucket.glasses.obruby;
+              bucket.glasses.zabrus =
+                specs?.entered_plu?.service || bucket.glasses.zabrus;
+              bucket.glasses.brylove_cocky =
+                specs?.entered_plu?.lenses || bucket.glasses.brylove_cocky;
+            }
+
+            if (row.item_type === "frame") {
+              bucket.frameData = {
+                collection: row.frame_collection,
+                product: row.frame_product,
+                color: row.frame_color,
+                size: row.frame_size,
+                gender: row.frame_gender,
+                material: row.frame_material,
+                type: row.frame_type,
+                price: Number(row.unit_sale_price ?? row.frame_price ?? 0),
+                rate: 0,
+                supplier_nick: row.frame_supplier_nick,
+              };
+            }
+
+            if (row.item_type === "lens") {
+              bucket.lensesData = {
+                plu: row.lens_plu,
+                code: row.lens_code,
+                sph: row.lens_sph,
+                cyl: row.lens_cyl,
+                ax: row.lens_ax,
+                price: Number(row.unit_sale_price ?? row.lens_price ?? 0),
+                rate: 0,
+              };
+            }
+
+            if (row.item_type === "service") {
+              bucket.serviceData = {
+                plu: row.service_plu,
+                name: row.service_name || "Služba",
+                amount: row.service_amount,
+                uom: row.service_uom,
+                price: Number(row.unit_sale_price ?? row.service_price ?? 0),
+                rate: Number(row.service_rate ?? 0),
+                category: row.service_category,
+                note: row.service_note,
+              };
+            }
+          }
+        }
+
+        const groups = [...glassesByGroup.entries()].sort((a, b) => a[0] - b[0]);
+
+        setObligatoryItems(obligatory);
+        setGlassesItems(groups.map(([, groupData]) => groupData.glasses));
+        setGlassesType(groups.map(([, groupData]) => groupData.type || "DÁLKA"));
+        setGlassesTypeCustomMode(groups.map(() => false));
+        setGlassesTypeCustomValue(groups.map(() => ""));
+        setCollapsedGlasses(groups.map(() => false));
+        setExpandedCentration(groups.map(() => false));
+        setExpandedDioptrie(groups.map(() => false));
+        setGlassesFrameData(groups.map(([, groupData]) => groupData.frameData));
+        setGlassesServiceData(groups.map(([, groupData]) => groupData.serviceData));
+        setGlassesLensesData(groups.map(([, groupData]) => groupData.lensesData));
+
+        setLoadedOrderItemsId(orderId);
+      } catch {
+        setLoadedOrderItemsId(null);
+      }
+    };
+
+    reconstructOrderItems();
+  }, [values?.order_id, loadedOrderItemsId, loadOrderItems]);
 
   const handleClose = () => {
     if (onCancel) {
@@ -487,19 +757,20 @@ export default function ModalNewOrder({
             </div>
 
             <div className="order-information-attributes box">
-              <h2>Nastavení zakázky</h2>
               <h3>Číslo zakázky: {formattedInvoiceNumber || "—"}</h3>
+              <h5>Termín zhotovení</h5>
               <SegmentedControl
                 items={orderDates}
                 selectedValue={orderDatesSelection}
                 onClick={(item) => setOrderDatesSelection(item)}
               />
+              <h5>Způsob oznámení</h5>
               <SegmentedControlMulti
                 items={orderNotice}
                 selectedValues={orderNoticeSelection}
                 onChange={setOrderNoticeSelection}
               />
-              <h3>Poslat poštou na:</h3>
+              <h5>Poslat poštou na:</h5>
               <input
                 type="text"
                 value={values.address_for_delivery}
@@ -518,7 +789,7 @@ export default function ModalNewOrder({
                 value={values.plu}
                 onChange={(e) => handleChange("plu", e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                  if (e.key === "Enter" && !e.repeat) {
                     e.preventDefault();
                     handleAddObligatoryItem();
                   }
@@ -540,9 +811,13 @@ export default function ModalNewOrder({
               </button>
             </div>
             <h1>Položky zakázky</h1>
-            
+
             {pluLoading && <span>Načítám...</span>}
             {pluError && <span className="error-message">{pluError}</span>}
+            {orderItemsLoading && <span>Načítám položky zakázky...</span>}
+            {orderItemsError && (
+              <span className="error-message">{orderItemsError}</span>
+            )}
             {obligatoryItems.length === 0 && <span>Nejsou žádné položky</span>}
             {/* Seznam přidaných položek */}
             {obligatoryItems.length > 0 && (
