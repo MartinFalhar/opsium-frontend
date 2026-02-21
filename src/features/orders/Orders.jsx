@@ -2,6 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import "./Orders.css";
 import ModalNewOrder from "../../components/modal/ModalNewOrder.jsx";
+import ModalFindClient from "../../components/modal/ModalFindClient.jsx";
 import { useUser } from "../../context/UserContext.jsx";
 import PuffLoaderSpinnerLarge from "../../components/loader/PuffLoaderSpinnerLarge.jsx";
 import Pagination from "../../components/pagination/Pagination.jsx";
@@ -14,6 +15,7 @@ function Invoices() {
   const [orderInformation] = useState({});
   const [searchInvoice, setSearchInvoices] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showFindClientModal, setShowFindClientModal] = useState(false);
   const [newOrderNumberFormatted, setNewOrderNumberFormatted] = useState("");
   const { user, activeId } = useUser();
   const [daysOldSelection, setDaysOldSelection] = useState("vše");
@@ -35,9 +37,10 @@ function Invoices() {
     phone: "+420123456789",
   };
 
-
   const formatInvoiceNumber = (invoice) => {
-    const yearShort = String(invoice?.year ?? "").slice(-2).padStart(2, "0");
+    const yearShort = String(invoice?.year ?? "")
+      .slice(-2)
+      .padStart(2, "0");
     const branch = String(invoice?.branch_id ?? "").padStart(2, "0");
     const number = String(invoice?.number ?? "").padStart(5, "0");
     return `${yearShort}${branch}${number}`;
@@ -102,7 +105,6 @@ function Invoices() {
     console.log("Active ID:", activeId);
     console.log("User:", user);
 
-
     if (!activeId?.client_id || !activeId?.member_id || !user?.branch_id) {
       alert("Chybí client_id, member_id nebo branch_id.");
       return;
@@ -122,6 +124,11 @@ function Invoices() {
       console.error(error);
       alert("Chyba při vytváření zakázky.");
     }
+  };
+
+  const handleFindClient = async () => {
+    console.log("Otevírám modal pro hledání klienta");
+    setShowFindClientModal(true);
   };
 
   const handleSubmitNewOrder = async () => {
@@ -169,7 +176,7 @@ function Invoices() {
               />
             </div>
           </div>
-          <button onClick={handleOpenNewOrder} disabled={creatingOrder}>
+          <button onClick={handleFindClient} disabled={creatingOrder}>
             {creatingOrder ? "Vytvářím..." : "Nová zakázka"}
           </button>
           <button onClick={() => handlePrintInvoice(invoices[0])}>Tisk</button>
@@ -217,7 +224,6 @@ function Invoices() {
                     })}
                   </p>
                   <p>{`${invoice.status}`} </p>
-                  
 
                   <p>{`${invoice.total_amount} Kč / ${invoice.paid_amount} Kč`}</p>
                 </div>
@@ -237,6 +243,12 @@ function Invoices() {
             secondButton="Zavřít"
             thirdButton={null}
             formattedInvoiceNumber={newOrderNumberFormatted}
+          />
+        )}
+        {showFindClientModal && (
+          <ModalFindClient
+            onClose={() => setShowFindClientModal(false)}
+            onCancel={() => setShowFindClientModal(false)}
           />
         )}
       </div>
