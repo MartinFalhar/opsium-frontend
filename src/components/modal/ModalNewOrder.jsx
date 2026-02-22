@@ -18,7 +18,7 @@ const paymentMethodToAttrib = {
   hotovost: 1,
   "platební karta": 2,
   "převod na účet": 3,
-  "šek": 4,
+  šek: 4,
   "okamžitá QR platba": 5,
 };
 
@@ -26,6 +26,7 @@ export default function ModalNewOrder({
   initialValues = {},
   formattedInvoiceNumber = "",
   onSubmit,
+  onPrintOrder,
   onClose,
   onCancel,
   firstButton,
@@ -643,7 +644,16 @@ export default function ModalNewOrder({
 
     const reconstructOrderItems = async () => {
       try {
-        const rows = await loadOrderItems(orderId);
+        const { items: rows, transactions = [] } =
+          await loadOrderItems(orderId);
+
+        setPaidTransactions(
+          transactions.map((payment) => ({
+            amount: Number(payment?.amount ?? 0),
+            method: payment?.method || "platba",
+            createdAt: payment?.created_at || new Date().toISOString(),
+          })),
+        );
 
         const obligatory = [];
         const glassesByGroup = new Map();
@@ -842,22 +852,31 @@ export default function ModalNewOrder({
           }
         }
 
-        const groups = [...glassesByGroup.entries()].sort((a, b) => a[0] - b[0]);
+        const groups = [...glassesByGroup.entries()].sort(
+          (a, b) => a[0] - b[0],
+        );
 
         setObligatoryItems(obligatory);
         setGlassesItems(groups.map(([, groupData]) => groupData.glasses));
-        setGlassesType(groups.map(([, groupData]) => groupData.type || "DÁLKA"));
+        setGlassesType(
+          groups.map(([, groupData]) => groupData.type || "DÁLKA"),
+        );
         setGlassesTypeCustomMode(groups.map(() => false));
         setGlassesTypeCustomValue(groups.map(() => ""));
         setCollapsedGlasses(groups.map(() => false));
         setExpandedCentration(groups.map(() => false));
         setExpandedDioptrie(groups.map(() => false));
         setGlassesFrameData(groups.map(([, groupData]) => groupData.frameData));
-        setGlassesServiceData(groups.map(([, groupData]) => groupData.serviceData));
-        setGlassesLensesData(groups.map(([, groupData]) => groupData.lensesData));
+        setGlassesServiceData(
+          groups.map(([, groupData]) => groupData.serviceData),
+        );
+        setGlassesLensesData(
+          groups.map(([, groupData]) => groupData.lensesData),
+        );
 
         setLoadedOrderItemsId(orderId);
       } catch {
+        setPaidTransactions([]);
         setLoadedOrderItemsId(null);
       }
     };
@@ -903,6 +922,10 @@ export default function ModalNewOrder({
   };
 
   const handleOpenPaymentModal = () => {
+    if (remainingToPay <= 0) {
+      return;
+    }
+
     setShowPaymentModal(true);
   };
 
@@ -934,7 +957,7 @@ export default function ModalNewOrder({
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
         body: JSON.stringify({
-          invoice_id: orderId,
+          order_id: orderId,
           attrib: attribCode,
           price_a: amount,
           vat_a: 0,
@@ -968,6 +991,13 @@ export default function ModalNewOrder({
       setPaymentSaving(false);
     }
   };
+
+  const paymentTotal = paymentItems.reduce((sum, item) => sum + item.price, 0);
+  const paidTotal = paidTransactions.reduce(
+    (sum, payment) => sum + Number(payment.amount || 0),
+    0,
+  );
+  const remainingToPay = Math.max(paymentTotal - paidTotal, 0);
 
   if (showConfirm) {
     return (
@@ -1080,7 +1110,6 @@ export default function ModalNewOrder({
           </div>
 
           <div className="order-obligatory-items">
-
             <textarea
               value={values.note || ""}
               onChange={(e) => handleChange("note", e.target.value)}
@@ -1686,7 +1715,9 @@ export default function ModalNewOrder({
                               />
                               {frameLoading && <span>Načítám obrubu...</span>}
                               {frameError && (
-                                <span className="error-message">{frameError}</span>
+                                <span className="error-message">
+                                  {frameError}
+                                </span>
                               )}
                               {glassesFrameData[index] && (
                                 <div className="frame-data-display">
@@ -1880,15 +1911,20 @@ export default function ModalNewOrder({
 
                       const framePrice =
                         glassesIndex !== undefined
-                          ? parseFloat(glassesFrameData[glassesIndex]?.price) || 0
+                          ? parseFloat(glassesFrameData[glassesIndex]?.price) ||
+                            0
                           : 0;
                       const servicePrice =
                         glassesIndex !== undefined
-                          ? parseFloat(glassesServiceData[glassesIndex]?.price) || 0
+                          ? parseFloat(
+                              glassesServiceData[glassesIndex]?.price,
+                            ) || 0
                           : 0;
                       const lensesPrice =
                         glassesIndex !== undefined
-                          ? parseFloat(glassesLensesData[glassesIndex]?.price) || 0
+                          ? parseFloat(
+                              glassesLensesData[glassesIndex]?.price,
+                            ) || 0
                           : 0;
 
                       return (
@@ -1896,7 +1932,10 @@ export default function ModalNewOrder({
                           <div
                             className={`payment-item-row${isGlassesTotal ? " payment-item-row-clickable" : ""}`}
                             onClick={() => {
-                              if (!isGlassesTotal || glassesIndex === undefined) {
+                              if (
+                                !isGlassesTotal ||
+                                glassesIndex === undefined
+                              ) {
                                 return;
                               }
 
@@ -1944,12 +1983,7 @@ export default function ModalNewOrder({
                   </div>
                   <div className="payment-total-row">
                     <span>Celkem:</span>
-                    <span>
-                      {paymentItems
-                        .reduce((sum, item) => sum + item.price, 0)
-                        .toFixed(2)}{" "}
-                      Kč
-                    </span>
+                    <span>{paymentTotal.toFixed(2)} Kč</span>
                   </div>
                 </>
               ) : (
@@ -1969,15 +2003,11 @@ export default function ModalNewOrder({
                     ))}
                     <div className="payment-item-row">
                       <span>Uhrazeno celkem</span>
-                      <span>
-                        {paidTransactions
-                          .reduce(
-                            (sum, payment) => sum + Number(payment.amount || 0),
-                            0,
-                          )
-                          .toFixed(2)}{" "}
-                        Kč
-                      </span>
+                      <span>{paidTotal.toFixed(2)} Kč</span>
+                    </div>
+                    <div className="payment-item-row payment-item-row-muted payment-item-row-no-border">
+                      <span>Zbývá doplatit</span>
+                      <span>{remainingToPay.toFixed(2)} Kč</span>
                     </div>
                   </div>
                 </div>
@@ -1999,9 +2029,13 @@ export default function ModalNewOrder({
                       delivery_address: values?.address_for_delivery ?? "",
                     });
                   } catch (error) {
-                    console.error("Nepodařilo se uložit dioptrické hodnoty:", error);
+                    console.error(
+                      "Nepodařilo se uložit dioptrické hodnoty:",
+                      error,
+                    );
                     alert(
-                      saveDioptricError || "Nepodařilo se uložit dioptrické hodnoty.",
+                      saveDioptricError ||
+                        "Nepodařilo se uložit dioptrické hodnoty.",
                     );
                     return;
                   }
@@ -2018,10 +2052,19 @@ export default function ModalNewOrder({
                   type="button"
                   className="payment-button-full"
                   onClick={handleOpenPaymentModal}
+                  disabled={remainingToPay <= 0}
+                  title={remainingToPay <= 0 ? "Zakázka je plně uhrazena" : ""}
                 >
                   Platba
                 </button>
-                <button type="button" className="payment-button-full">
+                <button
+                  type="button"
+                  className="payment-button-full"
+                  onClick={() =>
+                    onPrintOrder?.({ id: Number(values?.order_id) })
+                  }
+                  disabled={!Number(values?.order_id)}
+                >
                   Tisk zakázky
                 </button>
                 <div className="payment-actions-row">
@@ -2052,9 +2095,7 @@ export default function ModalNewOrder({
       </div>
       {showPaymentModal && (
         <ModalPayment
-          defaultAmount={paymentItems
-            .reduce((sum, item) => sum + item.price, 0)
-            .toFixed(2)}
+          defaultAmount={remainingToPay.toFixed(2)}
           loading={paymentSaving}
           onCancel={handleCancelPaymentModal}
           onPay={handlePayTransaction}

@@ -9,7 +9,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function InvoiceNew() {
   const [showModal, setShowModal] = useState(false);
-  const [invoiceID, setInvoiceID] = useState(null);
+  const [orderID, setOrderID] = useState(null);
   const { user, activeId } = useUser();
   const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ function InvoiceNew() {
   };
 
   const newTransaction = {
-    invoice_id: 7,
+    order_id: 7,
     attrib: 1,
     price_a: 111.11,
     vat_a: 11.11,
@@ -47,7 +47,7 @@ function InvoiceNew() {
 
       if (res.ok) {
         const data = await res.json();
-        setInvoiceID(data);
+        setOrderID(data);
       } else {
         alert("Chyba při odesílání.");
       }

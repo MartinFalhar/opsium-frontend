@@ -101,9 +101,13 @@ function Invoices() {
   const [totalPages, setTotalPages] = useState(1);
   const paginatedInvoices = invoices.slice((page - 1) * limit, page * limit);
 
-  function handlePrintInvoice(invoice) {
-    console.log("Tisk zakázky:", invoice.id);
-    window.open(`${API_URL}/pdf/invoice/${invoice.id}`, "_blank");
+  function handlePrintOrder(order) {
+    if (!order?.id) {
+      return;
+    }
+
+    console.log("Tisk zakázky:", order.id);
+    window.open(`${API_URL}/pdf/order/${order.id}`, "_blank");
   }
 
   const handleOpenNewOrder = async (selectedClientId = null) => {
@@ -233,7 +237,7 @@ function Invoices() {
           <button onClick={handleFindClient} disabled={creatingOrder}>
             {creatingOrder ? "Vytvářím..." : "Nová zakázka"}
           </button>
-          <button onClick={() => handlePrintInvoice(invoices[0])}>Tisk</button>
+          <button onClick={() => handlePrintOrder(invoices[0])}>Tisk</button>
         </div>
         <div className="show-items-panel">
           <div className="items-panel-label">
@@ -295,6 +299,7 @@ function Invoices() {
             orderInformation={orderInformation}
             initialValues={initialValues}
             onSubmit={handleSubmitNewOrder}
+            onPrintOrder={handlePrintOrder}
             onClose={() => setShowModal(false)}
             onCancel={() => setShowModal(false)}
             firstButton="Zakázka"

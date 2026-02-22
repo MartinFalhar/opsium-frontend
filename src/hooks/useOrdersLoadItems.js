@@ -8,7 +8,7 @@ export function useOrdersLoadItems() {
 
   const loadOrderItems = useCallback(async (order_id) => {
     if (!order_id) {
-      return [];
+      return { items: [], transactions: [] };
     }
 
     setLoading(true);
@@ -27,10 +27,15 @@ export function useOrdersLoadItems() {
       const data = await res.json();
 
       if (!res.ok || !data?.success) {
-        throw new Error(data?.message || "Nepodařilo se načíst položky zakázky.");
+        throw new Error(
+          data?.message || "Nepodařilo se načíst položky zakázky.",
+        );
       }
 
-      return Array.isArray(data.items) ? data.items : [];
+      return {
+        items: Array.isArray(data.items) ? data.items : [],
+        transactions: Array.isArray(data.transactions) ? data.transactions : [],
+      };
     } catch (err) {
       const message = err?.message || "Nepodařilo se načíst položky zakázky.";
       setError(message);
