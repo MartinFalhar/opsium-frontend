@@ -34,8 +34,8 @@ export default function ModalNewOrder({
   // Hook pro načtení obruby podle PLU
   const {
     frame: _pluFrame,
-    loading: _frameLoading,
-    error: _frameError,
+    loading: frameLoading,
+    error: frameError,
     getPluFrame,
   } = useStoreGetPluFrame();
 
@@ -101,6 +101,7 @@ export default function ModalNewOrder({
 
   // Položky k platbě
   const [paymentItems, setPaymentItems] = useState([]);
+  const [expandedPaymentGlasses, setExpandedPaymentGlasses] = useState({});
   const [loadedOrderItemsId, setLoadedOrderItemsId] = useState(null);
 
   // Aktualizace values při změně initialValues
@@ -240,11 +241,6 @@ export default function ModalNewOrder({
     setGlassesFrameData((prev) => prev.filter((_, i) => i !== index));
     setGlassesServiceData((prev) => prev.filter((_, i) => i !== index));
     setGlassesLensesData((prev) => prev.filter((_, i) => i !== index));
-
-    // Odebrat z paymentItems položku spojenou s tímto indexem brýlí
-    setPaymentItems((prev) =>
-      prev.filter((item) => item.glassesIndex !== index),
-    );
   };
 
   // Handler pro změnu hodnot brýlí
@@ -287,61 +283,59 @@ export default function ModalNewOrder({
     });
   };
 
+  const handleAddFrameItem = async (index, rawPluValue) => {
+    if (frameRequestLocksRef.current[index] || frameLoading) return;
+
+    const enteredPlu = (rawPluValue ?? "").trim();
+    if (!enteredPlu) return;
+
+    frameRequestLocksRef.current[index] = true;
+    try {
+      setGlassesItems((prev) => {
+        const updated = [...prev];
+        if (updated[index]) {
+          updated[index] = {
+            ...updated[index],
+            obruby: enteredPlu,
+          };
+        }
+        return updated;
+      });
+
+      const frameData = await getPluFrame(enteredPlu, {
+        order_id: values.order_id,
+        quantity: 1,
+        group: index + 1,
+        specification_id: null,
+        specification: {
+          ...(buildGlassesSpecification(index) || {}),
+          entered_plu: {
+            frame: enteredPlu,
+            service: glassesItems[index]?.zabrus || "",
+            lenses: glassesItems[index]?.brylove_cocky || "",
+          },
+        },
+        movement_type: "SALE",
+        item_status: "ON_STOCK",
+      });
+
+      if (frameData) {
+        setGlassesFrameData((prev) => {
+          const updated = [...prev];
+          updated[index] = frameData;
+          return updated;
+        });
+      }
+    } finally {
+      frameRequestLocksRef.current[index] = false;
+    }
+  };
+
   // Handler pro načtení obruby podle PLU
   const handleFramePluKeyDown = async (e, index) => {
     if (e.key === "Enter" && !e.repeat) {
       e.preventDefault();
-      if (frameRequestLocksRef.current[index] || _frameLoading) {
-        return;
-      }
-
-      const plu = e.target.value.trim();
-      if (plu) {
-        frameRequestLocksRef.current[index] = true;
-        try {
-          const frameData = await getPluFrame(plu, {
-            order_id: values.order_id,
-            quantity: 1,
-            group: index + 1,
-            specification_id: null,
-            specification: buildGlassesSpecification(index),
-            movement_type: "SALE",
-            item_status: "ON_STOCK",
-          });
-          if (frameData) {
-            // Uložit data obruby
-            setGlassesFrameData((prev) => {
-              const updated = [...prev];
-              updated[index] = frameData;
-              return updated;
-            });
-
-            // Přidat/aktualizovat paymentItems
-            setPaymentItems((prev) => {
-              // Odebrat předchozí položku obruby pro tento index, pokud existuje
-              const filtered = prev.filter(
-                (item) =>
-                  !(item.glassesIndex === index && item.source === "frame"),
-              );
-
-              // Přidat novou položku
-              const glassesTypeName = glassesType[index] || "DÁLKA";
-              return [
-                ...filtered,
-                {
-                  glassesIndex: index,
-                  model: glassesTypeName,
-                  price: parseFloat(frameData.price) || 0,
-                  rate: parseFloat(frameData.rate) || 0,
-                  source: "frame",
-                },
-              ];
-            });
-          }
-        } finally {
-          frameRequestLocksRef.current[index] = false;
-        }
-      }
+      await handleAddFrameItem(index, e.target.value);
     }
   };
 
@@ -372,25 +366,6 @@ export default function ModalNewOrder({
               const updated = [...prev];
               updated[index] = serviceData;
               return updated;
-            });
-
-            // Přidat/aktualizovat paymentItems pro službu
-            setPaymentItems((prev) => {
-              const filtered = prev.filter(
-                (item) =>
-                  !(item.glassesIndex === index && item.source === "service"),
-              );
-
-              return [
-                ...filtered,
-                {
-                  glassesIndex: index,
-                  model: serviceData.name || "Služba",
-                  price: parseFloat(serviceData.price) || 0,
-                  rate: parseFloat(serviceData.rate) || 0,
-                  source: "service",
-                },
-              ];
             });
           }
         } finally {
@@ -428,25 +403,6 @@ export default function ModalNewOrder({
               updated[index] = lensesData;
               return updated;
             });
-
-            // Přidat/aktualizovat paymentItems pro brýlové čočky
-            setPaymentItems((prev) => {
-              const filtered = prev.filter(
-                (item) =>
-                  !(item.glassesIndex === index && item.source === "lenses"),
-              );
-
-              return [
-                ...filtered,
-                {
-                  glassesIndex: index,
-                  model: lensesData.code || "Brýlové čočky",
-                  price: parseFloat(lensesData.price) || 0,
-                  rate: parseFloat(lensesData.rate) || 0,
-                  source: "lenses",
-                },
-              ];
-            });
           }
         } finally {
           lensesRequestLocksRef.current[index] = false;
@@ -455,22 +411,50 @@ export default function ModalNewOrder({
     }
   };
 
-  // UseEffect pro aktualizaci paymentItems ze obligatoryItems
+  // UseEffect pro aktualizaci paymentItems:
+  // obligatoryItems + 1 souhrnná položka za každý blok brýlí
   useEffect(() => {
-    const items = obligatoryItems.map((item) => ({
+    const obligatoryPayments = obligatoryItems.map((item) => ({
       model: item.model,
       price: parseFloat(item.price) || 0,
       rate: parseFloat(item.rate) || 0,
     }));
 
-    // Přidat položky z glassesItems (ty mají glassesIndex)
-    setPaymentItems((prevItems) => {
-      const glassesPayments = prevItems.filter(
-        (item) => item.glassesIndex !== undefined,
-      );
-      return [...items, ...glassesPayments];
-    });
-  }, [obligatoryItems]);
+    const glassesPayments = glassesItems
+      .map((_, index) => {
+        const framePrice = parseFloat(glassesFrameData[index]?.price) || 0;
+        const servicePrice = parseFloat(glassesServiceData[index]?.price) || 0;
+        const lensesPrice = parseFloat(glassesLensesData[index]?.price) || 0;
+        const totalPrice = framePrice + servicePrice + lensesPrice;
+
+        const hasAnyItem =
+          Boolean(glassesFrameData[index]) ||
+          Boolean(glassesServiceData[index]) ||
+          Boolean(glassesLensesData[index]);
+
+        if (!hasAnyItem) {
+          return null;
+        }
+
+        return {
+          glassesIndex: index,
+          model: glassesType[index] || "DÁLKA",
+          price: totalPrice,
+          rate: 0,
+          source: "glasses-total",
+        };
+      })
+      .filter(Boolean);
+
+    setPaymentItems([...obligatoryPayments, ...glassesPayments]);
+  }, [
+    obligatoryItems,
+    glassesItems,
+    glassesType,
+    glassesFrameData,
+    glassesServiceData,
+    glassesLensesData,
+  ]);
 
   useEffect(() => {
     const orderId = values?.order_id;
@@ -650,6 +634,8 @@ export default function ModalNewOrder({
   const handleThirdButtonClick = () => {
     if (thirdButton === "Smazat") {
       setShowConfirm(true);
+    } else if (thirdButton === "Zpět") {
+      handleClose();
     } else {
       // Pro jiné akce než smazání
       // vyvolá příslušný callback
@@ -995,7 +981,7 @@ export default function ModalNewOrder({
                                   onClick={() => toggleDioptrie(index)}
                                   className="btn-toggle-expand"
                                 >
-                                  +
+                                  {expandedDioptrie[index] ? "−" : "+"}
                                 </button>
                               </div>
                               <div className="dioptrie-grid">
@@ -1207,7 +1193,7 @@ export default function ModalNewOrder({
                                     onClick={() => toggleCentration(index)}
                                     className="btn-toggle-expand"
                                   >
-                                    +
+                                    {expandedCentration[index] ? "−" : "+"}
                                   </button>
                                 </div>
                                 <div className="eyes-inputs-mb">
@@ -1377,6 +1363,10 @@ export default function ModalNewOrder({
                                 placeholder="OBRUBA"
                                 className="input-frame-full"
                               />
+                              {frameLoading && <span>Načítám obrubu...</span>}
+                              {frameError && (
+                                <span className="error-message">{frameError}</span>
+                              )}
                               {glassesFrameData[index] && (
                                 <div className="frame-data-display">
                                   <div>
@@ -1550,68 +1540,140 @@ export default function ModalNewOrder({
             )}
           </div>
         </div>
-        <div className="payment-container">
-          <h2 className="payment-header-title">Platby</h2>
+        <div className="payment-side-panel">
+          <div className="payment-container">
+            <h2 className="payment-header-title">Platby</h2>
 
-          {/* Seznam položek k platbě */}
-          <div className="payment-information payment-information-full">
-            {paymentItems.length > 0 ? (
-              <>
-                <div className="payment-items-scroll">
-                  {paymentItems.map((item, index) => (
-                    <div key={index} className="payment-item-row">
-                      <span>{item.model}</span>
-                      <span>
-                        {item.price.toFixed(2)} Kč{" "}
-                        <span className="payment-item-rate">
-                          (DPH: {item.rate}%)
-                        </span>
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <div className="payment-total-row">
-                  <span>Celkem:</span>
-                  <span>
-                    {paymentItems
-                      .reduce((sum, item) => sum + item.price, 0)
-                      .toFixed(2)}{" "}
-                    Kč
-                  </span>
-                </div>
-              </>
-            ) : (
-              <h3>Vyberte zboží do zakázky...</h3>
-            )}
+            {/* Seznam položek k platbě */}
+            <div className="payment-information payment-information-full">
+              {paymentItems.length > 0 ? (
+                <>
+                  <div className="payment-items-scroll">
+                    {paymentItems.map((item, index) => {
+                      const isGlassesTotal = item.source === "glasses-total";
+                      const glassesIndex = item.glassesIndex;
+                      const isExpanded =
+                        isGlassesTotal &&
+                        glassesIndex !== undefined &&
+                        expandedPaymentGlasses[glassesIndex];
+
+                      const framePrice =
+                        glassesIndex !== undefined
+                          ? parseFloat(glassesFrameData[glassesIndex]?.price) || 0
+                          : 0;
+                      const servicePrice =
+                        glassesIndex !== undefined
+                          ? parseFloat(glassesServiceData[glassesIndex]?.price) || 0
+                          : 0;
+                      const lensesPrice =
+                        glassesIndex !== undefined
+                          ? parseFloat(glassesLensesData[glassesIndex]?.price) || 0
+                          : 0;
+
+                      return (
+                        <React.Fragment key={index}>
+                          <div
+                            className={`payment-item-row${isGlassesTotal ? " payment-item-row-clickable" : ""}`}
+                            onClick={() => {
+                              if (!isGlassesTotal || glassesIndex === undefined) {
+                                return;
+                              }
+
+                              setExpandedPaymentGlasses((prev) => ({
+                                ...prev,
+                                [glassesIndex]: !prev[glassesIndex],
+                              }));
+                            }}
+                          >
+                            <span>
+                              {isGlassesTotal && (
+                                <span className="payment-item-toggle-icon">
+                                  {isExpanded ? "▾" : "▸"}
+                                </span>
+                              )}
+                              {item.model}
+                            </span>
+                            <span>
+                              {item.price.toFixed(2)} Kč{" "}
+                              <span className="payment-item-rate">
+                                (DPH: {item.rate}%)
+                              </span>
+                            </span>
+                          </div>
+
+                          {isExpanded && (
+                            <div className="payment-item-breakdown">
+                              <div className="payment-item-breakdown-row">
+                                <span>Obruba</span>
+                                <span>{framePrice.toFixed(2)} Kč</span>
+                              </div>
+                              <div className="payment-item-breakdown-row">
+                                <span>Zábrus</span>
+                                <span>{servicePrice.toFixed(2)} Kč</span>
+                              </div>
+                              <div className="payment-item-breakdown-row">
+                                <span>Brýlové čočky</span>
+                                <span>{lensesPrice.toFixed(2)} Kč</span>
+                              </div>
+                            </div>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+                  <div className="payment-total-row">
+                    <span>Celkem:</span>
+                    <span>
+                      {paymentItems
+                        .reduce((sum, item) => sum + item.price, 0)
+                        .toFixed(2)}{" "}
+                      Kč
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <h3>Vyberte zboží do zakázky...</h3>
+              )}
+            </div>
           </div>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              onSubmit(values);
-              setTimeout(onClose, 2);
-            }}
-          >
-            <div></div>
-            {/* Tlačítka pro uložení, zrušení a případně další akci (smazat, naskladnit atd.) */}
-            <div className="modal-actions">
-              {thirdButton !== null && values.name !== "" && (
-                <button
-                  className={
-                    thirdButton === "Smazat" ? "button-warning" : "button"
-                  }
-                  type="button"
-                  onClick={handleThirdButtonClick}
-                >
-                  {thirdButton}
+          <div className="payment-actions-panel">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                onSubmit(values);
+                setTimeout(onClose, 2);
+              }}
+            >
+              <div></div>
+              {/* Tlačítka pro uložení, zrušení a případně další akci (smazat, naskladnit atd.) */}
+              <div className="modal-actions payment-actions-layout">
+                <button type="button" className="payment-button-full">
+                  Platba
                 </button>
-              )}
-              <button type="button" onClick={handleClose}>
-                {secondButton}
-              </button>
-              <button type="submit">{firstButton}</button>
-            </div>
-          </form>
+                <button type="button" className="payment-button-full">
+                  Tisk zakázky
+                </button>
+                <div className="payment-actions-row">
+                  {thirdButton !== null && values.name !== "" && (
+                    <button
+                      className={
+                        thirdButton === "Smazat" ? "button-warning" : "button"
+                      }
+                      type="button"
+                      onClick={handleThirdButtonClick}
+                    >
+                      {thirdButton}
+                    </button>
+                  )}
+                  <button type="button" onClick={handleClose}>
+                    {secondButton}
+                  </button>
+                  <button type="submit">{firstButton}</button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>

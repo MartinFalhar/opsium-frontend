@@ -293,9 +293,9 @@ function Invoices() {
             onSubmit={handleSubmitNewOrder}
             onClose={() => setShowModal(false)}
             onCancel={() => setShowModal(false)}
-            firstButton="Uložit"
-            secondButton="Zavřít"
-            thirdButton={null}
+            firstButton="Zakázka"
+            secondButton="Návrh"
+            thirdButton="Zpět"
             formattedInvoiceNumber={newOrderNumberFormatted}
           />
         )}
