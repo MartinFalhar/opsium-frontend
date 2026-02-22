@@ -2,13 +2,25 @@ import React, { useState, useEffect, useRef } from "react";
 import ConfirmDelete from "./ConfirmDelete";
 import SegmentedControl from "../../components/controls/SegmentedControl.jsx";
 import SegmentedControlMulti from "../../components/controls/SegmentedControlMulti.jsx";
+import ModalPayment from "./ModalPayment";
 import { useStoreGetPluItem } from "../../hooks/useStoreGetPluItem.js";
 import { useStoreGetPluFrame } from "../../hooks/useStoreGetPluFrame.js";
 import { useStoreGetPluService } from "../../hooks/useStoreGetPluService.js";
 import { useStoreGetPluLenses } from "../../hooks/useStoreGetPluLenses.js";
 import { useOrdersLoadItems } from "../../hooks/useOrdersLoadItems.js";
+import { useOrdersSaveDioptricValues } from "../../hooks/useOrdersSaveDioptricValues.js";
 import "./Modal.css";
 import "./ModalNewOrder.css";
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+const paymentMethodToAttrib = {
+  hotovost: 1,
+  "platební karta": 2,
+  "převod na účet": 3,
+  "šek": 4,
+  "okamžitá QR platba": 5,
+};
 
 export default function ModalNewOrder({
   initialValues = {},
@@ -59,6 +71,12 @@ export default function ModalNewOrder({
     error: orderItemsError,
   } = useOrdersLoadItems();
 
+  const {
+    saveOrderDioptricValues,
+    loading: saveDioptricLoading,
+    error: saveDioptricError,
+  } = useOrdersSaveDioptricValues();
+
   //Nastavení zakázky
   const orderDates = ["SPĚCHÁ", "zítra", "3 dny", "týden", "2-3 týdny", "..."];
   const [orderDatesSelection, setOrderDatesSelection] = useState(orderDates[3]);
@@ -102,6 +120,9 @@ export default function ModalNewOrder({
   // Položky k platbě
   const [paymentItems, setPaymentItems] = useState([]);
   const [expandedPaymentGlasses, setExpandedPaymentGlasses] = useState({});
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentSaving, setPaymentSaving] = useState(false);
+  const [paidTransactions, setPaidTransactions] = useState([]);
   const [loadedOrderItemsId, setLoadedOrderItemsId] = useState(null);
 
   // Aktualizace values při změně initialValues
@@ -150,6 +171,75 @@ export default function ModalNewOrder({
     };
   };
 
+  const buildDioptricPayload = () => {
+    return glassesItems
+      .map((glasses, index) => {
+        const order_item_id = glassesFrameData[index]?.order_item_id;
+        if (!order_item_id) {
+          return null;
+        }
+
+        return {
+          order_item_id,
+          right: {
+            sph: glasses?.right?.sph ?? "",
+            cyl: glasses?.right?.cyl ?? "",
+            osa: glasses?.right?.osa ?? "",
+            add: glasses?.right?.add ?? "",
+            prizma: glasses?.right?.prizma ?? "",
+            baze: glasses?.right?.baze ?? "",
+            pd: glasses?.right?.pd ?? "",
+            vyska: glasses?.right?.vyska ?? "",
+            vertex: glasses?.right?.vertex ?? "",
+            panto: glasses?.right?.panto ?? "",
+          },
+          left: {
+            sph: glasses?.left?.sph ?? "",
+            cyl: glasses?.left?.cyl ?? "",
+            osa: glasses?.left?.osa ?? "",
+            add: glasses?.left?.add ?? "",
+            prizma: glasses?.left?.prizma ?? "",
+            baze: glasses?.left?.baze ?? "",
+            pd: glasses?.left?.pd ?? "",
+            vyska: glasses?.left?.vyska ?? "",
+            vertex: glasses?.left?.vertex ?? "",
+            panto: glasses?.left?.panto ?? "",
+          },
+        };
+      })
+      .filter(Boolean);
+  };
+
+  const handleSecondButtonClick = async () => {
+    if (secondButton !== "Návrh") {
+      handleClose();
+      return;
+    }
+
+    const orderId = values?.order_id;
+    if (!orderId) {
+      handleClose();
+      return;
+    }
+
+    try {
+      const payload = buildDioptricPayload();
+      await saveOrderDioptricValues(orderId, payload, {
+        note: values?.note ?? "",
+        delivery_address: values?.address_for_delivery ?? "",
+      });
+
+      if (onSubmit) {
+        await onSubmit(values);
+      }
+
+      handleClose();
+    } catch (error) {
+      console.error("Nepodařilo se uložit údaje zakázky:", error);
+      alert(saveDioptricError || "Nepodařilo se uložit údaje zakázky.");
+    }
+  };
+
   // Handler pro přidání položky do obligatoryItems
   const handleAddObligatoryItem = async () => {
     if (isAddingObligatoryItemRef.current || pluLoading) return;
@@ -181,8 +271,50 @@ export default function ModalNewOrder({
   };
 
   // Handler pro odstranění položky z obligatoryItems
-  const handleRemoveObligatoryItem = (index) => {
-    setObligatoryItems((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveObligatoryItem = async (index) => {
+    const selectedItem = obligatoryItems[index];
+    const orderId = Number(values?.order_id);
+    const storeItemId = Number(selectedItem?.store_item_id);
+    const storeBatchId = Number(selectedItem?.store_batch_id);
+
+    if (
+      !Number.isFinite(orderId) ||
+      !Number.isFinite(storeItemId) ||
+      !Number.isFinite(storeBatchId)
+    ) {
+      setObligatoryItems((prev) => prev.filter((_, i) => i !== index));
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/store/order-item-delete-draft`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+        body: JSON.stringify({
+          order_id: orderId,
+          store_item_id: storeItemId,
+          store_batch_id: storeBatchId,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.message || "Nepodařilo se odstranit položku.");
+      }
+
+      setObligatoryItems((prev) => prev.filter((_, i) => i !== index));
+
+      if (onSubmit) {
+        await onSubmit(values);
+      }
+    } catch (error) {
+      console.error("Nepodařilo se odstranit položku zakázky:", error);
+      alert(error?.message || "Nepodařilo se odstranit položku.");
+    }
   };
 
   // Handler pro přidání brýlí
@@ -229,8 +361,7 @@ export default function ModalNewOrder({
     setGlassesLensesData((prev) => [...prev, null]);
   };
 
-  // Handler pro odstranění položky brýlí
-  const handleRemoveGlasses = (index) => {
+  const removeGlassesFromState = (index) => {
     setGlassesItems((prev) => prev.filter((_, i) => i !== index));
     setExpandedCentration((prev) => prev.filter((_, i) => i !== index));
     setExpandedDioptrie((prev) => prev.filter((_, i) => i !== index));
@@ -241,6 +372,50 @@ export default function ModalNewOrder({
     setGlassesFrameData((prev) => prev.filter((_, i) => i !== index));
     setGlassesServiceData((prev) => prev.filter((_, i) => i !== index));
     setGlassesLensesData((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Handler pro odstranění položky brýlí
+  const handleRemoveGlasses = async (index) => {
+    const orderId = Number(values?.order_id);
+    const orderItemIds = [
+      Number(glassesFrameData[index]?.order_item_id),
+      Number(glassesServiceData[index]?.order_item_id),
+      Number(glassesLensesData[index]?.order_item_id),
+    ].filter((value) => Number.isFinite(value) && value > 0);
+
+    if (!Number.isFinite(orderId) || orderItemIds.length === 0) {
+      removeGlassesFromState(index);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/store/order-glasses-delete-draft`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+        body: JSON.stringify({
+          order_id: orderId,
+          order_item_ids: orderItemIds,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.message || "Nepodařilo se odstranit blok brýlí.");
+      }
+
+      removeGlassesFromState(index);
+
+      if (onSubmit) {
+        await onSubmit(values);
+      }
+    } catch (error) {
+      console.error("Nepodařilo se odstranit blok brýlí:", error);
+      alert(error?.message || "Nepodařilo se odstranit blok brýlí.");
+    }
   };
 
   // Handler pro změnu hodnot brýlí
@@ -558,6 +733,7 @@ export default function ModalNewOrder({
 
             if (row.item_type === "frame") {
               bucket.frameData = {
+                order_item_id: row.id,
                 collection: row.frame_collection,
                 product: row.frame_product,
                 color: row.frame_color,
@@ -569,10 +745,77 @@ export default function ModalNewOrder({
                 rate: 0,
                 supplier_nick: row.frame_supplier_nick,
               };
+
+              const hasDioptricValues = [
+                row.dioptric_ps,
+                row.dioptric_pc,
+                row.dioptric_pa,
+                row.dioptric_padd,
+                row.dioptric_pp,
+                row.dioptric_pb,
+                row.dioptric_ls,
+                row.dioptric_lc,
+                row.dioptric_la,
+                row.dioptric_ladd,
+                row.dioptric_lp,
+                row.dioptric_lb,
+              ].some((value) => value !== null && value !== undefined);
+
+              if (hasDioptricValues) {
+                bucket.glasses.right = {
+                  ...bucket.glasses.right,
+                  sph: row.dioptric_ps ?? "",
+                  cyl: row.dioptric_pc ?? "",
+                  osa: row.dioptric_pa ?? "",
+                  add: row.dioptric_padd ?? "",
+                  prizma: row.dioptric_pp ?? "",
+                  baze: row.dioptric_pb ?? "",
+                };
+
+                bucket.glasses.left = {
+                  ...bucket.glasses.left,
+                  sph: row.dioptric_ls ?? "",
+                  cyl: row.dioptric_lc ?? "",
+                  osa: row.dioptric_la ?? "",
+                  add: row.dioptric_ladd ?? "",
+                  prizma: row.dioptric_lp ?? "",
+                  baze: row.dioptric_lb ?? "",
+                };
+              }
+
+              const hasCentrationValues = [
+                row.centration_p_pd,
+                row.centration_p_v,
+                row.centration_p_vd,
+                row.centration_p_panto,
+                row.centration_l_pd,
+                row.centration_l_v,
+                row.centration_l_vd,
+                row.centration_l_panto,
+              ].some((value) => value !== null && value !== undefined);
+
+              if (hasCentrationValues) {
+                bucket.glasses.right = {
+                  ...bucket.glasses.right,
+                  pd: row.centration_p_pd ?? "",
+                  vyska: row.centration_p_v ?? "",
+                  vertex: row.centration_p_vd ?? "",
+                  panto: row.centration_p_panto ?? "",
+                };
+
+                bucket.glasses.left = {
+                  ...bucket.glasses.left,
+                  pd: row.centration_l_pd ?? "",
+                  vyska: row.centration_l_v ?? "",
+                  vertex: row.centration_l_vd ?? "",
+                  panto: row.centration_l_panto ?? "",
+                };
+              }
             }
 
             if (row.item_type === "lens") {
               bucket.lensesData = {
+                order_item_id: row.id,
                 plu: row.lens_plu,
                 code: row.lens_code,
                 sph: row.lens_sph,
@@ -585,6 +828,7 @@ export default function ModalNewOrder({
 
             if (row.item_type === "service") {
               bucket.serviceData = {
+                order_item_id: row.id,
                 plu: row.service_plu,
                 name: row.service_name || "Služba",
                 amount: row.service_amount,
@@ -656,6 +900,73 @@ export default function ModalNewOrder({
 
   const handleCancelConfirm = () => {
     setShowConfirm(false);
+  };
+
+  const handleOpenPaymentModal = () => {
+    setShowPaymentModal(true);
+  };
+
+  const handleCancelPaymentModal = () => {
+    if (paymentSaving) {
+      return;
+    }
+
+    setShowPaymentModal(false);
+  };
+
+  const handlePayTransaction = async ({ amount, method }) => {
+    const orderId = Number(values?.order_id);
+
+    if (!Number.isFinite(orderId) || orderId <= 0) {
+      alert("Chybí order_id pro zaúčtování platby.");
+      return;
+    }
+
+    setPaymentSaving(true);
+
+    try {
+      const attribCode = paymentMethodToAttrib[method] ?? 1;
+
+      const res = await fetch(`${API_URL}/store/new-transaction`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+        body: JSON.stringify({
+          invoice_id: orderId,
+          attrib: attribCode,
+          price_a: amount,
+          vat_a: 0,
+          price_b: 0,
+          vat_b: 0,
+          price_c: 0,
+          vat_c: 0,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data?.success === false) {
+        throw new Error(data?.message || "Nepodařilo se zaúčtovat platbu.");
+      }
+
+      setPaidTransactions((prev) => [
+        ...prev,
+        {
+          amount,
+          method,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+
+      setShowPaymentModal(false);
+    } catch (error) {
+      console.error("Nepodařilo se zaúčtovat platbu:", error);
+      alert(error?.message || "Nepodařilo se zaúčtovat platbu.");
+    } finally {
+      setPaymentSaving(false);
+    }
   };
 
   if (showConfirm) {
@@ -766,6 +1077,16 @@ export default function ModalNewOrder({
                 placeholder="Adresa pro doručení"
               />
             </div>
+          </div>
+
+          <div className="order-obligatory-items">
+
+            <textarea
+              value={values.note || ""}
+              onChange={(e) => handleChange("note", e.target.value)}
+              placeholder="Poznámka k zakázce"
+              rows={3}
+            />
           </div>
 
           <div className="order-obligatory-items">
@@ -1634,13 +1955,58 @@ export default function ModalNewOrder({
               ) : (
                 <h3>Vyberte zboží do zakázky...</h3>
               )}
+              {paidTransactions.length > 0 && (
+                <div className="payment-total-row" style={{ marginTop: "8px" }}>
+                  <div style={{ width: "100%" }}>
+                    {paidTransactions.map((payment, index) => (
+                      <div
+                        key={`${payment.createdAt}-${index}`}
+                        className="payment-item-row"
+                      >
+                        <span>{payment.method}</span>
+                        <span>{Number(payment.amount).toFixed(2)} Kč</span>
+                      </div>
+                    ))}
+                    <div className="payment-item-row">
+                      <span>Uhrazeno celkem</span>
+                      <span>
+                        {paidTransactions
+                          .reduce(
+                            (sum, payment) => sum + Number(payment.amount || 0),
+                            0,
+                          )
+                          .toFixed(2)}{" "}
+                        Kč
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           <div className="payment-actions-panel">
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
+                const orderId = values?.order_id;
+
+                if (orderId) {
+                  try {
+                    const payload = buildDioptricPayload();
+                    await saveOrderDioptricValues(orderId, payload, {
+                      note: values?.note ?? "",
+                      delivery_address: values?.address_for_delivery ?? "",
+                    });
+                  } catch (error) {
+                    console.error("Nepodařilo se uložit dioptrické hodnoty:", error);
+                    alert(
+                      saveDioptricError || "Nepodařilo se uložit dioptrické hodnoty.",
+                    );
+                    return;
+                  }
+                }
+
                 onSubmit(values);
                 setTimeout(onClose, 2);
               }}
@@ -1648,7 +2014,11 @@ export default function ModalNewOrder({
               <div></div>
               {/* Tlačítka pro uložení, zrušení a případně další akci (smazat, naskladnit atd.) */}
               <div className="modal-actions payment-actions-layout">
-                <button type="button" className="payment-button-full">
+                <button
+                  type="button"
+                  className="payment-button-full"
+                  onClick={handleOpenPaymentModal}
+                >
                   Platba
                 </button>
                 <button type="button" className="payment-button-full">
@@ -1666,7 +2036,11 @@ export default function ModalNewOrder({
                       {thirdButton}
                     </button>
                   )}
-                  <button type="button" onClick={handleClose}>
+                  <button
+                    type="button"
+                    onClick={handleSecondButtonClick}
+                    disabled={saveDioptricLoading}
+                  >
                     {secondButton}
                   </button>
                   <button type="submit">{firstButton}</button>
@@ -1676,6 +2050,16 @@ export default function ModalNewOrder({
           </div>
         </div>
       </div>
+      {showPaymentModal && (
+        <ModalPayment
+          defaultAmount={paymentItems
+            .reduce((sum, item) => sum + item.price, 0)
+            .toFixed(2)}
+          loading={paymentSaving}
+          onCancel={handleCancelPaymentModal}
+          onPay={handlePayTransaction}
+        />
+      )}
     </div>
   );
 }

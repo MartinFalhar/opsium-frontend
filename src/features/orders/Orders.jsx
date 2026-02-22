@@ -38,6 +38,8 @@ function Invoices() {
     post_code: selectedClientForOrder?.post_code ?? "",
     email: selectedClientForOrder?.email ?? "",
     phone: selectedClientForOrder?.phone ?? "",
+    note: selectedClientForOrder?.note ?? "",
+    address_for_delivery: selectedClientForOrder?.address_for_delivery ?? "",
   };
 
   const formatInvoiceNumber = (invoice) => {
@@ -169,6 +171,8 @@ function Invoices() {
       post_code: invoice.post_code || "",
       email: invoice.email || "",
       phone: invoice.phone || "",
+      note: invoice.note || "",
+      address_for_delivery: invoice.delivery_address || "",
     });
 
     if (invoice.client_id) {
