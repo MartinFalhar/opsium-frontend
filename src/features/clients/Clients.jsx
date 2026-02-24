@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import "./Clients.css";
+
 import Modal from "../../components/modal/Modal.jsx";
 import { useNavigate, Navigate } from "react-router-dom";
 

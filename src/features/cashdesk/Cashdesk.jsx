@@ -1,110 +1,147 @@
-import React from "react";
-import { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "./Cashdesk.css";
 import SegmentedControl from "../../components/controls/SegmentedControl.jsx";
-import { useUser } from "../../context/UserContext";
-import { useEffect } from "react";
-
 
 const API_URL = import.meta.env.VITE_API_URL;
+const PAYMENT_METHOD_TO_ATTRIB = {
+  Hotovost: 1,
+  Karta: 2,
+  Převod: 3,
+  Šeky: 4,
+};
+const TIME_RANGE_TO_KEY = {
+  Dnes: "today",
+  Včera: "yesterday",
+  "3 dny": "3days",
+  Týden: "week",
+  Měsíc: "month",
+};
 
 function Cashdesk() {
-  const timeRange = ["Dnes", "Včera", "3 dny", "Týden", "Měsíc"];
-  const paymentMethod = ["Hotovost", "Karta", "Převod", "Šeky"];
+  const timeRange = ["Vše", "Dnes", "Včera", "3 dny", "Týden", "Měsíc"];
+  const paymentMethod = ["Vše", "Hotovost", "Karta", "Převod", "Šeky"];
 
   const [selectedTimeRange, setSelectedTimeRange] = useState(timeRange[0]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
-    paymentMethod[0]
+    paymentMethod[0],
   );
   const [isLoading, setIsLoading] = useState(false);
   const [inputSearch, setInputSearch] = useState("");
-  const [clients, setClients] = useState([]);
-  const [goods, setGoods] = useState([]);
+  const [activeSearch, setActiveSearch] = useState("");
+  const [transactions, setTransactions] = useState([]);
   const [error, setError] = useState(null);
-  const { user, vat } = useUser();
 
-  const [hoveredClientId, setHoveredClientId] = useState(null);
-  const [hoveredGoodId, setHoveredGoodId] = useState(null);
-
-  
-
-  //PAGINATION HOOKS
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const limit = 6;
-
-
-
-  const handleSearchInStore = async () => {
-    // SEARCH CLIENTS
+  const handleSearchInTransactions = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/client/clients_list`, {
+      setIsLoading(true);
+      setError(null);
+
+      const paymentAttrib =
+        PAYMENT_METHOD_TO_ATTRIB[selectedPaymentMethod] ?? null;
+      const timeRangeKey = TIME_RANGE_TO_KEY[selectedTimeRange] ?? null;
+
+      const res = await fetch(`${API_URL}/store/transaction-list`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ branch_id: user.branch_id }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+        body: JSON.stringify({
+          query: activeSearch,
+          payment_attrib: paymentAttrib,
+          time_range: timeRangeKey,
+        }),
       });
-      const data = await res.json();
-      if (res.ok) {
-        setClients(data);
-      } else {
-        setError(data.message);
-        console.error("Error loading users:", error);
-      }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      setError("Nepodařilo se načíst klienty.");
-    }
-    // SEARCH GOODS
 
-    try {
-      const res = await fetch(
-        `${API_URL}/store/search?page=${page}&limit=${limit}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ searchText: "BOOM" }),
-        }
-      );
       const data = await res.json();
 
       if (res.ok) {
-        setGoods(data.items);
-        setTotalPages(data.totalPages);
-        setIsLoading(false);
+        setTransactions(Array.isArray(data) ? data : []);
       } else {
         setError(data.message);
-        console.error("Error loading items:", error);
+        console.error("Error loading transactions:", data.message);
       }
     } catch (err) {
       console.error("Fetch error:", err);
-      setError("Nepodařilo se načíst klienty.");
+      setError("Nepodařilo se načíst transakce.");
+    } finally {
+      setIsLoading(false);
     }
+  }, [activeSearch, selectedPaymentMethod, selectedTimeRange]);
+
+  useEffect(() => {
+    handleSearchInTransactions();
+  }, [handleSearchInTransactions]);
+
+  const formatOrderNumber = (transaction) => {
+    const year = String(transaction?.year ?? "")
+      .slice(-2)
+      .padStart(2, "0");
+    const number = String(transaction?.number ?? "").padStart(5, "0");
+
+    if (!year && !number) {
+      return String(transaction?.order_id ?? "-");
+    }
+
+    return `${year}${number}`;
   };
+
+  const formatDateAndTime = (value) => {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return { date: "-", time: "-" };
+    }
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = String(date.getFullYear()).slice(-2);
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return {
+      date: `${day}/${month}/${year}`,
+      time: `${hours}:${minutes}`,
+    };
+  };
+
+  const formatPrice = (value) => `${Number(value ?? 0).toFixed(2)} Kč`;
 
   return (
     <div className="container">
       <div className="left-container-2">
         <div className="input-panel">
-          <input
-            className="client-search-input"
-            type="text"
-            value={inputSearch}
-            onChange={(e) => setInputSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSearchInStore(inputSearch);
-              }
-            }}
-            placeholder="Zadej hledaný text"
-          />
-
-          <div className="buttons-container">
-            <button
-              type="submit"
-              onClick={() => handleSearchInStore(inputSearch)}
-            >
+          <div className="search-input-container">
+            <input
+              type="text"
+              value={inputSearch}
+              onChange={(e) => setInputSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setActiveSearch(inputSearch);
+                }
+              }}
+              placeholder="Zadej hledaný text"
+            />
+            <button type="submit" onClick={() => setActiveSearch(inputSearch)}>
               Hledej
             </button>
+            <div className="segmented-control-item">
+              <h5>Časový rozsah</h5>
+              <SegmentedControl
+                items={timeRange}
+                selectedValue={selectedTimeRange}
+                onClick={(item) => setSelectedTimeRange(item)}
+              />
+            </div>
+            <div className="segmented-control-item">
+              <h5>Platební metoda</h5>
+              <SegmentedControl
+                items={paymentMethod}
+                selectedValue={selectedPaymentMethod}
+                onClick={(item) => setSelectedPaymentMethod(item)}
+              />
+            </div>
           </div>
         </div>
         <div
@@ -113,75 +150,85 @@ function Cashdesk() {
             overflowY: "scroll",
           }}
         >
-          <h5>Zboží</h5>
-          {goods.length > 0 &&
-            goods.map((good) => (
-              <div
-                key={good.id}
-                className="cl-item"
-                onMouseEnter={() => setHoveredGoodId(good.id)}
-                onMouseLeave={() => setHoveredGoodId(null)}
-              >
-                <h1>
-                  {`${good.ean} ${good.product} ${good.collection} ${good.color}`}{" "}
-                </h1>
-                <p>{`${good.supplier} ${good.quantity}ks ${good.price} Kč`}</p>
-                {hoveredGoodId === good.id && (
-                  <div className="item-actions">
-                    <button onClick={() => handleGoodSale(good)}>PRODEJ</button>
-                    <button onClick={() => handleGoodOrder(good)}>
-                      ZAKÁZKA
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
-          <h5>Klienti</h5>
-          {clients.length > 0 &&
-            clients.map((client) => (
-              <div
-                key={client.id}
-                className="cl-item"
-                onMouseEnter={() => setHoveredClientId(client.id)}
-                onMouseLeave={() => setHoveredClientId(null)}
-              >
-                <h1>
-                  {`${client.degree_before} ${client.name} ${client.surname}, ${client.degree_after}`}{" "}
-                </h1>
-                <p>{`${client.street} ${client.city} ${client.post_code} DB ID: ${client.id}`}</p>
-                {hoveredClientId === client.id && (
-                  <div className="item-actions">
-                    <button onClick={() => handleClientSale(client)}>
-                      PRODEJ
-                    </button>
-                    <button onClick={() => handleClientOrder(client)}>
-                      ZAKÁZKA
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
-          <h5>Kombinace</h5>
-        </div>
-      </div>
-      <div className="right-container-2">
-        <div className="show-items-panel">
-          <h1>POKLADNA</h1>
-          <div className="segmented-control-item">
-            <h5>Časový rozsah</h5>
-            <SegmentedControl
-              items={timeRange}
-              selectedValue={selectedTimeRange}
-              onClick={(item) => setSelectedTimeRange(item)}
-            />
+          <div className="items-panel-label">
+            <h5>Přijaté platby</h5>
+            <p>Nalezeno {transactions?.length || 0} položek</p>
           </div>
-          <div className="segmented-control-item">
-            <h5>Platební metoda</h5>
-            <SegmentedControl
-              items={paymentMethod}
-              selectedValue={selectedPaymentMethod}
-              onClick={(item) => setSelectedPaymentMethod(item)}
-            />
+          <div className="items-panel-table-header five-columns">
+            <h3>Datum</h3>
+            <h3>Zakázka / Jméno</h3>
+            <h3>Typ platby</h3>
+            <h3>Zakázka</h3>
+            <h3>Celková částka</h3>
+          </div>
+          <div className="items-list">
+            {isLoading && <p>Načítám transakce...</p>}
+            {error && <p>{error}</p>}
+
+            {!isLoading &&
+              transactions.length > 0 &&
+              transactions.map((transaction) => {
+                const { date, time } = formatDateAndTime(
+                  transaction.created_at,
+                );
+
+                return (
+                  <details key={transaction.id}>
+                    <summary
+                      className="items-panel-table-header five-columns"
+                      style={{ cursor: "pointer" }}
+                    >
+                      <div className="item-name">
+                        <p>{`${date} ${time}`}</p>
+                      </div>
+                      <div className="item-name">
+                        <p>{`${formatOrderNumber(transaction)} ${transaction.customer_name || "Neznámý zákazník"}`}</p>
+                      </div>
+                      <div className="item-name">
+                        <p>{transaction.payment_method || "platba"}</p>
+                      </div>
+                      <div className="item-name">
+                        <p>{formatOrderNumber(transaction)}</p>
+                      </div>
+                      <div className="item-name">
+                        <p>{formatPrice(transaction.amount)}</p>
+                      </div>
+                    </summary>
+                    <div>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Typ</th>
+                            <th>Price</th>
+                            <th>VAT</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>A</td>
+                            <td>{formatPrice(transaction.price_a)}</td>
+                            <td>{formatPrice(transaction.vat_a)}</td>
+                          </tr>
+                          <tr>
+                            <td>B</td>
+                            <td>{formatPrice(transaction.price_b)}</td>
+                            <td>{formatPrice(transaction.vat_b)}</td>
+                          </tr>
+                          <tr>
+                            <td>C</td>
+                            <td>{formatPrice(transaction.price_c)}</td>
+                            <td>{formatPrice(transaction.vat_c)}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </details>
+                );
+              })}
+
+            {!isLoading && transactions.length === 0 && !error && (
+              <p>Žádné transakce k zobrazení.</p>
+            )}
           </div>
         </div>
       </div>

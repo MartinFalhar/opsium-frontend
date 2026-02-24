@@ -68,7 +68,10 @@ function AdminMembers() {
     try {
       const res = await fetch(`${API_URL}/admin/create_member`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
         body: JSON.stringify(newUser),
       });
 
@@ -87,36 +90,59 @@ function AdminMembers() {
   };
 
   return (
-    <div className="admin-content-container ">
-      <div className="search-container">
-        <input
-          className="client-search-input"
-          type="text"
-          value={searchClient}
-          onChange={(e) => setSearchClient(e.target.value)}
-          placeholder="Hledej uživatele"
-        />
-        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>Nový člen</button>
-      </div>
-      <div className="clients-list-container">
-        <h1>
-          Nalezeno {members.length === undefined ? "0" : members.length} uživatel
-          {members.length == 0
-            ? "ů"
-            : members.length === 1
-            ? ""
-            : members.length in [2, 3, 4]
-            ? "é"
-            : "ů"}
-        </h1>
+    <div className="container ">
+      <div className="left-container-2">
+        <div className="input-panel">
+          <input
+            className="search-input-container"
+            type="text"
+            value={searchClient}
+            onChange={(e) => setSearchClient(e.target.value)}
+            placeholder="Hledej uživatele"
+          />
+        <button onClick={() => setShowModal(true)}>Nový člen</button>
+        </div>
+      
+      <div className="show-items-panel">
+        <div className="items-panel-label">
+          <h1>
+            Nalezeno {members.length === undefined ? "0" : members.length}{" "}
+            uživatel
+            {members.length == 0
+              ? "ů"
+              : members.length === 1
+                ? ""
+                : members.length in [2, 3, 4]
+                  ? "é"
+                  : "ů"}
+          </h1>
+        </div>
+        <div className="items-panel-table-header five-columns">
+          <h3>ID</h3>
+          <h3>Jméno / Adresa</h3>
+          <h3>Telefon</h3>
+          <h3>Email</h3>
+          <h3>Zakázka</h3>
+        </div>
         <PuffLoaderSpinner active={isLoading} />
-        {members?.length > 0 &&
-          members?.map((member) => (
-            <div key={member.id} className="client-item" onClick={() => null}>
-              <h1>{`${member.name} ${member.surname}`}</h1>
-              <p>{`Nick: ${member.nick} #${member.pin} | ID Organizace: ${member.organization_id}`}</p>
-            </div>
-          ))}
+        <div className="items-list">
+          {members?.length > 0 &&
+            members?.map((member) => (
+              <div
+                key={member.id}
+                className="item five-columns"
+                onClick={() => null}
+              >
+                <div className="item-name">{member.id}</div>
+                <div className="item-name">
+                  <h1>{`${member.name} ${member.surname}`}</h1>
+                </div>
+                <div className="item-name">
+                  <p>{`Nick: ${member.nick} #${member.pin} | ID Organizace: ${member.organization_id}`}</p>
+                </div>
+              </div>
+            ))}
+        </div>
       </div>
       <div>
         {showModal && (
@@ -126,6 +152,7 @@ function AdminMembers() {
             onClose={() => setShowModal(false)}
           />
         )}
+      </div>
       </div>
     </div>
   );

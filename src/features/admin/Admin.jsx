@@ -113,14 +113,13 @@ function Admin() {
           );
         })}
       </div>
-      <div className="left-container">
-        {Component ? <Component client={user} /> : null}
+<div className="left-container-2">
 
-      </div>
-      <div className="right-container">
-        <h1>INFO</h1>
-        
-      </div>
+        {Component ? <Component client={user} /> : null}
+</div>
+
+
+
     </div>
   );
 }

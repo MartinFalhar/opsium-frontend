@@ -9,6 +9,7 @@ import { useStoreGetPluService } from "../../hooks/useStoreGetPluService.js";
 import { useStoreGetPluLenses } from "../../hooks/useStoreGetPluLenses.js";
 import { useOrdersLoadItems } from "../../hooks/useOrdersLoadItems.js";
 import { useOrdersSaveDioptricValues } from "../../hooks/useOrdersSaveDioptricValues.js";
+import { useOrderConfirmOrder } from "../../hooks/useOrderConfirmOrder.js";
 import "./Modal.css";
 import "./ModalNewOrder.css";
 
@@ -77,6 +78,12 @@ export default function ModalNewOrder({
     loading: saveDioptricLoading,
     error: saveDioptricError,
   } = useOrdersSaveDioptricValues();
+
+  const {
+    confirmOrder,
+    loading: confirmOrderLoading,
+    error: confirmOrderError,
+  } = useOrderConfirmOrder();
 
   //Nastavení zakázky
   const orderDates = ["SPĚCHÁ", "zítra", "3 dny", "týden", "2-3 týdny", "..."];
@@ -2041,6 +2048,18 @@ export default function ModalNewOrder({
                   }
                 }
 
+                if (firstButton === "Zakázka" && orderId) {
+                  try {
+                    await confirmOrder(orderId);
+                  } catch (error) {
+                    console.error("Nepodařilo se potvrdit zakázku:", error);
+                    alert(
+                      confirmOrderError || "Nepodařilo se potvrdit zakázku.",
+                    );
+                    return;
+                  }
+                }
+
                 onSubmit(values);
                 setTimeout(onClose, 2);
               }}
@@ -2082,11 +2101,16 @@ export default function ModalNewOrder({
                   <button
                     type="button"
                     onClick={handleSecondButtonClick}
-                    disabled={saveDioptricLoading}
+                    disabled={saveDioptricLoading || confirmOrderLoading}
                   >
                     {secondButton}
                   </button>
-                  <button type="submit">{firstButton}</button>
+                  <button
+                    type="submit"
+                    disabled={saveDioptricLoading || confirmOrderLoading}
+                  >
+                    {firstButton}
+                  </button>
                 </div>
               </div>
             </form>
