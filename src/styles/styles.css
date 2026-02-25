@@ -457,23 +457,110 @@ button:hover {
 
 /* ----------- INFO BOX & INPUT PANEL MANAGEMENT*/
 
+.admin-dashboard-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
 .info-box {
-  border: 1px solid var(--color-el-e);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.55);
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-top: 16px;
   margin-left: 16px;
   width: 150px;
   height: 150px;
   min-width: 150px;
-  background: var(--color-bg-b1);
+  background: linear-gradient(
+    155deg,
+    rgba(243, 244, 246, 0.9) 0%,
+    rgba(224, 231, 240, 0.92) 55%,
+    rgba(169, 183, 201, 0.9) 100%
+  );
+  box-shadow:
+    0 10px 22px rgba(30, 41, 59, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.info-box::before {
+  content: "";
+  position: absolute;
+  top: -35%;
+  left: -35%;
+  width: 170%;
+  height: 170%;
+  background: var(--color-grd-app-accent);
+  opacity: 0.18;
+  transform: rotate(12deg);
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.info-box::after {
+  content: "";
+  position: absolute;
+  top: -24%;
+  right: -18%;
+  width: 130px;
+  height: 130px;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.52) 0%,
+    rgba(255, 255, 255, 0) 75%
+  );
+  pointer-events: none;
+}
+
+.info-box:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-el-e);
+  box-shadow:
+    0 14px 28px rgba(30, 41, 59, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .info-box-header {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  min-height: 36px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.info-box-header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 72%;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--color-grd-app-accent);
+  opacity: 0.75;
+}
+
+.info-box-header h3,
+.info-box-header h4,
+.info-box-header h5,
+.info-box-header h6 {
+  margin: 0;
+  color: var(--color-bg-b3);
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: none;
 }
 
 .info-box-content {
@@ -481,26 +568,74 @@ button:hover {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .info-box-content h5 {
   color: var(--color-grd-g1);
-  font-size: clamp(var(--font-size-small), 3vw, 7vw);
+  font-size: clamp(var(--font-size-regular), 3.4vw, 7.4vw);
+}
+
+.info-box-events {
+  width: 360px;
+  min-width: 360px;
+  height: auto;
+  min-height: 150px;
+}
+
+.info-box-events .info-box-content {
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.info-box-events .info-box-content p {
+  position: relative;
+  z-index: 1;
+  color: var(--color-bg-b3);
+  font-size: clamp(var(--font-size-small), 0.85vw, var(--font-size-regular));
+  line-height: 1.25;
 }
 
 .info-box-2 {
-  border: 1px solid var(--color-bg-b10);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.55);
   padding: 10px;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-top: 16px;
   margin-left: 16px;
   width: 300px;
   height: 150px;
-  background: var(--color-bg-b9);
+  background: linear-gradient(
+    155deg,
+    rgba(243, 244, 246, 0.88) 0%,
+    rgba(224, 231, 240, 0.9) 55%,
+    rgba(169, 183, 201, 0.85) 100%
+  );
+  box-shadow:
+    0 10px 22px rgba(30, 41, 59, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.info-box-2::before {
+  content: "";
+  position: absolute;
+  top: -35%;
+  left: -35%;
+  width: 170%;
+  height: 170%;
+  background: var(--color-grd-app-accent);
+  opacity: 0.14;
+  transform: rotate(10deg);
+  filter: blur(2px);
+  pointer-events: none;
 }
 
 .info-box-2 p {
+  position: relative;
+  z-index: 1;
+  color: var(--color-bg-b3);
   font-size: clamp(var(--font-size-small), 0.75vw, 0.8vw);
 }
 
@@ -708,7 +843,6 @@ button:hover {
   color: var(--color-bg-b1);
   font-weight: bold;
 }
-
 
 /* ----------- NEW INVOICE LAYOUT */
 

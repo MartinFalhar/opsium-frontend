@@ -5,6 +5,7 @@ import "./Modal.css";
 export default function Modal({
   fields,
   initialValues,
+  title,
   onSubmit,
   onClose,
   onCancel,
@@ -92,7 +93,7 @@ export default function Modal({
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h2>Zadej údaje</h2>
+        <h2>{title || "Zadej údaje"}</h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -210,7 +211,7 @@ export default function Modal({
           </div>
 
           <div className="modal-actions">
-            {thirdButton !== null && initialValues.name !== "" && (
+            {thirdButton != null && (initialValues?.name ?? "") !== "" && (
               <button
                 className={
                   thirdButton === "Smazat" ? "button-warning" : "button"
