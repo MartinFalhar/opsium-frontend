@@ -6,8 +6,7 @@ import PuffLoaderSpinner from "../../components/loader/PuffLoaderSpinner.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function AdminOrganization () {
-
+function AdminOrganization() {
   const { user, members } = useUser();
   const fields = [
     { varName: "name", label: "Jméno", input: "text", required: true },
@@ -16,12 +15,10 @@ function AdminOrganization () {
     { varName: "pin", label: "PIN", input: "password", required: true },
   ];
 
-
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const [error, setError] = useState(null);
-
 
   const handleSubmit = async (values) => {
     console.log("Submitted values:", values);
@@ -30,12 +27,9 @@ function AdminOrganization () {
   return (
     <div className="admin-dashboard-container">
       <div className="header-button-group">
-<p>
-  :: No buttons yet ::
-  </p>
+        <p>:: No buttons yet ::</p>
       </div>
-        <div className="clients-list-container">
-
+      <div className="clients-list-container">
         <div className="info-box-2">
           <h6>Informace o organizaci:</h6>
           <h1>{`${user.organization_name}`}</h1>
@@ -50,7 +44,7 @@ function AdminOrganization () {
         <div className="info-box-2">
           <h6>Členové organizace:</h6>
           {members.map((member) => (
-              <div key={member.id}>
+            <div key={member.id}>
               <p>{`${member.name} ${member.surname} (${member.nick}) #${member.pin}`}</p>
             </div>
           ))}
@@ -58,19 +52,19 @@ function AdminOrganization () {
         <div className="info-box-2">
           <h6>Spravovaná pobočka tímto účtem:</h6>
           {user.branch_id === 0 ? (
-              <p>
+            <p>
               K tomuto účtu není přiřazena žádná pobočka, jedná se o ADMIN účet.
             </p>
           ) : (
-              <div>              
+            <div>
               <h1>{`${user.branch_name}`}</h1>
               <h1>{`${user.branch_street}`}</h1>
               <h1>{`${user.branch_postal_code} ${user.branch_city} `}</h1>
-              <h1>{`${user?.open_hours?.['pondělí'] || `closed`}`}</h1>
+              <h1>{`${user?.open_hours?.["pondělí"] || `closed`}`}</h1>
             </div>
           )}
-          </div>
         </div>
+      </div>
       <div>
         {showModal && (
           <Modal

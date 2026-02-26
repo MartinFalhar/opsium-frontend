@@ -87,7 +87,6 @@ function Admin() {
         }}
       >
         <div className="secondary-menu-header">
-
           {isMenuExtended ? (
             <>
               <img

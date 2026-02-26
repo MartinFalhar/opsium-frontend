@@ -7,7 +7,7 @@ function AdminDashboard({ client }) {
   const [opsiumInfo, setOpsiumInfo] = useState({});
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [error, setError] = useState(null);
-  const { user } = useUser();
+  const { user, members } = useUser();
 
   const getMonthDay = (value) => {
     if (!value) {
@@ -143,8 +143,6 @@ function AdminDashboard({ client }) {
 
   return (
     <div className="admin-dashboard-container">
-
-
       <div className="info-box">
         <div className="info-box-header">
           <h5>Počet účtů</h5>
@@ -207,6 +205,46 @@ function AdminDashboard({ client }) {
                 {event.daysUntil === 0 ? "dnes" : `za ${event.daysUntil} dní`})
               </p>
             ))
+          )}
+        </div>
+      </div>
+
+      <div className="info-box info-box-wide">
+        <div className="info-box-header">
+          <h5>Informace o organizaci:</h5>
+        </div>
+        <div className="info-box-content ">
+          <h2>{`${user.organization_name}`}</h2>
+          <p>{`${user.organization_street}, ${user.organization_city} ${user.organization_postal_code}`}</p>
+          <p>{`IČO: ${user.organization_ico} DIČ: ${user.organization_dic}`}</p>
+        </div>
+      </div>
+
+      <div className="info-box info-box-wide">
+        <div className="info-box-header">
+          <h5>Členové organizace:</h5>
+        </div>
+        {(members || []).map((member) => (
+          <div key={member.id}>
+            <p>{`${member.name} ${member.surname} (${member.nick}) #${member.pin}`}</p>
+          </div>
+        ))}
+      </div>
+      <div className="info-box info-box-wide">
+        <div className="info-box-header">
+          <h5>Spravovaná pobočka tímto účtem:</h5>
+        </div>
+        <div className="info-box-content">
+          {user.branch_id === 0 ? (
+            <p>
+              K tomuto účtu není přiřazena žádná pobočka, jedná se o ADMIN účet.
+            </p>
+          ) : (
+            <div>
+              <h2>{`${user.branch_name}`}</h2>
+              <p>{`${user.branch_street}, ${user.branch_city} ${user.branch_postal_code} `}</p>
+              <p>{`${user?.open_hours?.["pondělí"] || `zavřeno`}`}</p>
+            </div>
           )}
         </div>
       </div>

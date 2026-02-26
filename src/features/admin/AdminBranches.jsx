@@ -15,11 +15,9 @@ function AdminBranches() {
     { varName: "postal_code", label: "PSČ", input: "text", required: true },
   ];
 
-
-
-
   const [searchClient, setSearchClient] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   //proměnné pro načtení poboček z DB
@@ -54,30 +52,38 @@ function AdminBranches() {
   }, [loadBranches]);
 
   const handleSubmit = async (values) => {
-    if (values.password !== values.passwordCheck) {
-      alert("Hesla se neshodují");
-      return;
-    }
-
-    const newBranch = {
+    const branchPayload = {
+      id: selectedBranch?.id,
+      user_id: selectedBranch?.user_id,
       name: values.name,
+      branch_name: values.name,
       street: values.street,
       city: values.city,
       postal_code: values.postal_code,
+      open_hours: selectedBranch?.open_hours || { pondělí: "08:00-17:00" },
       //zde je USER organization z CONTEXTu, což je organization ADMINA, který uživatele vytváří
       organization_id: user.organization_id,
     };
+
     try {
-      const res = await fetch(`${API_URL}/admin/create_branch`, {
+      const endpoint = selectedBranch?.id
+        ? `${API_URL}/admin/update_branch`
+        : `${API_URL}/admin/create_branch`;
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newBranch),
+        body: JSON.stringify(branchPayload),
       });
 
       if (res.ok) {
-        window.showToast("Úspěšně odesláno!");
+        window.showToast(
+          selectedBranch?.id
+            ? "Pobočka byla úspěšně upravena!"
+            : "Úspěšně odesláno!",
+        );
         await loadBranches();
-        setShowModal(false);
+        handleCloseModal();
       } else {
         window.showToast("Chyba při odesílání.");
       }
@@ -85,6 +91,21 @@ function AdminBranches() {
       console.error(error);
       window.showToast("Server je nedostupný.");
     }
+  };
+
+  const handleOpenNewBranchModal = () => {
+    setSelectedBranch(null);
+    setShowModal(true);
+  };
+
+  const handleOpenBranchModal = (branch) => {
+    setSelectedBranch(branch);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedBranch(null);
   };
 
   const handleSearchBranches = () => {
@@ -133,7 +154,9 @@ function AdminBranches() {
       part.toLowerCase() === query.toLowerCase() ? (
         <mark key={`${value}-${part}-${index}`}>{part}</mark>
       ) : (
-        <React.Fragment key={`${value}-${part}-${index}`}>{part}</React.Fragment>
+        <React.Fragment key={`${value}-${part}-${index}`}>
+          {part}
+        </React.Fragment>
       ),
     );
   };
@@ -184,7 +207,7 @@ function AdminBranches() {
               />
             </div>
             <button onClick={handleSearchBranches}>Hledej</button>
-            <button onClick={() => setShowModal(true)}>Nová pobočka</button>
+            <button onClick={handleOpenNewBranchModal}>Nová pobočka</button>
           </div>
         </div>
 
@@ -194,18 +217,48 @@ function AdminBranches() {
               {foundVerb} {branchCount} {branchNoun}
             </h4>
           </div>
+          <div className="items-panel-table-header six-columns-2 one-row">
+            <h3>ID</h3>
+            <h3 className="left">Pobočka</h3>
+            <h3 className="left">Adresa</h3>
+            <h3>Email</h3>
+            <h3>Telefon</h3>
+            <h3>Otevírací doba</h3>
+          </div>
           <PuffLoaderSpinner active={isLoading} />
           <div className="items-list">
             {filteredBranches?.length > 0 &&
               filteredBranches?.map((branch) => (
-                <div key={branch.id} className="item" onClick={() => null}>
-                  <h1>
-                    {renderHighlightedText(branch.name)}, {renderHighlightedText(branch.street)}, {" "}
-                    {renderHighlightedText(branch.postal_code)} {renderHighlightedText(branch.city)}
-                  </h1>
-                  <p>
-                    Email: {`${branch?.email ?? ""}`} | Telefon: {`${branch?.phone ?? ""}`} | Otevírací doba: {`${branch?.open_hours ?? ""}`} | ID Organizace: {branch.organization_id}
-                  </p>
+                <div
+                  key={branch.id}
+                  className="item six-columns-2 one-row"
+                  onClick={() => handleOpenBranchModal(branch)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      handleOpenBranchModal(branch);
+                    }
+                  }}
+                >
+                  <div className="item-plu  ">{branch.id}</div>
+                  <div className="item-name  left">
+                    <h1>{branch.name}</h1>
+                  </div>
+                  <div className="item-name  left">
+                    <h1>{`${branch.street}, ${branch.city} ${branch.postal_code}`}</h1>
+                  </div>
+
+                  <div className="item-name  ">
+                    <p>{branch?.email?.email}</p>
+                  </div>
+                  <div className="item-name  ">
+                    <p>{branch?.phone?.phone}</p>
+                  </div>
+                  <div className="item-name  ">
+                    <p>{JSON.stringify(branch.open_hours)}</p>
+                  </div>
                 </div>
               ))}
           </div>
@@ -215,11 +268,13 @@ function AdminBranches() {
         {showModal && (
           <Modal
             fields={fields}
+            title={selectedBranch?.id ? "Upravit pobočku" : "Nová pobočka"}
+            initialValues={selectedBranch ?? {}}
             onSubmit={handleSubmit}
-            onClose={() => setShowModal(false)}
-            onCancel={() => setShowModal(false)}
+            onClose={handleCloseModal}
+            onCancel={handleCloseModal}
             secondButton={"Zrušit"}
-            firstButton={"Uložit"}
+            firstButton={selectedBranch?.id ? "Upravit" : "Uložit"}
           />
         )}
       </div>
