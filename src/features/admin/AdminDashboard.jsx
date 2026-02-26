@@ -143,19 +143,7 @@ function AdminDashboard({ client }) {
 
   return (
     <div className="admin-dashboard-container">
-      <div className="info-box-2">
-        <div className="info-box-header">
-          <h6>
-            <strong>ADMIN DATA</strong>
-          </h6>
-        </div>
-        <p>{`ID users: ${user.id}`}</p>
-        <p>{`Jméno: ${user.name}`}</p>
-        <p>{`Příjmení: ${user.surname}`}</p>
-        <p>{`Email: ${user.email}`}</p>
-        <p>{`ID organizace: ${user.organization_id}`}</p>
-        <p>{`Práva: ${user.rights}`}</p>
-      </div>
+
 
       <div className="info-box">
         <div className="info-box-header">
@@ -192,8 +180,20 @@ function AdminDashboard({ client }) {
           <h5>{opsiumInfo.countTotalClients}</h5>
         </div>
       </div>
-
-      <div className="info-box info-box-events">
+      <div className="info-box info-box-wide">
+        <div className="info-box-header">
+          <h6>
+            <strong>ADMIN DATA</strong>
+          </h6>
+        </div>
+        <p>{`ID users: ${user.id}`}</p>
+        <p>{`Jméno: ${user.name}`}</p>
+        <p>{`Příjmení: ${user.surname}`}</p>
+        <p>{`Email: ${user.email}`}</p>
+        <p>{`ID organizace: ${user.organization_id}`}</p>
+        <p>{`Práva: ${user.rights}`}</p>
+      </div>
+      <div className="info-box info-box-wide">
         <div className="info-box-header">
           <h5>Nejbližší svátky / narozeniny</h5>
         </div>

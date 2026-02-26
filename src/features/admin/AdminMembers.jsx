@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./Admin.css";
 import Modal from "../../components/modal/Modal.jsx";
 import { useUser } from "../../context/UserContext.jsx";
@@ -97,9 +97,9 @@ function AdminMembers() {
 
   //proměnné pro načtení users z DB
   const [members, setMembers] = useState([]);
-  const [error, setError] = useState(null);
+  const [filteredMembers, setFilteredMembers] = useState([]);
 
-  const loadMembers = async () => {
+  const loadMembers = useCallback(async () => {
     setIsLoading(true); // 👈 zapneme loader
     try {
       const res = await fetch(`${API_URL}/admin/members_list`, {
@@ -111,22 +111,21 @@ function AdminMembers() {
 
       if (res.ok) {
         setMembers(data);
+        setFilteredMembers(data);
       } else {
-        setError(data.message);
         console.error("Error loading users:", data.message);
       }
     } catch (err) {
       console.error("Chyba při načítání:", err);
-      setError("Chyba při načítání dat.");
     } finally {
       setIsLoading(false); // 👈 vypneme loader
     }
-  };
+  }, [user?.organization_id]);
 
   //načtení uživatelů z DB
   useEffect(() => {
     loadMembers();
-  }, [user?.organization_id]);
+  }, [loadMembers]);
 
   const handleSubmit = async (values) => {
     if (values.password !== values.passwordCheck) {
@@ -204,46 +203,117 @@ function AdminMembers() {
     setSelectedMember(null);
   };
 
+  const handleSearchMembers = () => {
+    const query = searchClient.trim().toLowerCase();
+
+    if (!query) {
+      setFilteredMembers(members);
+      return;
+    }
+
+    const result = members.filter((member) => {
+      const memberName = `${member?.name ?? ""}`.toLowerCase();
+      const memberSurname = `${member?.surname ?? ""}`.toLowerCase();
+      return memberName.includes(query) || memberSurname.includes(query);
+    });
+
+    setFilteredMembers(result);
+  };
+
+  const handleClearSearch = () => {
+    setSearchClient("");
+    setFilteredMembers(members);
+  };
+
+  const renderHighlightedText = (text) => {
+    const value = `${text ?? ""}`;
+    const query = searchClient.trim();
+
+    if (!query) {
+      return value;
+    }
+
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escapedQuery})`, "ig");
+    const parts = value.split(regex);
+
+    return parts.map((part, index) =>
+      part.toLowerCase() === query.toLowerCase() ? (
+        <mark key={`${value}-${part}-${index}`}>{part}</mark>
+      ) : (
+        <React.Fragment key={`${value}-${part}-${index}`}>{part}</React.Fragment>
+      ),
+    );
+  };
+
+  const memberCount = Number.isFinite(filteredMembers?.length)
+    ? filteredMembers.length
+    : 0;
+  const isFewMembers =
+    memberCount >= 2 &&
+    memberCount <= 4 &&
+    !(memberCount >= 12 && memberCount <= 14);
+
+  const foundVerb =
+    memberCount === 1 ? "Nalezen" : isFewMembers ? "Nalezeni" : "Nalezeno";
+  const memberNoun =
+    memberCount === 1 ? "člen" : isFewMembers ? "členové" : "členů";
+
   return (
     <div className="container ">
       <div className="left-container-2">
         <div className="input-panel">
-          <input
-            className="search-input-container"
-            type="text"
-            value={searchClient}
-            onChange={(e) => setSearchClient(e.target.value)}
-            placeholder="Hledej uživatele"
-          />
-          <button onClick={handleOpenNewMemberModal}>Nový člen</button>
+          <div className="search-input-container">
+            <div className="search-input-wrapper">
+              {searchClient.trim() ? (
+                <button
+                  type="button"
+                  className="search-clear-button"
+                  onClick={handleClearSearch}
+                  aria-label="Vymazat hledání"
+                  title="Vymazat"
+                >
+                  ×
+                </button>
+              ) : null}
+              <input
+                type="text"
+                value={searchClient}
+                onChange={(e) => setSearchClient(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearchMembers();
+                  }
+                  if (e.key === "Escape") {
+                    handleClearSearch();
+                  }
+                }}
+                placeholder="Hledej uživatele"
+              />
+            </div>
+            <button onClick={handleSearchMembers}>Hledej</button>
+            <button onClick={handleOpenNewMemberModal}>Nový člen</button>
+          </div>
         </div>
 
         <div className="show-items-panel">
           <div className="items-panel-label">
-            <h1>
-              Nalezeno {members.length === undefined ? "0" : members.length}{" "}
-              člen
-              {members.length == 0
-                ? "ů"
-                : members.length === 1
-                  ? ""
-                  : members.length in [2, 3, 4]
-                    ? "i"
-                    : "ů"}
-            </h1>
+            <h4>
+              {foundVerb} {memberCount} {memberNoun}
+            </h4>
           </div>
           <div className="items-panel-table-header six-columns-2 one-row">
             <h3>ID#PIN</h3>
-            <h3>Jméno</h3>
-            <h3>Příjmení</h3>
+            <h3 className="left">Jméno</h3>
+            <h3 className="left">Příjmení</h3>
             <h3>Nick</h3>
             <h3>Narozeniny</h3>
             <h3>Svátek</h3>
           </div>
           <PuffLoaderSpinner active={isLoading} />
           <div className="items-list">
-            {members?.length > 0 &&
-              members?.map((member) => (
+            {filteredMembers?.length > 0 &&
+              filteredMembers?.map((member) => (
                 <div
                   key={member.id}
                   className="item six-columns-2 one-row"
@@ -251,11 +321,11 @@ function AdminMembers() {
                 >
                   {" "}
                   <div className="item-plu  ">{`${member.id}#${member.pin}`}</div>
-                  <div className="item-name">
-                    <h1>{`${member.name} `}</h1>
+                  <div className="item-name left">
+                    <h1>{renderHighlightedText(`${member.name} `)}</h1>
                   </div>
-                  <div className="item-name">
-                    <h1>{`${member.surname}`}</h1>
+                  <div className="item-name left">
+                    <h1>{renderHighlightedText(`${member.surname}`)}</h1>
                   </div>
                   <div className="item-name">
                     <p>{`${member.nick}`}</p>

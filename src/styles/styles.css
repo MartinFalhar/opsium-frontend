@@ -133,7 +133,7 @@
   --icon-size: 20px;
   --font-size-xsmall: 0.7rem;
   --font-size-small: 0.8rem;
-  --font-size-regular: 1rem;
+  --font-size-regular: 0.9rem;
   --font-size-large: 1.1rem;
   --font-size-xlarge: 1.2rem;
 }
@@ -201,8 +201,8 @@ textarea {
 
 h1 {
   font-size: clamp(var(--font-size-small), 2.5vw, var(--font-size-xlarge));
-  color: var(--color-bg-b3);
-  text-align: left;
+  color: var(--color-bg-b8);
+  /* text-align: left; */
   font-weight: 800;
   letter-spacing: 1px;
   font-weight: 400;
@@ -210,23 +210,23 @@ h1 {
 
 h2 {
   font-size: clamp(var(--font-size-small), 2.3vw, var(--font-size-large));
-  color: var(--color-bg-b1);
+  color: var(--color-bg-b5);
   text-align: left;
   font-weight: 600;
 }
 
 h3 {
-  font-size: clamp(var(--font-size-small), 1vw, var(--font-size-small));
+  font-size: clamp(var(--font-size-small), 1.6vw, var(--font-size-regular));
   color: var(--color-bg-b5);
   text-align: left;
   font-weight: 800;
 }
 
 h4 {
-  font-size: clamp(var(--font-size-small), 1vw, var(--font-size-small));
-  color: var(--color-bg-b10);
+  font-size: clamp(var(--font-size-small), 1.8vw, var(--font-size-regular));
+  color: var(--color-bg-b3);
   text-align: left;
-  font-weight: 400;
+  
   letter-spacing: 1px;
 }
 
@@ -236,8 +236,8 @@ h7 {
 }
 
 .fancy-1 {
-  font-size: clamp(var(--font-size-small), 2.3vw, var(--font-size-large));
-  text-align: left;
+  /* font-size: clamp(var(--font-size-small), 2.3vw, var(--font-size-large)); */
+  text-align: center;
   background: var(--color-grd-g6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -248,12 +248,12 @@ h7 {
 .fancy-2 {
   font-size: clamp(var(--font-size-small), 2.2vw, var(--font-size-large));
   color: var(--color-bg-b2);
-  text-align: left;
-  background: var(--color-grd-g11);
+  background: var(--color-grd-g7);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
+  font-weight: 800;
 }
 
 .fancy-3 {
@@ -265,6 +265,7 @@ h7 {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
+  font-weight: 800;
 }
 
 .fancy-4 {
@@ -576,8 +577,8 @@ button:hover {
   font-size: clamp(var(--font-size-regular), 3.4vw, 7.4vw);
 }
 
-.info-box-events {
-  width: 360px;
+.info-box-wide {
+  width: 400px;
   min-width: 360px;
   height: auto;
   min-height: 150px;
@@ -653,7 +654,7 @@ button:hover {
   display: flex;
   flex-direction: column;
   justify-content: start;
-  align-items: space-between;
+  align-items: space-evenly;
   width: 200px;
   height: 100%;
   background: var(--color-bg-b3);
@@ -665,15 +666,17 @@ button:hover {
 
 .secondary-menu-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
 
   height: 50px;
 }
 
 .secondary-menu-icon {
-  scale: 55%;
-  color: var(--color-bg-b2);
+  width: 25px;
+  height: 25px;
+  flex-shrink: 0;
+  color: var(--color-bg-b9);
   margin-left: 5px;
   cursor: pointer;
 }
@@ -801,6 +804,21 @@ button:hover {
 
 .button-secondary-menu.ico::before {
   background-image: url("../../src/styles/svg/outline-assistant.svg");
+  font-size: 0.5rem;
+}
+
+.button-secondary-menu.person::before {
+  background-image: url("../../src/styles/svg/persons.svg");
+  font-size: 0.5rem;
+}
+
+.button-secondary-menu.accounts::before {
+  background-image: url("../../src/styles/svg/accounts.svg");
+  font-size: 0.5rem;
+}
+
+.button-secondary-menu.catalog::before {
+  background-image: url("../../src/styles/svg/catalog.svg");
   font-size: 0.5rem;
 }
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useUser } from "../../context/UserContext";
 import Modal from "../../components/modal/Modal.jsx";
 import SegmentedControl from "../../components/controls/SegmentedControl.jsx";
@@ -61,6 +61,7 @@ function AgendaServices() {
   const [inputSearch, setInputSearch] = useState("");
   const [error, setError] = useState(null);
   const [items, setItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -71,12 +72,13 @@ function AgendaServices() {
   // Načtení dat při prvním načtení komponenty
   useEffect(() => {
     if (user?.branch_id) {
-      handleSearchInCatalog();
+      loadServices();
     }
   }, [user?.branch_id]);
 
-  const handleSearchInCatalog = async () => {
+  const loadServices = useCallback(async () => {
     // SEARCH SERVICES IN AGENDA
+    setIsLoading(true);
     try {
       const res = await fetch(`${API_URL}/agenda/services-search`, {
         method: "POST",
@@ -90,7 +92,7 @@ function AgendaServices() {
 
       if (res.ok) {
         setItems(data);
-        setIsLoading(false);
+        setFilteredItems(data);
 
         // Získání unikátních kategorií z načtených položek
         const uniqueCategories = [
@@ -102,12 +104,69 @@ function AgendaServices() {
         console.log("Categories fetched:", uniqueCategories);
       } else {
         setError(data.message);
-        console.error("Error loading users:", error);
+        console.error("Error loading services:", data.message);
       }
     } catch (err) {
       console.error("Fetch error:", err);
       setError("Nepodařilo se načíst klienty.");
+    } finally {
+      setIsLoading(false);
     }
+  }, [API_URL, user?.branch_id]);
+
+  const handleSearchInCatalog = () => {
+    const query = inputSearch.trim().toLowerCase();
+
+    if (!query) {
+      setFilteredItems(items);
+      return;
+    }
+
+    const result = items.filter((item) => {
+      const name = `${item?.name ?? ""}`.toLowerCase();
+      const amount = `${item?.amount ?? ""}`.toLowerCase();
+      const uom = `${item?.uom ?? ""}`.toLowerCase();
+      const category = `${item?.category ?? ""}`.toLowerCase();
+      const note = `${item?.note ?? ""}`.toLowerCase();
+      const plu = `${item?.plu ?? ""}`.toLowerCase();
+
+      return (
+        name.includes(query) ||
+        amount.includes(query) ||
+        uom.includes(query) ||
+        category.includes(query) ||
+        note.includes(query) ||
+        plu.includes(query)
+      );
+    });
+
+    setFilteredItems(result);
+  };
+
+  const handleClearSearch = () => {
+    setInputSearch("");
+    setFilteredItems(items);
+  };
+
+  const renderHighlightedText = (text) => {
+    const value = `${text ?? ""}`;
+    const query = inputSearch.trim();
+
+    if (!query) {
+      return value;
+    }
+
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escapedQuery})`, "ig");
+    const parts = value.split(regex);
+
+    return parts.map((part, index) =>
+      part.toLowerCase() === query.toLowerCase() ? (
+        <mark key={`${value}-${part}-${index}`}>{part}</mark>
+      ) : (
+        <React.Fragment key={`${value}-${part}-${index}`}>{part}</React.Fragment>
+      ),
+    );
   };
 
   const handleClick = (itemId) => {
@@ -156,7 +215,7 @@ function AgendaServices() {
       if (res.ok) {
         window.showToast("Položka v databázi změněna.");
 
-        handleSearchInCatalog(); // Obnovení seznamu položek po změně
+        loadServices(); // Obnovení seznamu položek po změně
       } else {
         setError(data.message);
         console.error("Chyba při ukládání výkonu:", error);
@@ -184,7 +243,7 @@ function AgendaServices() {
       const data = await res.json();
       if (res.ok) {
         window.showToast("Položka byla smazána.");
-        handleSearchInCatalog(); // Obnovení seznamu položek po smazání
+        loadServices(); // Obnovení seznamu položek po smazání
       } else {
         setError(data.message);
         console.error("Chyba při mazání položky:", error);
@@ -213,25 +272,52 @@ function AgendaServices() {
     setShowModal(true);
   };
 
+  const visibleItems = filteredItems.filter(
+    (item) => selectedCategory === "vše" || item.category === selectedCategory,
+  );
+
+  const itemCount = Number.isFinite(visibleItems?.length) ? visibleItems.length : 0;
+  const isFewItems =
+    itemCount >= 2 && itemCount <= 4 && !(itemCount >= 12 && itemCount <= 14);
+  const foundVerb =
+    itemCount === 1 ? "Nalezena" : isFewItems ? "Nalezeny" : "Nalezeno";
+  const itemNoun =
+    itemCount === 1 ? "položka" : isFewItems ? "položky" : "položek";
+
   return (
     <div className="container">
       <div className="left-container-2">
         <div className="input-panel">
-          <input
-            className="search-input-container"
-            type="text"
-            value={inputSearch}
-            onChange={(e) => setInputSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSearchInCatalog(inputSearch);
-              }
-            }}
-            placeholder="Zadej hledaný text"
-          />
-          <button onClick={() => handleSearchInCatalog(inputSearch)}>
-            Vyhledat
-          </button>
+          <div className="search-input-container">
+            <div className="search-input-wrapper">
+              {inputSearch.trim() ? (
+                <button
+                  type="button"
+                  className="search-clear-button"
+                  onClick={handleClearSearch}
+                  aria-label="Vymazat hledání"
+                  title="Vymazat"
+                >
+                  ×
+                </button>
+              ) : null}
+              <input
+                type="text"
+                value={inputSearch}
+                onChange={(e) => setInputSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearchInCatalog();
+                  }
+                  if (e.key === "Escape") {
+                    handleClearSearch();
+                  }
+                }}
+                placeholder="Zadej hledaný text"
+              />
+            </div>
+            <button onClick={handleSearchInCatalog}>Hledej</button>
+          </div>
 
           <SegmentedControl
             items={categoryFilter}
@@ -244,7 +330,9 @@ function AgendaServices() {
         <div className="show-items-panel">
           <div className="items-panel-label">
             <h2>Výkony a služby</h2>
-            <p>Nalezeno {items.length} položek</p>
+            <p>
+              {foundVerb} {itemCount} {itemNoun}
+            </p>
           </div>
           <div className="items-panel-table-header four-columns">
             <h3>PLU</h3>
@@ -254,26 +342,24 @@ function AgendaServices() {
           </div>
           <div className="items-list">
             <PuffLoaderSpinnerLarge active={isLoading} />
-            {items.length === 0 && <p>Žádné položky k zobrazení</p>}
-            {items.length > 0 &&
-              items.map(
-                (item) =>
-                  (selectedCategory === "vše" ||
-                    item.category === selectedCategory) && (
-                    <div
-                      key={item.id}
-                      className="item one-row four-columns"
-                      onClick={() => handleClick(item.id)}
-                    >
-               
-                        <div className="item-plu">{item.plu}</div>
+            {visibleItems.length === 0 && <p>Žádné položky k zobrazení</p>}
+            {visibleItems.length > 0 &&
+              visibleItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="item one-row four-columns"
+                  onClick={() => handleClick(item.id)}
+                >
+                        <div className="item-plu">{renderHighlightedText(item.plu)}</div>
 
                         <div className="item-name">
-                          <h1>{`${item.name}`}</h1>
+                          <h1>{renderHighlightedText(item.name)}</h1>
                         </div>
 
                         <div className="item-amount">
-                          <p>{`${item.amount} ${item.uom}`}</p>
+                          <p>
+                            {renderHighlightedText(item.amount)} {renderHighlightedText(item.uom)}
+                          </p>
                         </div>
 
                         <div className="item-price-vat">
@@ -285,7 +371,7 @@ function AgendaServices() {
                         </div>
 
                         <div className="item-note">
-                          <p>{item.note}</p>
+                          <p>{renderHighlightedText(item.note)}</p>
                         </div>
 
                         <div
@@ -295,7 +381,7 @@ function AgendaServices() {
                               categoryColors[item.category] || "#95a5a6",
                           }}
                         >
-                          {item.category}
+                          {renderHighlightedText(item.category)}
                         </div>
                       
 
@@ -309,9 +395,8 @@ function AgendaServices() {
                       </button>
                     </div>
                   )} */}
-                    </div>
-                  ),
-              )}
+                </div>
+              ))}
           </div>
         </div>
       </div>

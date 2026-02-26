@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./Superadmin.css";
 import Modal from "../../components/modal/Modal.jsx";
+import PuffLoaderSpinner from "../../components/loader/PuffLoaderSpinner.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -20,28 +21,37 @@ function SuperadminAdminPanel() {
 
   const [searchClient, setSearchClient] = useState("");
   const [showModal, setShowModal] = useState(false);
-  //proměnné pro načtení users z DB
+  const [isLoading, setIsLoading] = useState(false);
+  //proměnné pro načtení adminů z DB
   const [users, setUsers] = useState([]);
-  const [error, setError] = useState(null);
+  const [filteredUsers, setFilteredUsers] = useState([]);
 
-  useEffect(() => {
-    const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
+    setIsLoading(true);
+    try {
       const res = await fetch(`${API_URL}/admin/admin_list`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ users }),
+        body: JSON.stringify({}),
       });
       const data = await res.json();
 
       if (res.ok) {
         setUsers(data);
+        setFilteredUsers(data);
       } else {
-        setError(data.message);
-        console.error("Error loading users:", error);
+        console.error("Error loading users:", data.message);
       }
-    };
-    loadUsers();
+    } catch (err) {
+      console.error("Chyba při načítání:", err);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   const handleSubmit = async (values) => {
     if (values.password !== values.passwordCheck) {
@@ -65,47 +75,137 @@ function SuperadminAdminPanel() {
       });
 
       if (res.ok) {
-        alert("Úspěšně odesláno!");
+        window.showToast("Úspěšně odesláno!");
+        await loadUsers();
+        setShowModal(false);
       } else {
-        alert("Chyba při odesílání.");
+        window.showToast("Chyba při odesílání.");
       }
     } catch (error) {
       console.error(error);
-      alert("Server je nedostupný.");
+      window.showToast("Server je nedostupný.");
     }
   };
 
-  return (
-    <div className="admin-content-container ">
-      <div className="header-button-group">
-        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>Nový admin</button>
-      </div>
-      <div className="search-container">
-        <input
-          className="client-search-input"
-          type="text"
-          value={searchClient}
-          onChange={(e) => setSearchClient(e.target.value)}
-          placeholder="Hledej klienta"
-        />
-      </div>
-      <div className="clients-list-container">
-        <h1>Nalezeno {users.length} klientů</h1>
-        {users.map((client) => (
-          <div key={client.id} className="client-item" onClick={() => null}>
-            <h1>{`${client.name} ${client.surname} (${client.rights})`}</h1>
-              <p>{`Email: ${client.email} || ID Organizace: ${client.organization_id}`}</p>
-          </div>
-        ))}
-      </div>
+  const handleSearchUsers = () => {
+    const query = searchClient.trim().toLowerCase();
 
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Nový ADMIN účet</h2>
+    if (!query) {
+      setFilteredUsers(users);
+      return;
+    }
+
+    const result = users.filter((user) => {
+      const userName = `${user?.name ?? ""}`.toLowerCase();
+      const userSurname = `${user?.surname ?? ""}`.toLowerCase();
+      const userEmail = `${user?.email ?? ""}`.toLowerCase();
+
+      return (
+        userName.includes(query) ||
+        userSurname.includes(query) ||
+        userEmail.includes(query)
+      );
+    });
+
+    setFilteredUsers(result);
+  };
+
+  const handleClearSearch = () => {
+    setSearchClient("");
+    setFilteredUsers(users);
+  };
+
+  const renderHighlightedText = (text) => {
+    const value = `${text ?? ""}`;
+    const query = searchClient.trim();
+
+    if (!query) {
+      return value;
+    }
+
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escapedQuery})`, "ig");
+    const parts = value.split(regex);
+
+    return parts.map((part, index) =>
+      part.toLowerCase() === query.toLowerCase() ? (
+        <mark key={`${value}-${part}-${index}`}>{part}</mark>
+      ) : (
+        <React.Fragment key={`${value}-${part}-${index}`}>{part}</React.Fragment>
+      ),
+    );
+  };
+
+  const adminCount = Number.isFinite(filteredUsers?.length)
+    ? filteredUsers.length
+    : 0;
+  const isFewAdmins =
+    adminCount >= 2 && adminCount <= 4 && !(adminCount >= 12 && adminCount <= 14);
+
+  const foundVerb =
+    adminCount === 1 ? "Nalezen" : isFewAdmins ? "Nalezeni" : "Nalezeno";
+  const adminNoun =
+    adminCount === 1 ? "admin" : isFewAdmins ? "admini" : "adminů";
+
+  return (
+    <div className="container ">
+      <div className="left-container-2">
+        <div className="input-panel">
+          <div className="search-input-container">
+            <div className="search-input-wrapper">
+              {searchClient.trim() ? (
+                <button
+                  type="button"
+                  className="search-clear-button"
+                  onClick={handleClearSearch}
+                  aria-label="Vymazat hledání"
+                  title="Vymazat"
+                >
+                  ×
+                </button>
+              ) : null}
+              <input
+                type="text"
+                value={searchClient}
+                onChange={(e) => setSearchClient(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearchUsers();
+                  }
+                  if (e.key === "Escape") {
+                    handleClearSearch();
+                  }
+                }}
+                placeholder="Hledej admina"
+              />
+            </div>
+            <button onClick={handleSearchUsers}>Hledej</button>
+            <button onClick={() => setShowModal(true)}>Nový admin</button>
           </div>
         </div>
-      )}
+
+        <div className="show-items-panel">
+          <div className="items-panel-label">
+            <h4>
+              {foundVerb} {adminCount} {adminNoun}
+            </h4>
+          </div>
+          <PuffLoaderSpinner active={isLoading} />
+          <div className="items-list">
+            {filteredUsers?.length > 0 &&
+              filteredUsers.map((client) => (
+                <div key={client.id} className="item" onClick={() => null}>
+                  <h1>
+                    {renderHighlightedText(client.name)} {renderHighlightedText(client.surname)} ({client.rights})
+                  </h1>
+                  <p>
+                    Email: {renderHighlightedText(client.email)} | ID Organizace: {client.organization_id}
+                  </p>
+                </div>
+              ))}
+          </div>
+        </div>
+      </div>
 
       <div>
         {showModal && (
@@ -113,6 +213,9 @@ function SuperadminAdminPanel() {
             fields={fields}
             onSubmit={handleSubmit}
             onClose={() => setShowModal(false)}
+            onCancel={() => setShowModal(false)}
+            secondButton={"Zrušit"}
+            firstButton={"Uložit"}
           />
         )}
       </div>

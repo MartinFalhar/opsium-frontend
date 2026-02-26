@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import "./Store.css";
 import { useUser } from "../../context/UserContext";
-import menuIcon from "../../styles/svg/mirror-line.svg";
+import MenuToggleIcon from "../../components/icons/MenuToggleIcon";
 import StoreFrames from "./StoreFrames.jsx";
 import StoreLens from "./StoreLens.jsx";
 import StoreSunglasses from "./StoreSunglasses.jsx";
@@ -91,14 +91,13 @@ function Store() {
         <div className="secondary-menu-header">
           {isMenuExtended ? <h1 style={{ paddingLeft: "20px" }}>SKLAD</h1> : ""}
           {/* Ikona na sbalení menu - momentálně bez funkce */}
-          <img
+          <MenuToggleIcon
             onClick={() => {
               setIsMenuExtended(!isMenuExtended);
             }}
             className="secondary-menu-icon"
-            src={menuIcon}
             alt="Menu"
-          ></img>
+          />
         </div>
         {buttons.map((button) => {
           return (

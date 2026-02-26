@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./Admin.css";
 import Modal from "../../components/modal/Modal.jsx";
 import { useUser } from "../../context/UserContext.jsx";
+import PuffLoaderSpinner from "../../components/loader/PuffLoaderSpinner.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -31,28 +32,37 @@ function AdminAccounts() {
 
   const [searchClient, setSearchClient] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   //proměnné pro načtení users z DB
   const [users, setUsers] = useState([]);
-  const [error, setError] = useState(null);
+  const [filteredUsers, setFilteredUsers] = useState([]);
 
-  //načtení uživatelů z DB
-  useEffect(() => {
-    const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
+    setIsLoading(true);
+    try {
       const res = await fetch(`${API_URL}/admin/users_list`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ organization: user.organization_id }),
+        body: JSON.stringify({ organization: user?.organization_id }),
       });
       const data = await res.json();
       if (res.ok) {
         setUsers(data);
+        setFilteredUsers(data);
       } else {
-        setError(data.message);
-        console.error("Error loading users:", error);
+        console.error("Error loading users:", data.message);
       }
-    };
+    } catch (err) {
+      console.error("Chyba při načítání:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.organization_id]);
+
+  //načtení uživatelů z DB
+  useEffect(() => {
     loadUsers();
-  }, []);
+  }, [loadUsers]);
 
   const handleSubmit = async (values) => {
     if (values.password !== values.passwordCheck) {
@@ -81,50 +91,136 @@ function AdminAccounts() {
       });
 
       if (res.ok) {
-        alert("Úspěšně odesláno!");
+        window.showToast("Úspěšně odesláno!");
+        await loadUsers();
+        setShowModal(false);
       } else {
-        alert("Chyba při odesílání.");
+        window.showToast("Chyba při odesílání.");
       }
     } catch (error) {
       console.error(error);
-      alert("Server je nedostupný.");
+      window.showToast("Server je nedostupný.");
     }
   };
 
+  const handleSearchUsers = () => {
+    const query = searchClient.trim().toLowerCase();
+
+    if (!query) {
+      setFilteredUsers(users);
+      return;
+    }
+
+    const result = users.filter((item) => {
+      const userName = `${item?.name ?? ""}`.toLowerCase();
+      const userSurname = `${item?.surname ?? ""}`.toLowerCase();
+      const userEmail = `${item?.email ?? ""}`.toLowerCase();
+
+      return (
+        userName.includes(query) ||
+        userSurname.includes(query) ||
+        userEmail.includes(query)
+      );
+    });
+
+    setFilteredUsers(result);
+  };
+
+  const handleClearSearch = () => {
+    setSearchClient("");
+    setFilteredUsers(users);
+  };
+
+  const renderHighlightedText = (text) => {
+    const value = `${text ?? ""}`;
+    const query = searchClient.trim();
+
+    if (!query) {
+      return value;
+    }
+
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escapedQuery})`, "ig");
+    const parts = value.split(regex);
+
+    return parts.map((part, index) =>
+      part.toLowerCase() === query.toLowerCase() ? (
+        <mark key={`${value}-${part}-${index}`}>{part}</mark>
+      ) : (
+        <React.Fragment key={`${value}-${part}-${index}`}>{part}</React.Fragment>
+      ),
+    );
+  };
+
+  const userCount = Number.isFinite(filteredUsers?.length)
+    ? filteredUsers.length
+    : 0;
+  const isFewUsers =
+    userCount >= 2 && userCount <= 4 && !(userCount >= 12 && userCount <= 14);
+
+  const foundVerb =
+    userCount === 1 ? "Nalezen" : isFewUsers ? "Nalezeni" : "Nalezeno";
+  const userNoun =
+    userCount === 1 ? "uživatel" : isFewUsers ? "uživatelé" : "uživatelů";
+
   return (
-    <div className="admin-content-container ">
-
-      <div className="search-container">
-        <input
-          className="client-search-input"
-          type="text"
-          value={searchClient}
-          onChange={(e) => setSearchClient(e.target.value)}
-          placeholder="Hledej uživatele"
-        />
-        <button className="admin-menu-btn" onClick={() => setShowModal(true)}>
-          Nový účet
-        </button>
-      </div>
-      <div className="clients-list-container">
-        <h1>
-          Nalezeno {users.length} uživatel
-          {users.length == 0
-            ? "ů"
-            : users.length === 1
-            ? ""
-            : users.length in [2, 3, 4]
-            ? "é"
-            : "ů"}
-        </h1>
-
-        {users?.length > 0 &&
-          users?.map((client) => (
-            <div key={client.id} className="client-item" onClick={() => null}>
-              <h1>{`${client.name} ${client.surname} (${client.rights})`}</h1>
-              <p>{`Email: ${client.email} | ID Organizace: ${client.organization_id}`}</p>
+    <div className="container ">
+      <div className="left-container-2">
+        <div className="input-panel">
+          <div className="search-input-container">
+            <div className="search-input-wrapper">
+              {searchClient.trim() ? (
+                <button
+                  type="button"
+                  className="search-clear-button"
+                  onClick={handleClearSearch}
+                  aria-label="Vymazat hledání"
+                  title="Vymazat"
+                >
+                  ×
+                </button>
+              ) : null}
+              <input
+                type="text"
+                value={searchClient}
+                onChange={(e) => setSearchClient(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearchUsers();
+                  }
+                  if (e.key === "Escape") {
+                    handleClearSearch();
+                  }
+                }}
+                placeholder="Hledej uživatele"
+              />
             </div>
-          ))}
+            <button onClick={handleSearchUsers}>Hledej</button>
+            <button onClick={() => setShowModal(true)}>Nový účet</button>
+          </div>
+        </div>
+
+        <div className="show-items-panel">
+          <div className="items-panel-label">
+            <h4>
+              {foundVerb} {userCount} {userNoun}
+            </h4>
+          </div>
+          <PuffLoaderSpinner active={isLoading} />
+          <div className="items-list">
+            {filteredUsers?.length > 0 &&
+              filteredUsers?.map((client) => (
+                <div key={client.id} className="item" onClick={() => null}>
+                  <h1>
+                    {renderHighlightedText(client.name)} {renderHighlightedText(client.surname)} ({client.rights})
+                  </h1>
+                  <p>
+                    Email: {renderHighlightedText(client.email)} | ID Organizace: {client.organization_id}
+                  </p>
+                </div>
+              ))}
+          </div>
+        </div>
       </div>
       <div>
         {showModal && (
@@ -132,6 +228,9 @@ function AdminAccounts() {
             fields={fields}
             onSubmit={handleSubmit}
             onClose={() => setShowModal(false)}
+            onCancel={() => setShowModal(false)}
+            secondButton={"Zrušit"}
+            firstButton={"Uložit"}
           />
         )}
       </div>

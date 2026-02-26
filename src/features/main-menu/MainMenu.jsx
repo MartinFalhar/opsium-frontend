@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import Logout from "../settings/SettingsLogout";
 import "./MainMenu.css";
-import menuIcon from "../../styles/svg/mirror-line.svg";
+import MenuToggleIcon from "../../components/icons/MenuToggleIcon";
 
 const login_button = {
   id: "login",
@@ -143,14 +143,13 @@ function MainMenu({ isMenuExtended, setIsMenuExtended }) {
       <div className="main-menu">
         <div className="main-menu-header">
           {isMenuExtended ? <h1 style={{ paddingLeft: "20px" }}>Menu</h1> : ""}
-          <img
+          <MenuToggleIcon
             onClick={() => {
               setIsMenuExtended(!isMenuExtended);
             }}
             className="main-menu-icon"
-            src={menuIcon}
             alt="Menu"
-          ></img>
+          />
         </div>
         {buttons.map((button) => {
           // Kontrola práv uživatele

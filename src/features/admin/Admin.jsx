@@ -4,56 +4,56 @@ import { useUser } from "../../context/UserContext";
 
 import "./Admin.css";
 
-
 import AdminDashboard from "./AdminDashboard";
 import AdminOrganization from "./AdminOrganization";
 import AdminAccounts from "./AdminAccounts";
 import AdminMembers from "./AdminMembers";
 import AdminBranches from "./AdminBranches";
+import MenuToggleIcon from "../../components/icons/MenuToggleIcon";
 
-
-import menuIcon from "../../styles/svg/mirror-line.svg";
+import adminIcon from "../../styles/svg/ai.svg";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Admin() {
+  const [isMenuExtended, setIsMenuExtended] = useState(true);
+
   const buttons = [
     {
       id: "1",
       label: "Přehled",
       rights: 0,
       component: AdminDashboard,
-      icon: "clients",
+      icon: "dashboard",
     },
     {
       id: "2",
       label: "Organizace",
       rights: 0,
       component: AdminOrganization,
-      icon: "clients",
+      icon: "invoices",
     },
     {
       id: "3",
       label: "Účty",
       rights: 0,
       component: AdminAccounts,
-      icon: "eye",
+      icon: "accounts",
     },
     {
       id: "4",
       label: "Pobočky",
       rights: 0,
       component: AdminBranches,
-      icon: "eye",
+      icon: "catalog",
     },
     {
       id: "5",
       label: "Členové",
       rights: 0,
       component: AdminMembers,
-      icon: "eye",
+      icon: "person",
     },
-
   ];
 
   //nastavuje komponentu z menu
@@ -68,8 +68,6 @@ function Admin() {
   //zachycení kliku na tlačítko menu
   const [activeButton, setActiveButton] = useState(null);
 
-
-
   //handling kliků na tlačítka menu
   const handleClick = (button) => {
     setActiveButton(button.id);
@@ -77,23 +75,36 @@ function Admin() {
   };
 
   useEffect(() => {
-
     handleClick(buttons[0]);
   }, []);
 
   return (
     <div className="container">
-      <div className="secondary-menu">
+      <div
+        className="secondary-menu"
+        style={{
+          width: isMenuExtended ? "200px" : "60px",
+        }}
+      >
         <div className="secondary-menu-header">
-          <h1>* ADMIN *</h1>
-          <img
+
+          {isMenuExtended ? (
+            <>
+              <img
+                className="secondary-menu-icon"
+                src={adminIcon}
+                alt="Admin"
+              ></img>
+              <h1 className="fancy-3">ADMIN</h1>
+            </>
+          ) : null}
+          <MenuToggleIcon
             onClick={() => {
-              // setIsMenuExtended(!isMenuExtended);
+              setIsMenuExtended(!isMenuExtended);
             }}
             className="secondary-menu-icon"
-            src={menuIcon}
             alt="Menu"
-          ></img>
+          />
         </div>
         {buttons.map((button) => {
           return (
@@ -101,25 +112,21 @@ function Admin() {
               key={button.id}
               id={button.id}
               style={{
-                width: "200px",
+                width: isMenuExtended ? "200px" : "60px",
               }}
               className={`button-secondary-menu ${
                 activeButton === button.id ? "active" : ""
               } ${button.icon}`}
               onClick={() => handleClick(button)}
             >
-              {button.label}
+              {isMenuExtended ? button.label : ""}
             </button>
           );
         })}
       </div>
-<div className="left-container-2">
-
+      <div className="left-container-2">
         {Component ? <Component client={user} /> : null}
-</div>
-
-
-
+      </div>
     </div>
   );
 }

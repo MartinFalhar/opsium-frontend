@@ -36,3 +36,42 @@ body {
 .open-button:hover {
   background-color: #0056b3;
 }
+
+.items-list mark {
+  background: var(--color-bg-b2);
+  color: var(--color-bg-b12);
+  padding: 0 2px;
+  border-radius: 3px;
+}
+
+.search-clear-button {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  color: var(--color-bg-b9);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease, color 0.15s ease;
+  width: 20px;
+}
+
+.search-clear-button:hover {
+  transform: translateY(-50%) scale(1.08);
+  color: var(--color-bg-b1);
+  background: transparent;
+}
+
+.search-input-wrapper {
+  position: relative;
+}
+
+.search-input-wrapper input {
+  padding-right: 22px;
+}

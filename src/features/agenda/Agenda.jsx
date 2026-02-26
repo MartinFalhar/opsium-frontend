@@ -13,12 +13,14 @@ import AgendaSalesAction from "./AgendaSalesAction.jsx";
 import AgendaServices from "./AgendaServices.jsx";
 import AgendaEmail from "./AgendaEmail.jsx";
 import AgendaSMS from "./AgendaSMS.jsx";
+import MenuToggleIcon from "../../components/icons/MenuToggleIcon";
 
-import menuIcon from "../../styles/svg/mirror-line.svg";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Agenda() {
+  const [isMenuExtended, setIsMenuExtended] = useState(true);
+
   const buttons = [
     {
       id: "1",
@@ -102,17 +104,21 @@ function Agenda() {
 
   return (
     <div className="container">
-      <div className="secondary-menu">
+      <div
+        className="secondary-menu"
+        style={{
+          width: isMenuExtended ? "200px" : "60px",
+        }}
+      >
         <div className="secondary-menu-header">
-          <h1>Agenda</h1>
-          <img
+          {isMenuExtended ? <h1>Agenda</h1> : ""}
+          <MenuToggleIcon
             onClick={() => {
-              // setIsMenuExtended(!isMenuExtended);
+              setIsMenuExtended(!isMenuExtended);
             }}
             className="secondary-menu-icon"
-            src={menuIcon}
             alt="Menu"
-          ></img>
+          />
         </div>
         {buttons.map((button) => {
           return (
@@ -120,14 +126,14 @@ function Agenda() {
               key={button.id}
               id={button.id}
               style={{
-                width: "200px",
+                width: isMenuExtended ? "200px" : "60px",
               }}
               className={`button-secondary-menu ${
                 activeButton === button.id ? "active" : ""
               } ${button.icon}`}
               onClick={() => handleClick(button)}
             >
-              {button.label}
+              {isMenuExtended ? button.label : ""}
             </button>
           );
         })}

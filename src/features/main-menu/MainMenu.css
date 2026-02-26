@@ -16,7 +16,9 @@
 }
 
 .main-menu-icon {
-  scale: 55%;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
   color: var(--color-bg-b12);
   margin-left: 5px;
   cursor: pointer;

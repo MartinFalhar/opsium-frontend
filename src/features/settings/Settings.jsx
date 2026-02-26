@@ -10,12 +10,14 @@ import SettingsData from "./SettingsData";
 import SettingsPassword from "./SettingsPassword";
 import SettingsSubUser from "./SettingsSubUser";
 import SettingsLogout from "./SettingsLogout";
+import MenuToggleIcon from "../../components/icons/MenuToggleIcon";
 
-import menuIcon from "../../styles/svg/mirror-line.svg";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Settings(props) {
+  const [isMenuExtended, setIsMenuExtended] = useState(true);
+
   const buttons = [
     {
       id: "1",
@@ -99,17 +101,21 @@ function Settings(props) {
 
   return (
     <div className="container">
-      <div className="secondary-menu">
+      <div
+        className="secondary-menu"
+        style={{
+          width: isMenuExtended ? "200px" : "60px",
+        }}
+      >
         <div className="secondary-menu-header">
-          <h1>Můj účet</h1>
-          <img
+          {isMenuExtended ? <h1>Můj účet</h1> : ""}
+          <MenuToggleIcon
             onClick={() => {
               setIsMenuExtended(!isMenuExtended);
             }}
             className="secondary-menu-icon"
-            src={menuIcon}
             alt="Menu"
-          ></img>
+          />
         </div>
         {buttons.map((button) => {
           return (
@@ -117,14 +123,14 @@ function Settings(props) {
               key={button.id}
               id={button.id}
               style={{
-                width: "200px",
+                width: isMenuExtended ? "200px" : "60px",
               }}
               className={`button-secondary-menu ${
                 activeButton === button.id ? "active" : ""
               } ${button.icon}`}
               onClick={() => handleClick(button)}
             >
-              {button.label}
+              {isMenuExtended ? button.label : ""}
             </button>
           );
         })}

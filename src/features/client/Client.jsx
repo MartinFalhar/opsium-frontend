@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
+import MenuToggleIcon from "../../components/icons/MenuToggleIcon";
 
-import menuIcon from "../../styles/svg/mirror-line.svg";
 import ClientDashboard from "./ClientDashboard";
 import ClientInvoices from "./ClientInvoices";
 import ClientVisTraining from "./ClientVisTraining";
@@ -13,6 +13,8 @@ import ClientLab from "./ClientLab";
 import LoadExamsListFromDB from "../../components/optometry/LoadExamsListFromDB";
 
 function Client() {
+  const [isMenuExtended, setIsMenuExtended] = useState(true);
+
   //definice sekundárního MENU
   const clientMenu = [
     {
@@ -205,17 +207,21 @@ function Client() {
 
   return (
     <div className="container">
-      <div className="secondary-menu">
+      <div
+        className="secondary-menu"
+        style={{
+          width: isMenuExtended ? "200px" : "60px",
+        }}
+      >
         <div className="secondary-menu-header">
-          <h1>Klient</h1>
-          <img
+          {isMenuExtended ? <h1>Klient</h1> : ""}
+          <MenuToggleIcon
             onClick={() => {
-              // setIsMenuExtended(!isMenuExtended);
+              setIsMenuExtended(!isMenuExtended);
             }}
             className="secondary-menu-icon"
-            src={menuIcon}
             alt="Menu"
-          ></img>
+          />
         </div>
 
         {clientMenu.map((button) => {
@@ -223,12 +229,15 @@ function Client() {
             <div key={button.id}>
               <button
                 id={button.id}
+                style={{
+                  width: isMenuExtended ? "200px" : "60px",
+                }}
                 className={`button-secondary-menu ${
                   activeSecondaryButton === button.id ? "active" : ""
                 } ${button.icon}`}
                 onClick={() => handleClick(button)}
               >
-                {button.label}
+                {isMenuExtended ? button.label : ""}
               </button>
               {button.id === activeSecondaryButton &&
               activeSecondaryButton === 2 &&
