@@ -208,6 +208,10 @@ h1 {
   font-weight: 400;
 }
 
+h1.dark {
+  color: var(--color-bg-b1);
+}
+
 h2 {
   font-size: clamp(var(--font-size-small), 2.3vw, var(--font-size-large));
   color: var(--color-bg-b5);
@@ -226,7 +230,7 @@ h4 {
   font-size: clamp(var(--font-size-small), 1.8vw, var(--font-size-regular));
   color: var(--color-bg-b3);
   text-align: left;
-  
+
   letter-spacing: 1px;
 }
 

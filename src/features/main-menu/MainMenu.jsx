@@ -120,7 +120,7 @@ function MainMenu({ isMenuExtended, setIsMenuExtended }) {
         ? user?.name
           ? button.pathLogged
           : button.path
-        : button.path
+        : button.path,
     );
   };
 

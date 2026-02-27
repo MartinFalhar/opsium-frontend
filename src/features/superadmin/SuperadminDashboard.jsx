@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function SuperadminDashboard( ) {
+function SuperadminDashboard() {
   const [opsiumInfo, setOpsiumInfo] = useState({});
   const [error, setError] = useState(null);
 
@@ -37,7 +37,7 @@ function SuperadminDashboard( ) {
       </div>
       <div className="info-box">
         <div className="info-box-header">
-          <h3>Účtů</h3>
+          <h2>Účtů</h2>
         </div>
         <div className="info-box-content">
           <h5>{opsiumInfo.countTotal}</h5>
@@ -45,7 +45,7 @@ function SuperadminDashboard( ) {
       </div>
       <div className="info-box">
         <div className="info-box-header">
-          <h4>Poboček</h4>
+          <h2>Poboček</h2>
         </div>
         <div className="info-box-content">
           <h5>{opsiumInfo.countTotalBranches}</h5>
@@ -53,7 +53,7 @@ function SuperadminDashboard( ) {
       </div>
       <div className="info-box">
         <div className="info-box-header">
-          <h5>Členů</h5>
+          <h2>Členů</h2>
         </div>
         <div className="info-box-content">
           <h5>{opsiumInfo.countTotalMembers}</h5>
@@ -61,7 +61,7 @@ function SuperadminDashboard( ) {
       </div>
       <div className="info-box">
         <div className="info-box-header">
-          <h6>Klientů</h6>
+          <h2>Klientů</h2>
         </div>
         <div className="info-box-content">
           <h5>{opsiumInfo.countTotalClients}</h5>

@@ -90,6 +90,15 @@ function MainHeader() {
     return first + last;
   };
 
+  const getMemberShortcut = (member) => {
+    const nickShortcut = member?.nick?.trim();
+    if (nickShortcut) {
+      return nickShortcut.toUpperCase();
+    }
+
+    return getInitials(member?.name, member?.surname);
+  };
+
   const handleMemberClick = () => {
     setShowMemberModal(true);
   };
@@ -214,7 +223,7 @@ function MainHeader() {
             onClick={handleMemberClick}
             title={`${activeMember.name} ${activeMember.surname}`}
           >
-            {getInitials(activeMember.name, activeMember.surname)}
+            {getMemberShortcut(activeMember)}
           </div>
         ) : (
           members?.[0] && (
@@ -223,7 +232,7 @@ function MainHeader() {
               onClick={handleMemberClick}
               title={`${members[0].name} ${members[0].surname}`}
             >
-              {getInitials(members[0].name, members[0].surname)}
+              {getMemberShortcut(members[0])}
             </div>
           )
         )}

@@ -10,7 +10,6 @@ body {
   flex-direction: column;
 }
 
-
 .content-box {
   border: 1px solid #18c942;
   padding: 16px;
@@ -63,7 +62,9 @@ body {
   line-height: 1;
   cursor: pointer;
   padding: 0;
-  transition: transform 0.15s ease, color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease;
   width: 20px;
 }
 
@@ -81,5 +82,26 @@ body {
   padding-right: 22px;
 }
 
+.org-center-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding-top: 18px;
+}
 
+.org-info-box {
+  width: fit-content;
+  min-width: 360px;
+  max-width: calc(100% - 32px);
+  height: auto;
+  margin: 0;
+}
 
+.org-edit-button-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

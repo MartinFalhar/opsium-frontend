@@ -12,7 +12,6 @@ import SettingsSubUser from "./SettingsSubUser";
 import SettingsLogout from "./SettingsLogout";
 import MenuToggleIcon from "../../components/icons/MenuToggleIcon";
 
-
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Settings(props) {
@@ -21,41 +20,13 @@ function Settings(props) {
   const buttons = [
     {
       id: "1",
-      label: "Přehled",
-      rights: 0,
-      component: SettingsDashboard,
-      icon: "clients",
-    },
-    {
-      id: "2",
       label: "Nastavení účtu",
       rights: 0,
       component: SettingsAccount,
       icon: "eye",
     },
     {
-      id: "3",
-      label: "Změna údajů",
-      rights: 0,
-      component: SettingsData,
-      icon: "eye",
-    },
-    {
-      id: "4",
-      label: "Změna hesla",
-      rights: 0,
-      component: SettingsPassword,
-      icon: "eye",
-    },
-    {
-      id: "5",
-      label: "Správa uživatelů",
-      rights: 0,
-      component: SettingsSubUser,
-      icon: "eye",
-    },
-    {
-      id: "6",
+      id: "2",
       label: "ODHLÁSIT SE",
       rights: 0,
       component: SettingsLogout,
@@ -137,9 +108,6 @@ function Settings(props) {
       </div>
       <div className="left-container">
         {Component ? <Component client={user} /> : null}
-      </div>
-      <div className="right-container">
-        <h1>INFO</h1>
       </div>
     </div>
   );

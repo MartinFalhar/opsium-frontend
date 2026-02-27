@@ -244,20 +244,26 @@ function AdminBranches() {
                 >
                   <div className="item-plu  ">{branch.id}</div>
                   <div className="item-name  left">
-                    <h1>{branch.name}</h1>
+                    <h1>{renderHighlightedText(branch.name)}</h1>
                   </div>
                   <div className="item-name  left">
-                    <h1>{`${branch.street}, ${branch.city} ${branch.postal_code}`}</h1>
+                    <h1>
+                      {renderHighlightedText(
+                        `${branch.street}, ${branch.city} ${branch.postal_code}`,
+                      )}
+                    </h1>
                   </div>
 
                   <div className="item-name  ">
-                    <p>{branch?.email?.email}</p>
+                    <p>{renderHighlightedText(branch?.email?.email)}</p>
                   </div>
                   <div className="item-name  ">
-                    <p>{branch?.phone?.phone}</p>
+                    <p>{renderHighlightedText(branch?.phone?.phone)}</p>
                   </div>
                   <div className="item-name  ">
-                    <p>{JSON.stringify(branch.open_hours)}</p>
+                    <p>
+                      {renderHighlightedText(JSON.stringify(branch.open_hours))}
+                    </p>
                   </div>
                 </div>
               ))}

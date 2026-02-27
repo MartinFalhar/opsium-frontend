@@ -6,12 +6,9 @@ import "./Superadmin.css";
 
 import SuperadminDashboard from "./SuperadminDashboard";
 import SuperadminAdminPanel from "./SuperadminAdminPanel";
-import SuperadminData from "./SuperadminData";
-import SuperadminPassword from "./SuperadminPassword";
-import SuperadminSubUser from "./SuperadminSubUser";
-import SuperadminLogout from "./SuperadminLogout";
-import MenuToggleIcon from "../../components/icons/MenuToggleIcon";
 
+import MenuToggleIcon from "../../components/icons/MenuToggleIcon";
+import superAdminIcon from "../../styles/svg/ai2.svg";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -34,20 +31,6 @@ function Superadmin() {
       label: "ADMIN panel",
       rights: 0,
       component: SuperadminAdminPanel,
-      icon: "eye",
-    },
-    {
-      id: "3",
-      label: "Změna údajů",
-      rights: 0,
-      component: SuperadminData,
-      icon: "eye",
-    },
-    {
-      id: "4",
-      label: "Změna hesla",
-      rights: 0,
-      component: SuperadminPassword,
       icon: "eye",
     },
   ];
@@ -80,7 +63,16 @@ function Superadmin() {
         }}
       >
         <div className="secondary-menu-header">
-          {isMenuExtended ? <h1>SuperAdmin</h1> : ""}
+          {isMenuExtended ? (
+            <>
+              <img
+                className="secondary-menu-icon"
+                src={superAdminIcon}
+                alt="SuperAdmin"
+              ></img>
+              <h1 className="fancy-3">SUPERADMIN</h1>
+            </>
+          ) : null}
           <MenuToggleIcon
             onClick={() => {
               setIsMenuExtended(!isMenuExtended);
@@ -109,11 +101,6 @@ function Superadmin() {
       </div>
       <div className="left-container">
         {Component ? <Component userData={user} /> : null}
-      </div>
-      <div className="right-container">
-        <h1>INFO</h1>
-        <p>Jste přihlášen jako SuperAdmin.</p>
-        <pre>Organization:{user.organization_id}</pre>
       </div>
     </div>
   );

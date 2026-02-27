@@ -6,7 +6,7 @@ import PuffLoaderSpinner from "../../components/loader/PuffLoaderSpinner.jsx";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function SuperadminAdminPanel() {
-  const fields = [
+  const createFields = [
     { varName: "name", label: "Jméno", input: "text", required: true },
     { varName: "surname", label: "Příjmení", input: "text", required: true },
     { varName: "email", label: "Email", input: "email", required: true },
@@ -18,9 +18,33 @@ function SuperadminAdminPanel() {
       required: true,
     },
   ];
+  const editFields = [
+    { varName: "name", label: "Jméno", input: "text", required: true },
+    { varName: "surname", label: "Příjmení", input: "text", required: true },
+    { varName: "email", label: "Email", input: "email", required: true },
+    {
+      varName: "oldPassword",
+      label: "Staré heslo",
+      input: "password",
+      required: false,
+    },
+    {
+      varName: "newPassword",
+      label: "Nové heslo",
+      input: "password",
+      required: false,
+    },
+    {
+      varName: "newPasswordCheck",
+      label: "Znovu nové heslo",
+      input: "password",
+      required: false,
+    },
+  ];
 
   const [searchClient, setSearchClient] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   //proměnné pro načtení adminů z DB
   const [users, setUsers] = useState([]);
@@ -54,20 +78,69 @@ function SuperadminAdminPanel() {
   }, [loadUsers]);
 
   const handleSubmit = async (values) => {
-    if (values.password !== values.passwordCheck) {
-      alert("Hesla se neshodují");
-      return;
-    }
-
-    const newAdmin = {
-      name: values.name,
-      surname: values.surname,
-      email: values.email,
-      password: values.password,
-      rights: 10,
-    };
-
     try {
+      if (selectedUser?.id) {
+        const hasAnyPasswordField =
+          values.oldPassword || values.newPassword || values.newPasswordCheck;
+
+        if (hasAnyPasswordField) {
+          if (
+            !values.oldPassword ||
+            !values.newPassword ||
+            !values.newPasswordCheck
+          ) {
+            alert("Pro změnu hesla vyplň staré heslo, nové heslo i potvrzení.");
+            return;
+          }
+
+          if (values.newPassword !== values.newPasswordCheck) {
+            alert("Nová hesla se neshodují");
+            return;
+          }
+        }
+
+        const userPayload = {
+          id: selectedUser.id,
+          name: values.name,
+          surname: values.surname,
+          email: values.email,
+          organization_id: selectedUser.organization_id,
+          oldPassword: values.oldPassword,
+          newPassword: values.newPassword,
+        };
+
+        const res = await fetch(`${API_URL}/admin/update_user`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userPayload),
+        });
+
+        const data = await res.json().catch(() => null);
+
+        if (res.ok) {
+          window.showToast("Admin byl úspěšně upraven!");
+          await loadUsers();
+          handleCloseModal();
+        } else {
+          window.showToast(data?.message || "Chyba při odesílání.");
+        }
+
+        return;
+      }
+
+      if (values.password !== values.passwordCheck) {
+        alert("Hesla se neshodují");
+        return;
+      }
+
+      const newAdmin = {
+        name: values.name,
+        surname: values.surname,
+        email: values.email,
+        password: values.password,
+        rights: 10,
+      };
+
       const res = await fetch(`${API_URL}/admin/create_admin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -77,7 +150,7 @@ function SuperadminAdminPanel() {
       if (res.ok) {
         window.showToast("Úspěšně odesláno!");
         await loadUsers();
-        setShowModal(false);
+        handleCloseModal();
       } else {
         window.showToast("Chyba při odesílání.");
       }
@@ -85,6 +158,30 @@ function SuperadminAdminPanel() {
       console.error(error);
       window.showToast("Server je nedostupný.");
     }
+  };
+
+  const handleOpenNewUserModal = () => {
+    setSelectedUser(null);
+    setShowModal(true);
+  };
+
+  const handleOpenUserModal = (account) => {
+    setSelectedUser({
+      id: account.id,
+      name: account.name,
+      surname: account.surname,
+      email: account.email,
+      organization_id: account.organization_id,
+      oldPassword: "",
+      newPassword: "",
+      newPasswordCheck: "",
+    });
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedUser(null);
   };
 
   const handleSearchUsers = () => {
@@ -131,7 +228,9 @@ function SuperadminAdminPanel() {
       part.toLowerCase() === query.toLowerCase() ? (
         <mark key={`${value}-${part}-${index}`}>{part}</mark>
       ) : (
-        <React.Fragment key={`${value}-${part}-${index}`}>{part}</React.Fragment>
+        <React.Fragment key={`${value}-${part}-${index}`}>
+          {part}
+        </React.Fragment>
       ),
     );
   };
@@ -140,7 +239,9 @@ function SuperadminAdminPanel() {
     ? filteredUsers.length
     : 0;
   const isFewAdmins =
-    adminCount >= 2 && adminCount <= 4 && !(adminCount >= 12 && adminCount <= 14);
+    adminCount >= 2 &&
+    adminCount <= 4 &&
+    !(adminCount >= 12 && adminCount <= 14);
 
   const foundVerb =
     adminCount === 1 ? "Nalezen" : isFewAdmins ? "Nalezeni" : "Nalezeno";
@@ -180,7 +281,7 @@ function SuperadminAdminPanel() {
               />
             </div>
             <button onClick={handleSearchUsers}>Hledej</button>
-            <button onClick={() => setShowModal(true)}>Nový admin</button>
+            <button onClick={handleOpenNewUserModal}>Nový admin</button>
           </div>
         </div>
 
@@ -190,17 +291,50 @@ function SuperadminAdminPanel() {
               {foundVerb} {adminCount} {adminNoun}
             </h4>
           </div>
+          <div className="items-panel-table-header six-columns-2 one-row">
+            <h3>ID</h3>
+            <h3 className="left">Jméno</h3>
+            <h3 className="left">Příjmení</h3>
+            <h3>Práva</h3>
+            <h3>Email</h3>
+            <h3>ID ORG</h3>
+          </div>
           <PuffLoaderSpinner active={isLoading} />
           <div className="items-list">
             {filteredUsers?.length > 0 &&
               filteredUsers.map((client) => (
-                <div key={client.id} className="item" onClick={() => null}>
-                  <h1>
-                    {renderHighlightedText(client.name)} {renderHighlightedText(client.surname)} ({client.rights})
-                  </h1>
-                  <p>
-                    Email: {renderHighlightedText(client.email)} | ID Organizace: {client.organization_id}
-                  </p>
+                <div
+                  key={client.id}
+                  className="item six-columns-2 one-row"
+                  onClick={() => handleOpenUserModal(client)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      handleOpenUserModal(client);
+                    }
+                  }}
+                >
+                  <div className="item-plu  ">
+                    {renderHighlightedText(client.id)}
+                  </div>
+                  <div className="item-name  left">
+                    <h1>{renderHighlightedText(client.name)}</h1>
+                  </div>
+
+                  <div className="item-name  left">
+                    <h1>{renderHighlightedText(client.surname)}</h1>
+                  </div>
+                  <div className="item-name  ">
+                    <p>{client.rights}</p>
+                  </div>
+                  <div className="item-name  ">
+                    <p>{renderHighlightedText(client.email)}</p>
+                  </div>
+                  <div className="item-name  ">
+                    <p>{client.organization_id}</p>
+                  </div>
                 </div>
               ))}
           </div>
@@ -210,12 +344,14 @@ function SuperadminAdminPanel() {
       <div>
         {showModal && (
           <Modal
-            fields={fields}
+            fields={selectedUser?.id ? editFields : createFields}
+            title={selectedUser?.id ? "Upravit admina" : "Nový admin"}
+            initialValues={selectedUser ?? {}}
             onSubmit={handleSubmit}
-            onClose={() => setShowModal(false)}
-            onCancel={() => setShowModal(false)}
+            onClose={handleCloseModal}
+            onCancel={handleCloseModal}
             secondButton={"Zrušit"}
-            firstButton={"Uložit"}
+            firstButton={selectedUser?.id ? "Upravit" : "Uložit"}
           />
         )}
       </div>

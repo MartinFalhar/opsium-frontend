@@ -145,7 +145,7 @@ function AdminDashboard({ client }) {
     <div className="admin-dashboard-container">
       <div className="info-box">
         <div className="info-box-header">
-          <h5>Počet účtů</h5>
+          <h3>Počet účtů</h3>
         </div>
         <div className="info-box-content">
           <h5>{opsiumInfo.countTotal}</h5>
@@ -154,7 +154,7 @@ function AdminDashboard({ client }) {
 
       <div className="info-box">
         <div className="info-box-header">
-          <h5>Poboček</h5>
+          <h3>Poboček</h3>
         </div>
         <div className="info-box-content">
           <h5>{opsiumInfo.countTotalBranches}</h5>
@@ -163,7 +163,7 @@ function AdminDashboard({ client }) {
 
       <div className="info-box">
         <div className="info-box-header">
-          <h5>Členové</h5>
+          <h3>Členové</h3>
         </div>
         <div className="info-box-content">
           <h5>{opsiumInfo.countTotalMembers}</h5>
@@ -172,7 +172,7 @@ function AdminDashboard({ client }) {
 
       <div className="info-box">
         <div className="info-box-header">
-          <h5>Klientů</h5>
+          <h3>Klientů</h3>
         </div>
         <div className="info-box-content">
           <h5>{opsiumInfo.countTotalClients}</h5>
@@ -180,15 +180,12 @@ function AdminDashboard({ client }) {
       </div>
       <div className="info-box info-box-wide">
         <div className="info-box-header">
-          <h6>
-            <strong>ADMIN DATA</strong>
-          </h6>
+          <h3>ADMIN DATA</h3>
         </div>
-        <p>{`ID users: ${user.id}`}</p>
-        <p>{`Jméno: ${user.name}`}</p>
-        <p>{`Příjmení: ${user.surname}`}</p>
+        <p>{`ID users: ${user.id} ID organizace: ${user.organization_id}`}</p>
+        <p>{`Jméno: ${user.name} ${user.surname}`}</p>
         <p>{`Email: ${user.email}`}</p>
-        <p>{`ID organizace: ${user.organization_id}`}</p>
+
         <p>{`Práva: ${user.rights}`}</p>
       </div>
       <div className="info-box info-box-wide">
