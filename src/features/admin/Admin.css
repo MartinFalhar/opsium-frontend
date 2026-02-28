@@ -104,4 +104,33 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 10px;
+}
+
+.org-logo-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 8px 0 10px;
+}
+
+.org-logo-preview {
+  max-width: 220px;
+  max-height: 90px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: transparent;
+  padding: 6px;
+}
+
+.org-logo-placeholder {
+  margin: 0;
+  font-size: clamp(var(--font-size-small), 0.75vw, var(--font-size-regular));
+}
+
+.org-logo-input {
+  display: none;
 }

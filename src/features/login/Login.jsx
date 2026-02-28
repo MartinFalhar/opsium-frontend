@@ -23,7 +23,7 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [heroImgID, setHeroImgID] = useState(() =>
-    Math.floor(Math.random() * 15 + 1)
+    Math.floor(Math.random() * 15 + 1),
   );
 
   const imageHeroText = [
@@ -121,10 +121,10 @@ function Login() {
         const dataMember = await res.json();
 
         if (res.ok) {
-              setActiveId((prev) => ({
-      ...prev,
-      member_id: dataMember[0].id,
-    }));
+          setActiveId((prev) => ({
+            ...prev,
+            member_id: dataMember[0].id,
+          }));
           setMembers(dataMember);
         } else {
           setError(dataMember.message);
@@ -186,7 +186,6 @@ function Login() {
         });
         const dataBranch = await res.json();
 
-
         if (res.ok) {
           setUser((prev) => {
             const next = {
@@ -231,7 +230,7 @@ function Login() {
           localStorage.setItem("authToken", user.token);
           console.log("JWT token byl uložen");
         }
-        
+
         await setUser(user);
         //Pokud je vše v pořádku, stáhnu si
         //seznam členů pro daný USER-ACCOUNT
@@ -239,19 +238,17 @@ function Login() {
         //******** */
         // await loadBranch(data.organization_id);
         //******** */
-    
 
         await loadMembers(user.id);
 
         await loadOrganizationInfo(user.organization_id);
-        
-        await loadBranchInfo(user.id);
 
+        await loadBranchInfo(user.id);
 
         // Zkontrolujeme, jestli se uložil do localStorage
         console.log(
           "Co je v localStorage po přihlášení USER:",
-          JSON.parse(localStorage.getItem("user"))
+          JSON.parse(localStorage.getItem("user")),
         );
 
         navigate("/dashboard"); // přesměrování na domovskou stránku s právy
@@ -338,6 +335,13 @@ function Login() {
             }{" "}
           </p>
         </div>
+      </div>
+
+      <div className="login-contact-panel">
+        <p>Máte dotaz k OPSIUM?</p>
+        <p>
+          Napište nám na <a href="mailto:info@opsium.cz">info@opsium.cz</a>
+        </p>
       </div>
     </div>
   );
