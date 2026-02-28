@@ -253,7 +253,7 @@ function SuperadminAdminPanel() {
       <div className="left-container-2">
         <div className="input-panel">
           <div className="search-input-container">
-            <div className="search-input-wrapper">
+
               {searchClient.trim() ? (
                 <button
                   type="button"
@@ -279,7 +279,7 @@ function SuperadminAdminPanel() {
                 }}
                 placeholder="Hledej admina"
               />
-            </div>
+
             <button onClick={handleSearchUsers}>Hledej</button>
             <button onClick={handleOpenNewUserModal}>Nový admin</button>
           </div>

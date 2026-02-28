@@ -135,6 +135,10 @@
   grid-template-columns: 1fr 2fr 2fr 2fr 2fr 2fr;
 }
 
+.items-panel-table-header.six-columns-3 {
+  grid-template-columns: 2fr 3fr 2fr 2fr 2fr 2fr;
+}
+
 .items-panel-header-services h3 {
   text-align: center;
 }
@@ -205,6 +209,10 @@
 .item.six-columns-2 {
   grid-template-columns: 1fr 2fr 2fr 2fr 2fr 2fr;
 }
+/* Agenda Contacts */
+.item.six-columns-3 {
+  grid-template-columns: 2fr 3fr 2fr 2fr 2fr 2fr;
+}
 
 .item.one-row {
   grid-template-rows: 1fr;
@@ -249,6 +257,11 @@
   color: var(--color-bg-b1);
   text-align: center;
 }
+
+.item-name.tiny-text p {
+  font-size: var(--font-size-small);
+}
+
 .item-name.left {
   text-align: left;
 }

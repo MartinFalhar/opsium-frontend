@@ -81,6 +81,15 @@ export default function Modal({
     setShowConfirm(false);
   };
 
+  const visibleFieldCount = fields.filter((field) => field.input !== "hidden").length;
+  const layoutClass =
+    visibleFieldCount > 12
+      ? "three-columns"
+      : visibleFieldCount > 5
+        ? "two-columns"
+        : "";
+  const modalClassName = visibleFieldCount > 12 ? "modal modal-wide" : "modal";
+
   if (showConfirm) {
     return (
       <ConfirmDelete
@@ -92,7 +101,7 @@ export default function Modal({
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
+      <div className={modalClassName}>
         <h2>{title || "Zadej údaje"}</h2>
         <form
           onSubmit={(e) => {
@@ -102,9 +111,7 @@ export default function Modal({
           }}
         >
           <div
-            //Jestliže je více než 5 polí, použij dva
-            //sloupce pro zobrazení
-            className={`modal-content ${fields.length > 5 ? "two-columns" : ""}`}
+            className={`modal-content ${layoutClass}`}
           >
             {fields.map((field, index) => {
               // Pro pole s dynamickými options použij předem načtená data

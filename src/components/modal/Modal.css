@@ -56,6 +56,12 @@
   column-gap: 20px;
 }
 
+.modal-content.three-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 20px;
+}
+
 .modal-field {
   display: flex;
   flex-direction: column;
