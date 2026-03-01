@@ -2,15 +2,15 @@ import { useMemo, useState } from "react";
 import Tabs from "../../components/controls/Tabs.jsx";
 
 const BENEFIT_TABS = [
-  { label: "Dneye", value: "dneye" },
+  { label: "DNEye prémie", value: "dneye" },
   { label: "Kontaktní čočky - aplikace", value: "contact_lenses_application" },
   { label: "SickDays", value: "sickdays" },
 ];
 
 const BENEFIT_CONTENT = {
   dneye: {
-    title: "Dneye",
-    description: "Modelový obsah pro benefit Dneye.",
+    title: "DNEye prémie",
+    description: "Modelový obsah pro benefit DNEye prémie.",
   },
   contact_lenses_application: {
     title: "Kontaktní čočky - aplikace",

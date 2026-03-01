@@ -19,7 +19,7 @@
   gap: 6px;
   align-items: flex-end;
   border-bottom: 1px solid var(--color-bg-b8);
-  padding: 0 4px;
+  padding: 3px 2px;
 }
 
 .tabs-item {
@@ -34,9 +34,9 @@
     rgba(224, 231, 240, 0.96) 55%,
     rgba(217, 220, 222, 0.94) 100%
   );
-  color: var(--color-bg-b2);
-  border: 1px solid var(--color-bg-b8);
-  border-bottom: 1px solid var(--color-bg-b8);
+  color: var(--color-bg-b5);
+  /* border: 1px solid var(--color-bg-b1); */
+  /* border-bottom: 1px solid var(--color-bg-b); */
   border-radius: 8px 8px 0 0;
   box-shadow: none;
   font-size: clamp(var(--font-size-small), 1.8vw, var(--font-size-regular));
@@ -45,46 +45,45 @@
   transform: translateY(4px) scaleY(1);
   transform-origin: bottom center;
   box-shadow: 0 1px 3px rgba(30, 41, 59, 0.05);
-  will-change: transform, background;
-  transition:
-    background 180ms ease,
-    color 180ms ease,
-    transform 180ms ease,
-    border-color 180ms ease;
+
+
 }
 
 .tabs-item:hover {
-  background: linear-gradient(
+  /* background: linear-gradient(
     155deg,
     rgba(243, 244, 246, 0.98) 0%,
     rgba(224, 231, 240, 0.97) 55%,
     rgba(217, 220, 222, 0.95) 100%
-  );
-  color: var(--color-bg-b1);
+  ); */
+  background-color: var(--color-bg-b5);
+  color: var(--color-bg-b10);
+  
   box-shadow: 0 2px 5px rgba(30, 41, 59, 0.08);
 }
 
 .tabs-item.active {
-  background: linear-gradient(
+  /* background: linear-gradient(
     155deg,
     rgba(241, 249, 255, 0.98) 0%,
     rgba(176, 224, 250, 0.85) 30%,
     rgba(182, 236, 226, 0.82) 58%,
     rgba(223, 200, 245, 0.84) 82%,
     rgba(255, 240, 190, 0.9) 100%
-  );
+  ); */
+  background: var(--color-grd-g8);
   color: var(--color-bg-b1);
   border-color: rgba(255, 255, 255, 0.9);
   border-bottom-color: var(--color-bg-b13);
   transform: translateY(4px) scaleY(1.12) scaleX(1.03);
   position: relative;
   z-index: 2;
-  box-shadow:
+  /* box-shadow:
     0 3px 7px rgba(30, 41, 59, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    inset 0 1px 0 rgba(255, 255, 255, 0.55); */
 }
 
-.tabs-item.active:hover {
+/* .tabs-item.active:hover {
   background: linear-gradient(
     155deg,
     rgba(255, 240, 190, 0.92) 0%,
@@ -92,7 +91,7 @@
     rgba(182, 236, 226, 0.84) 65%,
     rgba(176, 224, 250, 0.87) 100%
   );
-}
+} */
 
 .tabs-item.active::after {
   content: "";
