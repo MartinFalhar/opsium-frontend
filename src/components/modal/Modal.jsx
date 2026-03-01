@@ -218,7 +218,7 @@ export default function Modal({
           </div>
 
           <div className="modal-actions">
-            {thirdButton != null && (initialValues?.name ?? "") !== "" && (
+            {thirdButton != null && initialValues?.id != null && (
               <button
                 className={
                   thirdButton === "Smazat" ? "button-warning" : "button"

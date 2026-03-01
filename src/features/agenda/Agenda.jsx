@@ -13,6 +13,7 @@ import AgendaSalesAction from "./AgendaSalesAction.jsx";
 import AgendaServices from "./AgendaServices.jsx";
 import AgendaEmail from "./AgendaEmail.jsx";
 import AgendaSMS from "./AgendaSMS.jsx";
+import AgendaTasks from "./AgendaTasks.jsx";
 import MenuToggleIcon from "../../components/icons/MenuToggleIcon";
 
 
@@ -76,6 +77,13 @@ function Agenda() {
       label: "Ceník výkonů",
       rights: 0,
       component: AgendaServices,
+      icon: "eye",
+    },
+    {
+      id: "9",
+      label: "Úkoly",
+      rights: 0,
+      component: AgendaTasks,
       icon: "eye",
     },
   ];
