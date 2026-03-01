@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiCall } from "../utils/api";
 
 export function useOrdersLoadItems() {
   const [loading, setLoading] = useState(false);
@@ -15,18 +14,9 @@ export function useOrdersLoadItems() {
     setError(null);
 
     try {
-      const res = await fetch(`${API_URL}/store/order-items`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-        body: JSON.stringify({ order_id }),
-      });
+      const data = await apiCall("/store/order-items", "POST", { order_id });
 
-      const data = await res.json();
-
-      if (!res.ok || !data?.success) {
+      if (!data?.success) {
         throw new Error(
           data?.message || "Nepodařilo se načíst položky zakázky.",
         );

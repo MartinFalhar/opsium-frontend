@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiCall } from "../utils/api";
 
 /**
  * Custom hook pro vyhledávání položek ve skladu
@@ -19,36 +18,20 @@ export function useStoreSearch(storeId) {
       if (!storeId) return;
 
       setLoading(true);
-      setError(null); 
+      setError(null);
 
       try {
-        const res = await fetch(
-          `${API_URL}/store/search?store=${storeId}&page=${page}&limit=${limit}&value=${searchValue}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
+        const data = await apiCall(
+          `/store/search?store=${storeId}&page=${page}&limit=${limit}&value=${searchValue}`,
+          "GET",
         );
 
-        const data = await res.json();
-
-        if (res.ok) {
-          window.showToast("Úspěšně načteno");
-          setItems(data.items);
-          setTotalPages(data.totalPages);
-        } else {
-          const errorMsg = data.message || "Nepodařilo se načíst položky.";
-          setError(errorMsg);
-          setItems([]);
-          setTotalPages(1);
-          console.error("Chyba při načítání položek:", errorMsg);
-        }
+        window.showToast("Úspěšně načteno");
+        setItems(data.items);
+        setTotalPages(data.totalPages);
       } catch (err) {
         console.error("Fetch error:", err);
-        const errorMsg = "Nepodařilo se načíst položky.";
+        const errorMsg = err?.message || "Nepodařilo se načíst položky.";
         setError(errorMsg);
         setItems([]);
         setTotalPages(1);
@@ -56,9 +39,8 @@ export function useStoreSearch(storeId) {
         setLoading(false);
       }
     },
-    [storeId]
+    [storeId],
   );
 
   return { items, totalPages, loading, error, searchItems };
 }
-

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiCall } from "../utils/api";
 
 /**
  * Custom hook pro načtení seznamu dodavatelů
@@ -10,36 +9,24 @@ const API_URL = import.meta.env.VITE_API_URL;
 export function useStoreGetSuppliers(field) {
   const [suppliers, setSuppliers] = useState([]);
 
-
   useEffect(() => {
     const fetchSuppliers = async () => {
-
       try {
         // Pokud je field null nebo undefined, pošleme prázdný parametr pro načtení všech dodavatelů
-        const fieldParam = field || '';
-        const res = await fetch(`${API_URL}/store/suppliers-list?field=${fieldParam}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        });
-        const result = await res.json();
-
-        if (res.ok) {
-          setSuppliers(result.items || []);
-        } else {
-          console.error("Chyba při načítání dodavatelů:", result.message);
-          setSuppliers([]);
-        }
+        const fieldParam = field || "";
+        const result = await apiCall(
+          `/store/suppliers-list?field=${fieldParam}`,
+          "GET",
+        );
+        setSuppliers(result.items || []);
       } catch (err) {
         console.error("Fetch error:", err);
         setSuppliers([]);
-      } 
+      }
     };
 
     fetchSuppliers();
   }, [field]);
 
-  return { suppliers,  };
+  return { suppliers };
 }

@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiCall } from "../../utils/api";
 
 async function LoadExamsListFromDB(client_id, branch_id) {
   const loadInfo = {
@@ -7,22 +7,10 @@ async function LoadExamsListFromDB(client_id, branch_id) {
   };
 
   try {
-    const res = await fetch(`${API_URL}/client/load_exams_list`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(loadInfo),
-    });
-    console.log("Response from load_examiList:", res);
-
-    const data = await res.json();
+    const data = await apiCall("/client/load_exams_list", "POST", loadInfo);
 
     console.log("Data from loadsave_examList:", data);
-
-    if (res.ok) {
-      console.log("Examination loaded successfully.");
-    } else {
-      throw new Error(data?.message || "Chyba při načítání do DB");
-    }
+    console.log("Examination loaded successfully.");
 
     return data;
   } catch (err) {

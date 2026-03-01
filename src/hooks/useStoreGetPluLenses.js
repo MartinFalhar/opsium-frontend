@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiCall } from "../utils/api";
 
 /**
  * Custom hook pro získání brýlových čoček podle PLU kódu
@@ -27,18 +26,9 @@ export function useStoreGetPluLenses() {
         ...(payload || {}),
       };
 
-      const res = await fetch(`${API_URL}/store/plu-lenses`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-        body: JSON.stringify(requestBody),
-      });
+      const data = await apiCall("/store/plu-lenses", "POST", requestBody);
 
-      const data = await res.json();
-
-      if (res.ok && data.success) {
+      if (data.success) {
         setLenses(data.lenses);
         setError(null);
         return data.lenses;

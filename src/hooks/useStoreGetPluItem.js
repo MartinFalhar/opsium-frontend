@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiCall } from "../utils/api";
 
 /**
  * Custom hook pro získání položky podle PLU kódu
@@ -25,22 +24,16 @@ export function useStoreGetPluItem() {
         item_status = "ON_STOCK",
       } = {},
     ) => {
-    if (!plu || plu.trim() === "") {
-      setItem(null);
-      return null;
-    }
+      if (!plu || plu.trim() === "") {
+        setItem(null);
+        return null;
+      }
 
-    setLoading(true);
-    setError(null);
+      setLoading(true);
+      setError(null);
 
-    try {
-      const res = await fetch(`${API_URL}/store/plu-item`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-        body: JSON.stringify({
+      try {
+        const data = await apiCall("/store/plu-item", "POST", {
           plu: plu.trim(),
           order_id: orderId,
           quantity,
@@ -49,31 +42,28 @@ export function useStoreGetPluItem() {
           specification_id,
           movement_type,
           item_status,
-        }),
-      });
+        });
 
-      const data = await res.json();
+        console.log("Fetched PLU item data:", data);
 
-      console.log("Fetched PLU item data:", data);
-
-      if (res.ok && data.success) {
-        setItem(data.item);
-        setError(null);
-        return data.item;
-      } else {
-        const errorMsg = data.message || "Položka nebyla nalezena.";
-        setError(errorMsg);
+        if (data.success) {
+          setItem(data.item);
+          setError(null);
+          return data.item;
+        } else {
+          const errorMsg = data.message || "Položka nebyla nalezena.";
+          setError(errorMsg);
+          setItem(null);
+          return null;
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError("Chyba při komunikaci se serverem.");
         setItem(null);
         return null;
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      setError("Chyba při komunikaci se serverem.");
-      setItem(null);
-      return null;
-    } finally {
-      setLoading(false);
-    }
     },
     [],
   );

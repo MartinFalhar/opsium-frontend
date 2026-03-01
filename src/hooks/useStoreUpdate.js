@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiCall } from "../utils/api";
 
 /**
  * Custom hook pro aktualizaci položky ve skladu
@@ -19,36 +18,19 @@ export function useStoreUpdate(storeId) {
       setError(null);
 
       try {
-        const res = await fetch(`${API_URL}/store/update`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-          body: JSON.stringify({ values, storeId }),
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          window.showToast("Položka byla aktualizována.");
-          return { success: true, error: null };
-        } else {
-          const errorMsg = data.message || "Nepodařilo se aktualizovat položku.";
-          setError(errorMsg);
-          console.error("Chyba při aktualizaci položky:", errorMsg);
-          return { success: false, error: errorMsg };
-        }
+        await apiCall("/store/update", "POST", { values, storeId });
+        window.showToast("Položka byla aktualizována.");
+        return { success: true, error: null };
       } catch (err) {
         console.error("Fetch error:", err);
-        const errorMsg = "Nepodařilo se aktualizovat položku.";
+        const errorMsg = err?.message || "Nepodařilo se aktualizovat položku.";
         setError(errorMsg);
         return { success: false, error: errorMsg };
       } finally {
         setLoading(false);
       }
     },
-    [storeId]
+    [storeId],
   );
 
   return { loading, error, updateItem };

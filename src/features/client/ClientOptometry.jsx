@@ -85,8 +85,8 @@ function ClientOptometry({ client }) {
     if (typeof setHeaderClients === "function" && activeId?.client_id) {
       setHeaderClients((prev) =>
         prev.map((c) =>
-          c.id === activeId.client_id ? { ...c, notSavedDetected: true } : c
-        )
+          c.id === activeId.client_id ? { ...c, notSavedDetected: true } : c,
+        ),
       );
     }
   };
@@ -116,7 +116,7 @@ function ClientOptometry({ client }) {
           await window.DeleteOptometryRecord(
             client.id,
             user.branch_id,
-            client.examName
+            client.examName,
           );
         } else {
           // fallback: zavolat endpoint přes fetch (příklad)
@@ -148,8 +148,8 @@ function ClientOptometry({ client }) {
           prev.map((c) =>
             c.id === client.id
               ? { ...c, activeTertiaryButton: 0, notSavedDetected: true }
-              : c
-          )
+              : c,
+          ),
         );
       }
     } catch (err) {
@@ -200,12 +200,12 @@ function ClientOptometry({ client }) {
         const examination = await LoadExaminationFromDB(
           client.id,
           user.branch_id,
-          client.examName
+          client.examName,
         );
 
         const restoredItems = restoreOptometryItems(
           examination.data,
-          optometryModules
+          optometryModules,
         );
 
         setOptometryItems(restoredItems);
@@ -224,16 +224,16 @@ function ClientOptometry({ client }) {
   const handleUpdateItem = (id, newValues) => {
     setOptometryItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, values: newValues } : item
-      )
+        item.id === id ? { ...item, values: newValues } : item,
+      ),
     );
 
     // označíme, že změna proběhla (autosave hook detekuje přes debounce)
     if (typeof setHeaderClients === "function" && activeId?.client_id) {
       setHeaderClients((prev) =>
         prev.map((c) =>
-          c.id === activeId.client_id ? { ...c, notSavedDetected: true } : c
-        )
+          c.id === activeId.client_id ? { ...c, notSavedDetected: true } : c,
+        ),
       );
     }
   };
@@ -269,9 +269,9 @@ function ClientOptometry({ client }) {
   };
 
   return (
-    <div className="optometry-container">
+    <div className="container">
       <div className="optometry-left-container">
-        <div className="optometry-modul-container">
+        <div className="input-panel">
           <div className="optometry-modul-panel">
             <button className="menu-btn">DIOP</button>
             <button className="menu-btn">ASTG</button>

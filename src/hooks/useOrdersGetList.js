@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiCall } from "../utils/api";
 
 export function useOrdersGetList({
   search = "",
@@ -17,17 +16,9 @@ export function useOrdersGetList({
     setError(null);
 
     try {
-      const res = await fetch(`${API_URL}/store/orders-list`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-      });
+      const data = await apiCall("/store/orders-list", "POST");
 
-      const data = await res.json();
-
-      if (res.ok && Array.isArray(data)) {
+      if (Array.isArray(data)) {
         setOrders(data);
       } else {
         const errorMsg = data?.message || "Nepodarilo se nacist zakazky.";

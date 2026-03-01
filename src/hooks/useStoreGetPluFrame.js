@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiCall } from "../utils/api";
 
 /**
  * Custom hook pro získání obruby podle PLU kódu
@@ -27,18 +26,9 @@ export function useStoreGetPluFrame() {
         ...(payload || {}),
       };
 
-      const res = await fetch(`${API_URL}/store/plu-frame`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-        body: JSON.stringify(requestBody),
-      });
+      const data = await apiCall("/store/plu-frame", "POST", requestBody);
 
-      const data = await res.json();
-
-      if (res.ok && data.success) {
+      if (data.success) {
         setFrame(data.frame);
         setError(null);
         return data.frame;

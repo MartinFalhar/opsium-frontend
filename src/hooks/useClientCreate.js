@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiCall } from "../utils/api";
 
 export function useClientCreate() {
   const [loading, setLoading] = useState(false);
@@ -11,29 +10,11 @@ export function useClientCreate() {
     setError(null);
 
     try {
-      const res = await fetch(`${API_URL}/client/create_client`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-        body: JSON.stringify(clientPayload),
-      });
-
-      const responseText = await res.text();
-      let data = null;
-
-      if (responseText) {
-        try {
-          data = JSON.parse(responseText);
-        } catch {
-          data = null;
-        }
-      }
-
-      if (!res.ok) {
-        throw new Error(data?.message || "Chyba při odesílání.");
-      }
+      const data = await apiCall(
+        "/client/create_client",
+        "POST",
+        clientPayload,
+      );
 
       return data;
     } catch (err) {

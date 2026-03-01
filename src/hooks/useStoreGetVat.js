@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiCall } from "../utils/api";
 
 /**
  * Custom hook pro načtení seznamu sazeb DPH
@@ -12,21 +11,8 @@ export function useStoreGetVat() {
   useEffect(() => {
     const fetchVatRates = async () => {
       try {
-        const res = await fetch(`${API_URL}/store/vat-list`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        });
-        const result = await res.json();
-
-        if (res.ok) {
-          setVatRates(result.items || []);
-        } else {
-          console.error("Chyba při načítání sazeb DPH:", result.message);
-          setVatRates([]);
-        }
+        const result = await apiCall("/store/vat-list", "GET");
+        setVatRates(result.items || []);
       } catch (err) {
         console.error("Fetch error:", err);
         setVatRates([]);

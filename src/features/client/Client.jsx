@@ -12,6 +12,8 @@ import ClientOptometry from "./ClientOptometry";
 import ClientLab from "./ClientLab";
 import LoadExamsListFromDB from "../../components/optometry/LoadExamsListFromDB";
 
+import personsIcon from "../../styles/svg/persons.svg";
+
 function Client() {
   const [isMenuExtended, setIsMenuExtended] = useState(true);
 
@@ -81,7 +83,7 @@ function Client() {
     }
     console.log(
       `START CLIENT.activeSecondaryButton`,
-      client.activeSecondaryButton
+      client.activeSecondaryButton,
     );
 
     // Nastavíme výchozí sekundárního MENU jen pokud máme platná data
@@ -92,12 +94,12 @@ function Client() {
       setActiveSecondaryButton(clientMenu[0].id);
       setHeaderClients((prev) =>
         prev.map((c) =>
-          c.id === client.id ? { ...c, activeSecondaryButton: 1 } : c
-        )
+          c.id === client.id ? { ...c, activeSecondaryButton: 1 } : c,
+        ),
       );
     } else {
       setMenuComponent(
-        () => clientMenu[client.activeSecondaryButton - 1].component
+        () => clientMenu[client.activeSecondaryButton - 1].component,
       );
       setActiveSecondaryButton(clientMenu[client.activeSecondaryButton - 1].id);
     }
@@ -113,7 +115,7 @@ function Client() {
         //načte seznam examů (name) pro daného klienta a pobočku
         const data = await LoadExamsListFromDB(
           activeId.client_id,
-          user.branch_id
+          user.branch_id,
         );
         // najdeme klienta jen jednou
         const client = headerClients?.find((c) => c.id === activeId.client_id);
@@ -139,8 +141,8 @@ function Client() {
                         : c.activeTertiaryButton,
                     notSavedDetected: true,
                   }
-                : c
-            )
+                : c,
+            ),
           );
         }
 
@@ -180,8 +182,8 @@ function Client() {
 
     setHeaderClients((prev) =>
       prev.map((c) =>
-        c.id === client.id ? { ...c, activeSecondaryButton: button.id } : c
-      )
+        c.id === client.id ? { ...c, activeSecondaryButton: button.id } : c,
+      ),
     );
     console.log(`client.activeSecondaryButton`, client.activeSecondaryButton);
   };
@@ -195,8 +197,8 @@ function Client() {
       prev.map((c) =>
         c.id === client.id
           ? { ...c, activeTertiaryButton: examId.id, examName: examId.name }
-          : c
-      )
+          : c,
+      ),
     );
   };
 
@@ -214,7 +216,18 @@ function Client() {
         }}
       >
         <div className="secondary-menu-header">
-          {isMenuExtended ? <h1>Klient</h1> : ""}
+          {isMenuExtended ? (
+            <>
+              <img
+                className="secondary-menu-icon"
+                src={personsIcon}
+                alt="Admin"
+              ></img>
+              <h1 className="fancy-3">Klient</h1>
+            </>
+          ) : (
+            ""
+          )}
           <MenuToggleIcon
             onClick={() => {
               setIsMenuExtended(!isMenuExtended);
@@ -271,9 +284,6 @@ function Client() {
       <div className="left-container">
         {/* {console.log(`XXXCLIENT ${JSON.stringify(client)}`)} */}
         {Component ? <Component client={client} /> : null}
-      </div>
-      <div className="right-container">
-        <h1>INFO</h1>
       </div>
     </div>
   );
