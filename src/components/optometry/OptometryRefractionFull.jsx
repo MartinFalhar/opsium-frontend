@@ -6,6 +6,7 @@ function OptometryRefractionFull({
   setActiveElement,
   itemValues,
   onChange,
+  signColoringForSphCyl = false,
 }) {
   const [values, setValues] = useState(itemValues);
 
@@ -27,6 +28,23 @@ function OptometryRefractionFull({
   const lSRef = useRef(null);
   const lCRef = useRef(null);
   const lARef = useRef(null);
+
+  const getSignedClassName = (key, value) => {
+    if (!signColoringForSphCyl) return "";
+
+    const isSphOrCyl = ["pS", "pC", "lS", "lC"].includes(key);
+    if (!isSphOrCyl) return "";
+
+    const normalized = String(value ?? "")
+      .trim()
+      .replace(",", ".")
+      .replace(/\s+/g, "");
+
+    const numericValue = Number(normalized);
+    if (Number.isNaN(numericValue) || numericValue === 0) return "";
+
+    return numericValue < 0 ? "lab-signed-negative" : "lab-signed-positive";
+  };
 
   // const input1Ref = useRef(null);
   // const input2Ref = useRef(null);
@@ -62,11 +80,13 @@ function OptometryRefractionFull({
         <input
           value={values.pS}
           type="text"
+          className={getSignedClassName("pS", values.pS)}
           onChange={(e) => handleChange("pS", e.target.value)}
         />
         <input
           value={values.pC}
           type="text"
+          className={getSignedClassName("pC", values.pC)}
           onChange={(e) => handleChange("pC", e.target.value)}
         />
         <input
@@ -105,11 +125,13 @@ function OptometryRefractionFull({
         <input
           value={values.lS}
           type="text"
+          className={getSignedClassName("lS", values.lS)}
           onChange={(e) => handleChange("lS", e.target.value)}
         />
         <input
           value={values.lC}
           type="text"
+          className={getSignedClassName("lC", values.lC)}
           onChange={(e) => handleChange("lC", e.target.value)}
         />
         <input
