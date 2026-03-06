@@ -47,3 +47,22 @@ body {
   justify-content: left;
   align-items: left;
 }
+
+.secondary-menu > div {
+  flex-shrink: 0;
+}
+
+.client-exam-menu-scroll {
+  display: flex;
+  flex-direction: column;
+  /* 100vh - main-header(70px) - footer(~40px) - sec-menu-header(50px) - 5 buttons(250px) - buffer(10px) */
+  max-height: min(360px, calc(100vh - 420px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+
+.client-exam-menu-scroll .button-tertiary-menu {
+  height: 50px;
+  min-height: 50px;
+}

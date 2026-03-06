@@ -255,8 +255,9 @@ function Client() {
               {button.id === activeSecondaryButton &&
               activeSecondaryButton === 2 &&
               !loadingExams &&
-              examMenuList.length > 0
-                ? examMenuList.map((exam, index) => (
+              examMenuList.length > 0 ? (
+                <div className="client-exam-menu-scroll">
+                  {examMenuList.map((exam, index) => (
                     <button
                       style={{ transitionDelay: `${index * 0.05}s` }}
                       key={exam.id}
@@ -275,8 +276,9 @@ function Client() {
                     >
                       {exam.name}
                     </button>
-                  ))
-                : null}
+                  ))}
+                </div>
+              ) : null}
             </div>
           );
         })}
