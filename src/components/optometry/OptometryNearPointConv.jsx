@@ -1,14 +1,10 @@
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 function OptometryNearPointConv({
   isActive,
-  setActiveElement,
   itemValues,
   onChange,
 }) {
-  const input1Ref = useRef(null);
-  const input2Ref = useRef(null);
-  const input3Ref = useRef(null);
   const [values, setValues] = useState(itemValues);
 
   useEffect(() => {
@@ -19,13 +15,6 @@ function OptometryNearPointConv({
     const newData = { ...values, [key]: value };
     setValues(newData);
     onChange?.(newData);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "ArrowUp") {
-      input2Ref.current?.focus();
-      setActiveElement(0);
-    }
   };
 
   return (

@@ -1,10 +1,7 @@
-import { useRef, useState, useEffect, forwardRef } from "react";
+import { useState, useEffect, forwardRef } from "react";
 
 const OptometryNaturalVisus = forwardRef(
-  ({ isActive, setActiveModul, itemValues, onChange }, ref) => {
-    const input1Ref = useRef(null);
-    const input2Ref = useRef(null);
-    const input3Ref = useRef(null);
+  ({ isActive, itemValues, onChange }, ref) => {
     const [values, setValues] = useState(itemValues);
 
     useEffect(() => {
@@ -17,23 +14,8 @@ const OptometryNaturalVisus = forwardRef(
       onChange?.(newData);
     };
 
-    const handleKeyDown = (e) => {
-      e.preventDefault();
-      if (e.key === "ArrowUp") {
-        setActiveModul(true);
-
-        const parentArea = e.target.closest(".optometry-area");
-        if (parentArea) {
-          parentArea.focus();
-        }
-      }
-    };
-
     return (
-      <div
-        className={`modul ${isActive ? "active" : ""}`}
-        onKeyDown={(e) => handleKeyDown(e)}
-      >
+      <div className={`modul ${isActive ? "active" : ""}`}>
         <input
           value={values.name}
           className={`modul-name ${isActive ? "active" : ""}`}
