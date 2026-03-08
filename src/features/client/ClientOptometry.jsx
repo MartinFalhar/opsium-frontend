@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUser } from "../../context/UserContext";
 
 import ModulesDB from "../../components/optometry/ModulesDB.jsx";
@@ -12,6 +11,8 @@ import LoadExaminationFromDB from "../../components/optometry/LoadExaminationFro
 import PuffLoaderSpinnerDark from "../../components/loader/PuffLoaderSpinnerDark.jsx";
 import useAutosave from "./useAutosave";
 import OptometryInfo from "../../components/optometry/OptometryInfo.jsx";
+import Modal from "../../components/modal/Modal.jsx";
+import SegmentedControlMulti from "../../components/controls/SegmentedControlMulti.jsx";
 
 import closeIcon from "../../styles/svg/close.svg";
 import copyIcon from "../../styles/svg/copy.svg";
@@ -20,12 +21,26 @@ import copyIcon from "../../styles/svg/copy.svg";
 
 import "./ClientOptometry.css";
 const API_URL = import.meta.env.VITE_API_URL;
+const COPY_ADD_OPTIONS = [
+  "+0,25",
+  "+0,50",
+  "+0,75",
+  "+1,00",
+  "+1,25",
+  "+1,50",
+  "+1,75",
+  "+2,00",
+  "+2,25",
+  "+2,50",
+  "+2,75",
+  "+3,00",
+  "...",
+];
 
 function ClientOptometry({ client }) {
-  const optometryModules = ModulesDB();
-  const [optometryItems, setOptometryItems] = useState(optometryModules);
+  const [optometryItems, setOptometryItems] = useState(() => ModulesDB());
 
-  const { user, headerClients, activeId, setHeaderClients, memory, setMemory } =
+  const { user, headerClients, activeId, setHeaderClients, setMemory } =
     useUser();
 
   const [activeItem, setActiveItem] = useState(null);
@@ -33,7 +48,11 @@ function ClientOptometry({ client }) {
   const [optometryRecordName, setOptometryRecordName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hoveredItemId, setHoveredItemId] = useState(null);
-  const [error, setError] = useState("");
+  const [showCopyAddModal, setShowCopyAddModal] = useState(false);
+  const [copyAddSourceId, setCopyAddSourceId] = useState(null);
+  const [copyAddSelection, setCopyAddSelection] = useState(["+0,25"]);
+  const [copyAddCustomValue, setCopyAddCustomValue] = useState("");
+  const [, setError] = useState("");
 
   const dateRef = useRef(new Date());
 
@@ -62,6 +81,11 @@ function ClientOptometry({ client }) {
     autosaveIntervalMs: 60000,
     debounceMs: 1000,
   });
+
+  const saveNowRef = useRef(saveNow);
+  useEffect(() => {
+    saveNowRef.current = saveNow;
+  }, [saveNow]);
 
   // --- HELPERS ---
   const resetToDefaults = () => {
@@ -182,15 +206,18 @@ function ClientOptometry({ client }) {
 
   // Načtení vyšetření při změně tertiárního menu
   useEffect(() => {
+    const clientId = client?.id;
+    const examName = client?.examName;
+    const branchId = user?.branch_id;
+
     const load = async () => {
-      if (!client || !client.examName || client.examName === "(neuloženo)")
-        return;
+      if (!clientId || !examName || examName === "(neuloženo)") return;
 
       setIsLoading(true);
 
       // uložíme aktuální data před přepnutím
       try {
-        await saveNow();
+        await saveNowRef.current?.();
       } catch (e) {
         // ignoruj chyby saveNow při načítání
         console.warn("save before load failed", e);
@@ -198,18 +225,18 @@ function ClientOptometry({ client }) {
 
       try {
         const examination = await LoadExaminationFromDB(
-          client.id,
-          user.branch_id,
-          client.examName,
+          clientId,
+          branchId,
+          examName,
         );
 
         const restoredItems = restoreOptometryItems(
           examination.data,
-          optometryModules,
+          ModulesDB(),
         );
 
         setOptometryItems(restoredItems);
-        setOptometryRecordName(client.examName);
+        setOptometryRecordName(examName);
       } catch (err) {
         console.error("load exam failed", err);
         setError(err.message || "Chyba při načítání vyšetření");
@@ -219,7 +246,96 @@ function ClientOptometry({ client }) {
     };
 
     load();
-  }, [client.activeTertiaryButton]);
+  }, [
+    client?.activeTertiaryButton,
+    client?.id,
+    client?.examName,
+    user?.branch_id,
+  ]);
+
+  const markAsNotSaved = () => {
+    if (typeof setHeaderClients === "function" && activeId?.client_id) {
+      setHeaderClients((prev) =>
+        prev.map((c) =>
+          c.id === activeId.client_id ? { ...c, notSavedDetected: true } : c,
+        ),
+      );
+    }
+  };
+
+  const duplicateItemById = (id, mapValuesFn, sourceValuesOverride) => {
+    let nextId = null;
+
+    setOptometryItems((prev) => {
+      const sourceIndex = prev.findIndex((item) => item.id === id);
+      if (sourceIndex === -1) return prev;
+
+      const sourceItem = prev[sourceIndex];
+      const maxId = prev.reduce((max, item) => Math.max(max, item.id), 0);
+      nextId = maxId + 1;
+
+        const originalValues = sourceValuesOverride ?? sourceItem.values ?? {};
+      const clonedValues = JSON.parse(JSON.stringify(originalValues));
+      const duplicatedValues = mapValuesFn
+        ? mapValuesFn(clonedValues)
+        : clonedValues;
+
+      const duplicatedItem = {
+        ...sourceItem,
+        id: nextId,
+        values: duplicatedValues,
+      };
+
+      const updated = [
+        ...prev.slice(0, sourceIndex + 1),
+        duplicatedItem,
+        ...prev.slice(sourceIndex + 1),
+      ];
+
+      saveNow(updated);
+      return updated;
+    });
+
+    if (nextId !== null) {
+      setActiveItem(nextId);
+      setMemory?.((prev) => ({ ...prev, dpt: nextId }));
+      markAsNotSaved();
+    }
+  };
+
+  const parseSignedNumber = (value) => {
+    const normalized = String(value ?? "")
+      .trim()
+      .replace(",", ".")
+      .replace(/\s+/g, "");
+
+    const numeric = Number(normalized);
+    return Number.isNaN(numeric) ? null : numeric;
+  };
+
+  const formatSignedNumber = (value) => {
+    const fixed = value.toFixed(2).replace(".", ",");
+    return value > 0 ? `+${fixed}` : fixed;
+  };
+
+  const addDeltaToSph = (originalValue, delta) => {
+    const parsed = parseSignedNumber(originalValue);
+    if (parsed === null) return originalValue;
+    return formatSignedNumber(parsed + delta);
+  };
+
+  const buildNearAddValues = (values, delta, deltaLabel) => ({
+    ...values,
+    name: `BLÍZKO S ADD ${deltaLabel}`,
+    pS: addDeltaToSph(values.pS, delta),
+    lS: addDeltaToSph(values.lS, delta),
+    pAdd: "",
+    lAdd: "",
+    pV: "",
+    lV: "",
+    bV: "",
+    showAdd: false,
+  });
 
   const handleUpdateItem = (id, newValues) => {
     setOptometryItems((prev) =>
@@ -229,13 +345,7 @@ function ClientOptometry({ client }) {
     );
 
     // označíme, že změna proběhla (autosave hook detekuje přes debounce)
-    if (typeof setHeaderClients === "function" && activeId?.client_id) {
-      setHeaderClients((prev) =>
-        prev.map((c) =>
-          c.id === activeId.client_id ? { ...c, notSavedDetected: true } : c,
-        ),
-      );
-    }
+    markAsNotSaved();
   };
 
   const handleDeleteItem = (e, id) => {
@@ -249,23 +359,57 @@ function ClientOptometry({ client }) {
 
   const handleCopyItem = (e, id) => {
     e.stopPropagation(); // zabrání kliknutí aktivovat celý modul
-    setMemory((prev) => ({ ...prev, dpt: id }));
+    duplicateItemById(id);
   };
 
-  const ruka = useRef(null);
+  const handleOpenCopyAddModal = (e, id, addValueFromModule, sourceValues) => {
+    e.stopPropagation();
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && activeModul) {
-      e.preventDefault();
-      setActiveModul(false);
-      ruka.current.focus();
+    const parsedAddValue = parseSignedNumber(addValueFromModule);
+    if (parsedAddValue !== null) {
+      const deltaLabel = formatSignedNumber(parsedAddValue);
+
+      duplicateItemById(
+        id,
+        (values) => buildNearAddValues(values, parsedAddValue, deltaLabel),
+        sourceValues,
+      );
+      return;
     }
-    if (e.key === "ArrowRight" && activeModul) {
-      setActiveItem(activeItem + 1);
+
+    setCopyAddSourceId(id);
+    setCopyAddSelection(["+0,25"]);
+    setCopyAddCustomValue("");
+    setShowCopyAddModal(true);
+  };
+
+  const handleCopyAddSubmit = () => {
+    if (!copyAddSourceId) {
+      setShowCopyAddModal(false);
+      return;
     }
-    if (e.key === "ArrowLeft" && activeModul) {
-      activeItem > 1 ? setActiveItem(activeItem - 1) : null;
+
+    const selected = copyAddSelection[0];
+    if (!selected) return;
+
+    let delta = null;
+
+    if (selected === "...") {
+      delta = parseSignedNumber(copyAddCustomValue);
+      if (delta === null) return;
+    } else {
+      delta = parseSignedNumber(selected);
+      if (delta === null) return;
     }
+
+    const deltaLabel =
+      selected === "..." ? formatSignedNumber(delta) : selected;
+
+    duplicateItemById(copyAddSourceId, (values) =>
+      buildNearAddValues(values, delta, deltaLabel),
+    );
+
+    setShowCopyAddModal(false);
   };
 
   return (
@@ -297,12 +441,6 @@ function ClientOptometry({ client }) {
               type="text"
               value={optometryRecordName ?? ""}
               onChange={(e) => setOptometryRecordName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleSave();
-                }
-              }}
               placeholder={`Název vyšetření`}
             />
 
@@ -320,10 +458,11 @@ function ClientOptometry({ client }) {
           </div>
         </div>
 
-        <div className="optometry-area" tabIndex={0} onKeyDown={handleKeyDown}>
+        <div className="optometry-area">
           {optometryItems.map((item) => {
             const Component = item.component;
-            const isActive = activeItem === item.id;
+            const isRefractionFullModule =
+              Component?.name === "OptometryRefractionFull";
             return (
               <div
                 key={item.id}
@@ -338,38 +477,95 @@ function ClientOptometry({ client }) {
                 onMouseLeave={() => setHoveredItemId(null)}
               >
                 <Component
-                  ref={isActive ? ruka : null}
                   isActive={activeItem === item.id}
                   activeModul={activeModul}
                   setActiveModul={setActiveModul}
                   itemValues={item.values}
                   onChange={(newValues) => handleUpdateItem(item.id, newValues)}
+                  onDeleteAction={(e) => handleDeleteItem(e, item.id)}
+                  onCopyAction={(e) => handleCopyItem(e, item.id)}
+                  onCopyAddAction={(e, addValue, sourceValues) =>
+                    handleOpenCopyAddModal(e, item.id, addValue, sourceValues)
+                  }
+                  deleteIconSrc={closeIcon}
+                  copyIconSrc={copyIcon}
                 />
                 {/* Zobrazeni ikon */}
-                {hoveredItemId === item.id && (
-                  <>
-                    <div className="deleteSign">
-                      <img
-                        src={closeIcon}
-                        alt="Close"
-                        onClick={(e) => handleDeleteItem(e, item.id)}
+                {hoveredItemId === item.id && !isRefractionFullModule && (
+                  <div
+                    className={`modul-actions ${
+                      isRefractionFullModule ? "modul-actions-refraction" : ""
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      className="modul-action-btn"
+                      onClick={(e) => handleCopyItem(e, item.id)}
+                      aria-label="Copy module"
+                    >
+                      <span
+                        className="modul-action-icon-copy"
+                        aria-hidden="true"
                       />
-                    </div>
-                    <div className="copySign">
-                      <img
-                        src={copyIcon}
-                        alt="Copy"
-                        height="20px"
-                        onClick={(e) => handleCopyItem(e, item.id)}
-                      />
-                    </div>
-                  </>
+                    </button>
+                    <img
+                      src={closeIcon}
+                      alt="Delete"
+                      className="modul-action-icon-delete"
+                      onClick={(e) => handleDeleteItem(e, item.id)}
+                      role="button"
+                      tabIndex={0}
+                    />
+                  </div>
                 )}
               </div>
             );
           })}
         </div>
       </div>
+
+      {showCopyAddModal && (
+        <Modal
+          fields={[]}
+          initialValues={{}}
+          title="Přidání refrakčního modulu s přidanou adicí"
+          firstButton="Potvrdit"
+          secondButton="Zrušit"
+          onSubmit={handleCopyAddSubmit}
+          onClose={() => setShowCopyAddModal(false)}
+          onCancel={() => setShowCopyAddModal(false)}
+          customContent={
+            <div className="copy-add-modal-content">
+              <p>Zvol hodnotu adice, která se přičte ke SPH pro pravé i levé oko</p>
+              <SegmentedControlMulti
+                items={COPY_ADD_OPTIONS}
+                width="100%"
+                selectedValues={copyAddSelection}
+                onChange={(values) => {
+                  if (!values.length) {
+                    setCopyAddSelection([]);
+                    return;
+                  }
+
+                  setCopyAddSelection([values[values.length - 1]]);
+                }}
+              />
+
+              {copyAddSelection[0] === "..." && (
+                <>
+                <h1>Zadej individuální hodnotu adice</h1>
+                  <input
+                    type="text"
+                    value={copyAddCustomValue}
+                    onChange={(e) => setCopyAddCustomValue(e.target.value)}
+                    placeholder="Např. +0,33"
+                  />
+                </>
+              )}
+            </div>
+          }
+        />
+      )}
 
       <div className="optometry-right-container">
         <div className="optometry-right-container-head">

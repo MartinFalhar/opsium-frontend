@@ -3,7 +3,7 @@ import ConfirmDelete from "./ConfirmDelete";
 import "./Modal.css";
 
 export default function Modal({
-  fields,
+  fields = [],
   initialValues,
   title,
   onSubmit,
@@ -14,6 +14,7 @@ export default function Modal({
   thirdButton,
   onClickThirdButton,
   suppliers = [],
+  customContent,
 }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [values, setValues] = useState({});
@@ -81,7 +82,9 @@ export default function Modal({
     setShowConfirm(false);
   };
 
-  const visibleFieldCount = fields.filter((field) => field.input !== "hidden").length;
+  const visibleFieldCount = customContent
+    ? 1
+    : fields.filter((field) => field.input !== "hidden").length;
   const layoutClass =
     visibleFieldCount > 12
       ? "three-columns"
@@ -113,7 +116,8 @@ export default function Modal({
           <div
             className={`modal-content ${layoutClass}`}
           >
-            {fields.map((field, index) => {
+            {customContent ??
+              fields.map((field, index) => {
               // Pro pole s dynamickými options použij předem načtená data
               const isDynamic =
                 field.options &&
@@ -214,7 +218,7 @@ export default function Modal({
                   )}
                 </div>
               );
-            })}
+              })}
           </div>
 
           <div className="modal-actions">

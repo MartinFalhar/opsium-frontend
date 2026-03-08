@@ -686,6 +686,7 @@ button:hover {
 }
 
 .secondary-settings-menu {
+  --menu-icon-stroke: var(--color-bg-b6);
   display: flex;
   align-items: center;
   width: 200px;
@@ -710,19 +711,23 @@ button:hover {
   width: var(--icon-size);
   height: var(--icon-size);
   flex: 0 0 auto;
-  background-repeat: no-repeat;
-  background-size: contain;
-  fill: var(--color-bg-b11);
-  /* simple star svg, url-encoded */
+  background-color: var(--menu-icon-stroke);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: center;
   transition:
-    filter 0.72s ease,
+    background-color 0.2s ease,
     transform 0.72s ease,
-    background-image 0.72s ease;
+    -webkit-mask-image 0.72s ease;
   padding: 0 1px 0 15px;
 }
 
 .secondary-settings-menu:hover {
   background: var(--color-bg-b2);
+  --menu-icon-stroke: var(--color-bg-b9);
 }
 
 .secondary-settings-menu.active {
@@ -737,28 +742,34 @@ button:hover {
   width: var(--icon-size);
   height: var(--icon-size);
   flex: 0 0 auto;
-  background-repeat: no-repeat;
-  background-size: contain;
-  fill: var(--color-bg-b11);
-  /* simple star svg, url-encoded */
+  background-color: var(--menu-icon-stroke);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: center;
   transition:
-    filter 0.72s ease,
+    background-color 0.2s ease,
     transform 0.72s ease,
-    background-image 0.72s ease;
+    -webkit-mask-image 0.72s ease;
   padding: 0 1px 0 15px;
 }
 
 .button-secondary-menu:hover {
   background: var(--color-bg-b2);
+  --menu-icon-stroke: var(--color-bg-b9);
 }
 
 .button-secondary-menu.active {
   background: var(--color-grd-g3);
   color: var(--color-bg-b1);
+  --menu-icon-stroke: var(--color-bg-b1);
   font-weight: bold;
 }
 
 .button-secondary-menu {
+  --menu-icon-stroke: var(--color-bg-b10);
   display: flex;
   align-items: center;
   width: 200px;
@@ -773,57 +784,80 @@ button:hover {
   box-shadow: 0 1px 13px rgba(0, 0, 0, 0.3);
   font-size: var(--font-size-main-menu);
   text-align: left;
-  padding-left: 20px;
+  padding-left: 10px;  
   margin-top: 0px;
   letter-spacing: 0.8px;
 }
 .button-secondary-menu.dashboard::before {
-  background-image: url("../../src/styles/svg/dashboard-3.svg");
+  -webkit-mask-image: url("../../src/styles/svg/dashboard-3.svg");
+  mask-image: url("../../src/styles/svg/dashboard-3.svg");
   font-size: 0.5rem;
 }
 
 .button-secondary-menu.invoices::before {
-  background-image: url("../../src/styles/svg/invoice-duotone.svg");
+  -webkit-mask-image: url("../../src/styles/svg/invoice-duotone.svg");
+  mask-image: url("../../src/styles/svg/invoice-duotone.svg");
 }
 
 .button-secondary-menu.optometry::before {
-  background-image: url("../../src/styles/svg/optician.svg");
+  -webkit-mask-image: url("../../src/styles/svg/optician.svg");
+  mask-image: url("../../src/styles/svg/optician.svg");
 }
 
 .button-secondary-menu.training::before {
-  background-image: url("../../src/styles/svg/eye-tracking-outline.svg");
+  -webkit-mask-image: url("../../src/styles/svg/eye-tracking-outline.svg");
+  mask-image: url("../../src/styles/svg/eye-tracking-outline.svg");
 }
 .button-secondary-menu.lab::before {
-  background-image: url("../../src/styles/svg/lab.svg");
+  -webkit-mask-image: url("../../src/styles/svg/lab.svg");
+  mask-image: url("../../src/styles/svg/lab.svg");
   font-size: 0.5rem;
 }
 .button-secondary-menu.optician::before {
-  background-image: url("../../src/styles/svg/optician.svg");
+  -webkit-mask-image: url("../../src/styles/svg/optician.svg");
+  mask-image: url("../../src/styles/svg/optician.svg");
   font-size: 0.5rem;
 }
 
 .button-secondary-menu.dashboard::before {
-  background-image: url("../../src/styles/svg/dashboard-3.svg");
+  -webkit-mask-image: url("../../src/styles/svg/dashboard-3.svg");
+  mask-image: url("../../src/styles/svg/dashboard-3.svg");
   font-size: 0.5rem;
 }
 
 .button-secondary-menu.ico::before {
-  background-image: url("../../src/styles/svg/outline-assistant.svg");
+  -webkit-mask-image: url("../../src/styles/svg/outline-assistant.svg");
+  mask-image: url("../../src/styles/svg/outline-assistant.svg");
   font-size: 0.5rem;
 }
 
 .button-secondary-menu.person::before {
-  background-image: url("../../src/styles/svg/persons.svg");
+  -webkit-mask-image: url("../../src/styles/svg/persons.svg");
+  mask-image: url("../../src/styles/svg/persons.svg");
+  font-size: 0.5rem;
+}
+
+.button-secondary-menu.clients::before {
+  -webkit-mask-image: url("../../src/styles/svg/persons.svg");
+  mask-image: url("../../src/styles/svg/persons.svg");
+  font-size: 0.5rem;
+}
+
+.button-secondary-menu.eye::before {
+  -webkit-mask-image: url("../../src/styles/svg/eye.svg");
+  mask-image: url("../../src/styles/svg/eye.svg");
   font-size: 0.5rem;
 }
 
 .button-secondary-menu.accounts::before {
-  background-image: url("../../src/styles/svg/accounts.svg");
+  -webkit-mask-image: url("../../src/styles/svg/accounts.svg");
+  mask-image: url("../../src/styles/svg/accounts.svg");
   font-size: 0.5rem;
 }
 
 .button-secondary-menu.catalog::before {
-  background-image: url("../../src/styles/svg/catalog.svg");
+  -webkit-mask-image: url("../../src/styles/svg/catalog.svg");
+  mask-image: url("../../src/styles/svg/catalog.svg");
   font-size: 0.5rem;
 }
 

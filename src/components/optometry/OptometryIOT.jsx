@@ -1,9 +1,8 @@
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 
 function OptometryIOT({
   isActive,
-  setActiveElement,
   itemValues,
   onChange,
 }) {
@@ -40,13 +39,6 @@ function OptometryIOT({
 
         {/* pravé oko */}
         <p className="desc">P</p>
-        {/* <input
-          ref={pSphRef}
-          value={values.pS || ""}
-          type="numeric"
-          onChange={(e) => handleChange("pS", e.target.value)}
-          onKeyDown={(e) => handleKeyDown(e, pCylRef)}
-        /> */}
         <input
           value={values.pIOT || ""}
           type="text"

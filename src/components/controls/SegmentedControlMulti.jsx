@@ -19,6 +19,7 @@ const SegmentedControlMulti = ({ items, selectedValues = [], onChange, width }) 
       {items.map((item) => (
         <button
           key={item}
+          type="button"
           className={`button-controler ${
             selectedValues.includes(item) ? "active" : ""
           }`}
