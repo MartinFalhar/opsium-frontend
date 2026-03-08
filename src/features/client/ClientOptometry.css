@@ -180,8 +180,8 @@
 
 .optometry-modul .opt-modul-toggle {
   position: absolute;
-  top: -10px;
-  right: 0;
+  top: -5px;
+  right: -10px;
   transform: none;
   z-index: 20;
   display: flex;
@@ -204,8 +204,9 @@
 
 .optometry-modul .opt-modul-toggle-row {
   display: flex;
+  flex-direction: column-reverse;
   align-items: center;
-  gap: 8px;
+  /* gap: 3px; */
 }
 
 .optometry-modul .opt-modul-toggle-actions {
@@ -218,12 +219,12 @@
 .optometry-modul .opt-modul-toggle-label {
   display: inline-flex;
   align-items: center;
-  height: 24px;
+  height: 16px;
   margin: 0;
   font-size: clamp(var(--font-size-small), 0.8vw, var(--font-size-large));
   color: var(--color-bg-b4);
   font-weight: 600;
-  line-height: 24px;
+  line-height: 1;
   text-align: left;
 }
 
@@ -232,8 +233,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 24px;
+  width: 32px;
+  height: 17px;
+  margin: 3px;
 }
 
 .optometry-modul .opt-toggle-switch input {
@@ -246,30 +248,31 @@
   position: absolute;
   cursor: pointer;
   inset: 0;
-  background-color: var(--color-bg-b5);
-  border-radius: 24px;
+  background-color: var(--color-bg-b10);
+  border: 1px solid var(--color-bg-b6);
+  border-radius: 17px;
   transition: 0.2s;
 }
 
 .optometry-modul .opt-toggle-slider::before {
   content: "";
   position: absolute;
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  top: 3px;
-  background-color: var(--color-bg-b10);
+  height: 13px;
+  width: 13px;
+  left: 1px;  
+  top: 1px;
+  background-color: var(--color-bg-b3);
   border-radius: 50%;
   transition: 0.2s;
 }
 
 .optometry-modul .opt-toggle-switch input:checked + .opt-toggle-slider {
-  background: var(--color-el-j);
+  background: var(--color-bg-b5);
 }
 
 .optometry-modul .opt-toggle-switch input:checked + .opt-toggle-slider::before {
-  transform: translateX(22px);
-  background: var(--color-bg-b4);
+  transform: translateX(17px);
+  background: var(--color-bg-b13);
 }
 
 .optometry-modul .opt-bottom-tabs {
@@ -711,7 +714,7 @@ input {
 .modul-actions {
   position: absolute;
   top: 8px;
-  right: 10px;
+  right: 5px;
   display: flex;
   flex-direction: row;
   gap: 6px;
@@ -719,7 +722,8 @@ input {
 }
 
 .modul-action-btn {
-  width: 65px;
+  --modul-action-icon-color: var(--color-bg-b3);
+  width: 35px;
   height: 30px;
   min-width: 25px;
   min-height: 25px;
@@ -728,16 +732,36 @@ input {
   background: var(--background-color-active);
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 0;
-  margin: 0;
+  justify-content: center;  
   cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.modul-action-btn.wider-btn {
+  width: 80px;
+}
+
+.modul-action-btn.wider-btn .modul-action-icon-copy {
+  margin-right: 8px;
 }
 
 .modul-action-btn img {
-  width: 14px;
-  height: 14px;
+  margin: 0;
+  width: 20px;
+  height: 20px;
   display: block;
+}
+
+.modul-action-icon-copy {
+  margin: 0;
+  width: 20px;
+  height: 20px;
+  display: block;
+  background: transparent;
+  background-color: var(--modul-action-icon-color);
+  -webkit-mask: url("../../styles/svg/copy.svg") center / contain no-repeat;
+  mask: url("../../styles/svg/copy.svg") center / contain no-repeat;
+  transition: background-color 0.2s ease;
 }
 
 .modul-action-btn-delete {
@@ -760,18 +784,18 @@ input {
   border-color: transparent;
 }
 
-.modul-action-btn-delete:hover {
-  border-color: transparent;
-}
-/* 
+
 .modul-action-btn-delete:hover,
 .modul-action-btn-delete:focus,
 .modul-action-btn-delete:active {
   box-shadow: none;
+    background: transparent;
+  border-color: transparent;
   outline: none;
-} */
+}
 
-.opt-modul-toggle-actions .modul-action-icon-delete {
+.opt-modul-toggle-actions .modul-action-icon-delete,
+.modul-actions .modul-action-icon-delete {
   width: 20px;
   height: 20px;
   display: block;
@@ -779,7 +803,16 @@ input {
 }
 
 .modul-action-btn:hover {
+  background: var(--color-bg-b3);
   border-color: var(--color-el-j);
+  --modul-action-icon-color: var(--color-bg-b10);
+}
+
+.modul-action-btn:focus,
+.modul-action-btn:active {
+  background: var(--color-bg-b3);
+  border-color: var(--color-el-j);
+  --modul-action-icon-color: var(--color-bg-b10);
 }
 
 .modul-action-btn:focus {

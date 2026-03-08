@@ -32,7 +32,11 @@ function OptometryRefractionFull({
   copyIconSrc,
 }) {
   const [values, setValues] = useState(itemValues);
-  const [showAdd, setShowAdd] = useState(defaultShowAdd);
+  const [showAdd, setShowAdd] = useState(
+    typeof itemValues?.showAdd === "boolean"
+      ? itemValues.showAdd
+      : defaultShowAdd,
+  );
   const [showPrismBase, setShowPrismBase] = useState(defaultShowPrismBase);
   const [showBinoTabs, setShowBinoTabs] = useState(defaultShowBinoTabs);
   const [activeBinoTab, setActiveBinoTab] = useState(null);
@@ -67,7 +71,10 @@ function OptometryRefractionFull({
 
   //zachtycení změn v jednotlivých polích - globální handler
   const handleChange = (key, value) => {
-    const newData = { ...values, [key]: value };
+    const newData =
+      key === "pAdd"
+        ? { ...values, pAdd: value, lAdd: value }
+        : { ...values, [key]: value };
     setValues(newData);
     onChange?.(newData); // pošle změnu zpět do rodiče
   };
@@ -101,6 +108,14 @@ function OptometryRefractionFull({
         [activeBinoTab]: updated,
       };
     });
+  };
+
+  const handlePAddKeyDown = (e) => {
+    if (e.key !== "Enter" || !onCopyAddAction) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    onCopyAddAction(e, e.currentTarget.value, values);
   };
 
   const activeMatrix = activeBinoTab ? tabMatrices[activeBinoTab] : null;
@@ -169,16 +184,23 @@ function OptometryRefractionFull({
                 onClick={onCopyAction}
                 aria-label="Copy module"
               >
-                <img src={copyIconSrc} alt="Copy" />
+                <span className="modul-action-icon-copy" aria-hidden="true" />
               </button>
               <button
                 type="button"
-                className="modul-action-btn"
-                onClick={onCopyAddAction || onCopyAction}
+                className="modul-action-btn wider-btn"
+                onClick={(e) => {
+                  if (onCopyAddAction) {
+                    onCopyAddAction(e, values?.pAdd, values);
+                    return;
+                  }
+
+                  onCopyAction?.(e);
+                }}
                 aria-label="Copy and add module"
               >
-                <img src={copyIconSrc} alt="Copy" />
-                <span>ADD</span>
+                <span className="modul-action-icon-copy" aria-hidden="true" />
+                {`ADD`}
               </button>
               <img
                 src={deleteIconSrc}
@@ -246,6 +268,7 @@ function OptometryRefractionFull({
             value={values.pAdd}
             type="text"
             onChange={(e) => handleChange("pAdd", e.target.value)}
+            onKeyDown={handlePAddKeyDown}
           />
           <input
             value={values.pV}

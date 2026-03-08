@@ -4,7 +4,7 @@ const OptometryAnamnesis = forwardRef(
   ({ isActive, itemValues, onChange }, ref) => {
     const [values, setValues] = useState(itemValues);
 
-    useEffect(() => {
+    useEffect(() => { 
       setValues(itemValues);
     }, [itemValues]);
 

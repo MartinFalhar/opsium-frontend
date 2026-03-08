@@ -263,7 +263,7 @@ function ClientOptometry({ client }) {
     }
   };
 
-  const duplicateItemById = (id, mapValuesFn) => {
+  const duplicateItemById = (id, mapValuesFn, sourceValuesOverride) => {
     let nextId = null;
 
     setOptometryItems((prev) => {
@@ -274,9 +274,11 @@ function ClientOptometry({ client }) {
       const maxId = prev.reduce((max, item) => Math.max(max, item.id), 0);
       nextId = maxId + 1;
 
-      const originalValues = sourceItem.values ?? {};
+        const originalValues = sourceValuesOverride ?? sourceItem.values ?? {};
       const clonedValues = JSON.parse(JSON.stringify(originalValues));
-      const duplicatedValues = mapValuesFn ? mapValuesFn(clonedValues) : clonedValues;
+      const duplicatedValues = mapValuesFn
+        ? mapValuesFn(clonedValues)
+        : clonedValues;
 
       const duplicatedItem = {
         ...sourceItem,
@@ -322,6 +324,19 @@ function ClientOptometry({ client }) {
     return formatSignedNumber(parsed + delta);
   };
 
+  const buildNearAddValues = (values, delta, deltaLabel) => ({
+    ...values,
+    name: `BLÍZKO S ADD ${deltaLabel}`,
+    pS: addDeltaToSph(values.pS, delta),
+    lS: addDeltaToSph(values.lS, delta),
+    pAdd: "",
+    lAdd: "",
+    pV: "",
+    lV: "",
+    bV: "",
+    showAdd: false,
+  });
+
   const handleUpdateItem = (id, newValues) => {
     setOptometryItems((prev) =>
       prev.map((item) =>
@@ -347,8 +362,21 @@ function ClientOptometry({ client }) {
     duplicateItemById(id);
   };
 
-  const handleOpenCopyAddModal = (e, id) => {
+  const handleOpenCopyAddModal = (e, id, addValueFromModule, sourceValues) => {
     e.stopPropagation();
+
+    const parsedAddValue = parseSignedNumber(addValueFromModule);
+    if (parsedAddValue !== null) {
+      const deltaLabel = formatSignedNumber(parsedAddValue);
+
+      duplicateItemById(
+        id,
+        (values) => buildNearAddValues(values, parsedAddValue, deltaLabel),
+        sourceValues,
+      );
+      return;
+    }
+
     setCopyAddSourceId(id);
     setCopyAddSelection(["+0,25"]);
     setCopyAddCustomValue("");
@@ -377,12 +405,9 @@ function ClientOptometry({ client }) {
     const deltaLabel =
       selected === "..." ? formatSignedNumber(delta) : selected;
 
-    duplicateItemById(copyAddSourceId, (values) => ({
-      ...values,
-      name: `BLÍZKO s ADD ${deltaLabel}`,
-      pS: addDeltaToSph(values.pS, delta),
-      lS: addDeltaToSph(values.lS, delta),
-    }));
+    duplicateItemById(copyAddSourceId, (values) =>
+      buildNearAddValues(values, delta, deltaLabel),
+    );
 
     setShowCopyAddModal(false);
   };
@@ -459,7 +484,9 @@ function ClientOptometry({ client }) {
                   onChange={(newValues) => handleUpdateItem(item.id, newValues)}
                   onDeleteAction={(e) => handleDeleteItem(e, item.id)}
                   onCopyAction={(e) => handleCopyItem(e, item.id)}
-                  onCopyAddAction={(e) => handleOpenCopyAddModal(e, item.id)}
+                  onCopyAddAction={(e, addValue, sourceValues) =>
+                    handleOpenCopyAddModal(e, item.id, addValue, sourceValues)
+                  }
                   deleteIconSrc={closeIcon}
                   copyIconSrc={copyIcon}
                 />
@@ -476,16 +503,19 @@ function ClientOptometry({ client }) {
                       onClick={(e) => handleCopyItem(e, item.id)}
                       aria-label="Copy module"
                     >
-                      <img src={copyIcon} alt="Copy" />
+                      <span
+                        className="modul-action-icon-copy"
+                        aria-hidden="true"
+                      />
                     </button>
-                    <button
-                      type="button"
-                      className="modul-action-btn modul-action-btn-delete"
+                    <img
+                      src={closeIcon}
+                      alt="Delete"
+                      className="modul-action-icon-delete"
                       onClick={(e) => handleDeleteItem(e, item.id)}
-                      aria-label="Delete module"
-                    >
-                      <img src={closeIcon} alt="Delete" />
-                    </button>
+                      role="button"
+                      tabIndex={0}
+                    />
                   </div>
                 )}
               </div>
@@ -498,7 +528,7 @@ function ClientOptometry({ client }) {
         <Modal
           fields={[]}
           initialValues={{}}
-          title="COPY s ADD"
+          title="Přidání refrakčního modulu s přidanou adicí"
           firstButton="Potvrdit"
           secondButton="Zrušit"
           onSubmit={handleCopyAddSubmit}
@@ -506,9 +536,10 @@ function ClientOptometry({ client }) {
           onCancel={() => setShowCopyAddModal(false)}
           customContent={
             <div className="copy-add-modal-content">
-              <p>Zvol hodnotu, která se přičte ke SPH v řádku P i L.</p>
+              <p>Zvol hodnotu adice, která se přičte ke SPH pro pravé i levé oko</p>
               <SegmentedControlMulti
                 items={COPY_ADD_OPTIONS}
+                width="100%"
                 selectedValues={copyAddSelection}
                 onChange={(values) => {
                   if (!values.length) {
@@ -521,12 +552,15 @@ function ClientOptometry({ client }) {
               />
 
               {copyAddSelection[0] === "..." && (
-                <input
-                  type="text"
-                  value={copyAddCustomValue}
-                  onChange={(e) => setCopyAddCustomValue(e.target.value)}
-                  placeholder="Např. +0,33"
-                />
+                <>
+                <h1>Zadej individuální hodnotu adice</h1>
+                  <input
+                    type="text"
+                    value={copyAddCustomValue}
+                    onChange={(e) => setCopyAddCustomValue(e.target.value)}
+                    placeholder="Např. +0,33"
+                  />
+                </>
               )}
             </div>
           }
