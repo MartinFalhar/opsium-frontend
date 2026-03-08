@@ -274,7 +274,7 @@ function ClientOptometry({ client }) {
       const maxId = prev.reduce((max, item) => Math.max(max, item.id), 0);
       nextId = maxId + 1;
 
-        const originalValues = sourceValuesOverride ?? sourceItem.values ?? {};
+      const originalValues = sourceValuesOverride ?? sourceItem.values ?? {};
       const clonedValues = JSON.parse(JSON.stringify(originalValues));
       const duplicatedValues = mapValuesFn
         ? mapValuesFn(clonedValues)
@@ -366,19 +366,13 @@ function ClientOptometry({ client }) {
     e.stopPropagation();
 
     const parsedAddValue = parseSignedNumber(addValueFromModule);
-    if (parsedAddValue !== null) {
-      const deltaLabel = formatSignedNumber(parsedAddValue);
-
-      duplicateItemById(
-        id,
-        (values) => buildNearAddValues(values, parsedAddValue, deltaLabel),
-        sourceValues,
-      );
-      return;
-    }
+    const formatted =
+      parsedAddValue !== null ? formatSignedNumber(parsedAddValue) : null;
+    const preselected =
+      formatted && COPY_ADD_OPTIONS.includes(formatted) ? formatted : "+0,25";
 
     setCopyAddSourceId(id);
-    setCopyAddSelection(["+0,25"]);
+    setCopyAddSelection([preselected]);
     setCopyAddCustomValue("");
     setShowCopyAddModal(true);
   };
@@ -536,7 +530,9 @@ function ClientOptometry({ client }) {
           onCancel={() => setShowCopyAddModal(false)}
           customContent={
             <div className="copy-add-modal-content">
-              <p>Zvol hodnotu adice, která se přičte ke SPH pro pravé i levé oko</p>
+              <p>
+                Zvol hodnotu adice, která se přičte ke SPH pro pravé i levé oko
+              </p>
               <SegmentedControlMulti
                 items={COPY_ADD_OPTIONS}
                 width="100%"
@@ -553,7 +549,7 @@ function ClientOptometry({ client }) {
 
               {copyAddSelection[0] === "..." && (
                 <>
-                <h1>Zadej individuální hodnotu adice</h1>
+                  <h1>Zadej individuální hodnotu adice</h1>
                   <input
                     type="text"
                     value={copyAddCustomValue}
