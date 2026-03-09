@@ -508,7 +508,7 @@
   grid-template-columns: 6% repeat(8, 1fr);
   gap: 2px;
   column-gap: 7px;
-  background: var(--color-bg-b3);
+  background: var(--color-bg-bí);
   align-items: center;
 }
 .grid-refraction-full.opt-hide-prism-base {
