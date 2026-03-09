@@ -13,6 +13,8 @@ import useAutosave from "./useAutosave";
 import OptometryInfo from "../../components/optometry/OptometryInfo.jsx";
 import Modal from "../../components/modal/Modal.jsx";
 import SegmentedControlMulti from "../../components/controls/SegmentedControlMulti.jsx";
+import Tabs from "../../components/controls/Tabs.jsx";
+import AiAnamnesisAnalysisPanel from "../../components/ai/AiAnamnesisAnalysisPanel.jsx";
 
 import closeIcon from "../../styles/svg/close.svg";
 import copyIcon from "../../styles/svg/copy.svg";
@@ -37,6 +39,12 @@ const COPY_ADD_OPTIONS = [
   "...",
 ];
 
+const RIGHT_PANEL_TABS = [
+  { label: "Analýza", value: "analysis" },
+  { label: "AI", value: "ai" },
+  { label: "Popis", value: "description" },
+];
+
 function ClientOptometry({ client }) {
   const [optometryItems, setOptometryItems] = useState(() => ModulesDB());
 
@@ -52,6 +60,9 @@ function ClientOptometry({ client }) {
   const [copyAddSourceId, setCopyAddSourceId] = useState(null);
   const [copyAddSelection, setCopyAddSelection] = useState(["+0,25"]);
   const [copyAddCustomValue, setCopyAddCustomValue] = useState("");
+  const [activeRightTab, setActiveRightTab] = useState(
+    RIGHT_PANEL_TABS[0].value,
+  );
   const [, setError] = useState("");
 
   const dateRef = useRef(new Date());
@@ -183,24 +194,67 @@ function ClientOptometry({ client }) {
     }
   };
 
-  // Export (PDF + tisk)
-  const handleExport = () => {
+  // Export přes backend /pdf/exam
+  const handleExport = async () => {
+    if (!activeId?.client_id) return;
+
+    const examName = String(optometryRecordName ?? "").trim();
+    if (!examName) return;
+
+    setIsLoading(true);
+
     try {
-      // const doc = new jsPDF();
-      const doc = "";
-      doc.setFontSize(12);
-      doc.text(`Záznam vyšetření — ${optometryRecordName}`, 10, 10);
+      await saveNow();
 
-      // jednoduchý export JSON -> PDF (doporučuji vytvořit pěknou šablonu podle potřeby)
-      const text = JSON.stringify(optometryItems, null, 2);
-      const lines = doc.splitTextToSize(text, 180);
-      doc.text(lines, 10, 20);
+      const token = localStorage.getItem("authToken");
+      const response = await fetch(`${API_URL}/pdf/exam`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          client_id: activeId.client_id,
+          exam_name: examName,
+        }),
+      });
 
-      doc.save(`optometrie-${activeId?.client_id || "unknown"}.pdf`);
+      if (!response.ok) {
+        let errorMessage = "Nepodařilo se vygenerovat PDF vyšetření.";
+        try {
+          const errorData = await response.json();
+          if (errorData?.error) {
+            errorMessage = errorData.error;
+          }
+        } catch {
+          // keep default message
+        }
+        throw new Error(errorMessage);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const opened = window.open(url, "_blank", "noopener,noreferrer");
+
+      if (!opened) {
+        // Fallback pokud prohlížeč zablokuje nové okno
+        const link = document.createElement("a");
+        link.href = url;
+        link.target = "_blank";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+
+      // Necháme URL aktivní chvíli kvůli načtení PDF v nové záložce
+      window.setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 60000);
     } catch (e) {
       console.error("PDF export failed", e);
-      // fallback: tisk stránky
-      window.print();
+      setError(e.message || "Chyba při exportu PDF");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -362,7 +416,7 @@ function ClientOptometry({ client }) {
     duplicateItemById(id);
   };
 
-  const handleOpenCopyAddModal = (e, id, addValueFromModule, sourceValues) => {
+  const handleOpenCopyAddModal = (e, id, addValueFromModule) => {
     e.stopPropagation();
 
     const parsedAddValue = parseSignedNumber(addValueFromModule);
@@ -568,35 +622,73 @@ function ClientOptometry({ client }) {
           <h6>INFO</h6>
           <PuffLoaderSpinnerDark active={isLoading} />
         </div>
-        <div>
-          <OptometryInfo
-            optometryItems={optometryItems}
-            activeItem={activeItem}
-          />
-        </div>
-        <div className="optometry-right-container-body">
-          {optometryItems[activeItem - 1]?.component.name ===
-            "OptometryAnamnesis" && (
-            <>
-              <p>
-                V rámci anamnézy je nutné zjistit minulé zkušenosti, léky a
-                požadavky klienta.
-              </p>
-              <p>
-                Důležité je zdravotní anamnéza jak osobní, tak rodinná,
-                pracovní, sociální a volnočasová.
-              </p>
-            </>
-          )}
+        <Tabs
+          items={RIGHT_PANEL_TABS}
+          selectedValue={activeRightTab}
+          onChange={setActiveRightTab}
+          idPrefix="optometry-right"
+          width="100%"
+        />
 
-          {optometryItems[activeItem - 1]?.component.name ===
-            "OptometryNaturalVisus" && (
-            <>
-              <p>Zde zadej hodnotu naturálního vizu – bez korekce do dálky.</p>
-              <p>Nejprve PRAVÉ oko, poté LEVÉ a nakonec BINO (obě oči).</p>
-            </>
-          )}
-        </div>
+        {activeRightTab === "analysis" && (
+          <div
+            id="optometry-right-analysis-panel"
+            role="tabpanel"
+            aria-labelledby="optometry-right-analysis-tab"
+            className="optometry-right-container-body"
+          >
+            <p>
+              <OptometryInfo
+                optometryItems={optometryItems}
+                activeItem={activeItem}
+              />
+            </p>
+          </div>
+        )}
+
+        {activeRightTab === "ai" && (
+          <div
+            id="optometry-right-ai-panel"
+            role="tabpanel"
+            aria-labelledby="optometry-right-ai-tab"
+            className="optometry-right-container-body"
+          >
+            <AiAnamnesisAnalysisPanel optometryItems={optometryItems} />
+          </div>
+        )}
+
+        {activeRightTab === "description" && (
+          <div
+            className="optometry-right-container-body"
+            id="optometry-right-description-panel"
+            role="tabpanel"
+            aria-labelledby="optometry-right-description-tab"
+          >
+            {optometryItems[activeItem - 1]?.component.name ===
+              "OptometryAnamnesis" && (
+              <>
+                <p>
+                  V rámci anamnézy je nutné zjistit minulé zkušenosti, léky a
+                  požadavky klienta.
+                </p>
+                <p>
+                  Důležité je zdravotní anamnéza jak osobní, tak rodinná,
+                  pracovní, sociální a volnočasová.
+                </p>
+              </>
+            )}
+
+            {optometryItems[activeItem - 1]?.component.name ===
+              "OptometryNaturalVisus" && (
+              <>
+                <p>
+                  Zde zadej hodnotu naturálního vizu – bez korekce do dálky.
+                </p>
+                <p>Nejprve PRAVÉ oko, poté LEVÉ a nakonec BINO (obě oči).</p>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
