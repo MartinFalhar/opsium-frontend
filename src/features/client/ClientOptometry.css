@@ -45,12 +45,23 @@
   box-shadow: 0 10px 13px rgba(0, 0, 0, 0.7);
   z-index: 1;
   padding: 15px;
+  min-height: 0;
 }
 .optometry-right-container-head {
   text-align: center;
   margin-bottom: 10px;
 }
+.optometry-right-container-body {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 .optometry-right-container-body p {
+  color: var(--color-bg-b1);
+  
+  margin-top: 10px;
   margin-bottom: 10px;
 }
 
@@ -831,4 +842,73 @@ input {
 
 .copy-add-modal-content input {
   margin-top: 4px;
+}
+
+.ai-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ai-btn {
+  width: 100%;
+  min-height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--color-bg-b7);
+  background: var(--color-grd-g8);
+  color: var(--color-bg-b1);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ai-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.ai-results {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid var(--color-bg-b7);
+  border-radius: 8px;
+  padding: 10px;
+  background: var(--color-bg-b10);
+  overflow-y: auto;
+}
+
+.ai-results ul {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-results p {
+  margin: 0;
+}
+
+.ai-followup {
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-followup label {
+  font-size: clamp(var(--font-size-small), 0.9vw, var(--font-size-regular));
+  font-weight: 600;
+}
+
+.ai-followup-textarea {
+  width: 100%;
+  min-height: 90px;
+  border: 1px solid var(--color-bg-b7);
+  border-radius: 8px;
+  padding: 8px;
+  resize: vertical;
+  background: var(--color-bg-b12);
+  color: var(--color-bg-b1);
 }
