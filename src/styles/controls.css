@@ -19,7 +19,7 @@
   gap: 6px;
   align-items: flex-end;
   border-bottom: 1px solid var(--color-bg-b8);
-  padding: 3px 2px;
+  padding: 0px 2px;
 }
 
 .tabs-item {
@@ -45,8 +45,6 @@
   transform: translateY(4px) scaleY(1);
   transform-origin: bottom center;
   box-shadow: 0 1px 3px rgba(30, 41, 59, 0.05);
-
-
 }
 
 .tabs-item:hover {
@@ -58,7 +56,7 @@
   ); */
   background-color: var(--color-bg-b5);
   color: var(--color-bg-b10);
-  
+
   box-shadow: 0 2px 5px rgba(30, 41, 59, 0.08);
 }
 
@@ -103,9 +101,14 @@
   background: var(--color-bg-b13);
 }
 
-
 .benefits-tabs-header {
   margin: 8px;
+  background: transparent;
+}
+
+.insurance-tabs-header {
+  margin: 8px;
+  margin-bottom: 3px;
   background: transparent;
 }
 

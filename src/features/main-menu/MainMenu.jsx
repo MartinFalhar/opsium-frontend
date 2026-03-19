@@ -68,7 +68,7 @@ const buttons = [
   {
     id: "insurance",
     label: "Pojišťovna",
-    rights: 1,
+    rights: 0,
     path: "/insurance",
     icon: "insurance",
   },

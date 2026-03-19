@@ -17,26 +17,17 @@
   --color-bg-b1: #1f2937;
   --color-bg-b2: #51698b;
   --color-bg-b3: #2c3e50;
-
-  /* --color-bg-b4: #51779e;
-  --color-bg-b5: #789ac1;
-  --color-bg-b6: #8eb9ea;
-  --color-bg-b7: #7f8c8d;
-  --color-bg-b8: #95a5a6; */
-
   --color-bg-b4: #3a4b61; /* deep blue-gray */
   --color-bg-b5: #465a75; /* muted steel */
   --color-bg-b6: #5a6f8d; /* calm blue-gray */
   --color-bg-b7: #6f849f; /* soft slate */
   --color-bg-b8: #889bb3; /* light steel */
-
-  /* --color-bg-b9: #bdc3c7; */
   --color-bg-b9: #a9b7c9;
-
   --color-bg-b10: #d9dcde;
   --color-bg-b11: #e0e7f0;
   --color-bg-b12: #f3f4f6;
   --color-bg-b13: #ffffff;
+
   --color-grd-g1: linear-gradient(45deg, rgb(255, 175, 3), rgb(255, 0, 0));
   --color-grd-g2: linear-gradient(
     45deg,
@@ -134,8 +125,8 @@
   --font-size-xsmall: 0.7rem;
   --font-size-small: 0.8rem;
   --font-size-regular: 0.9rem;
-  --font-size-large: 1.1rem;
-  --font-size-xlarge: 1.2rem;
+  --font-size-large: 1.2rem;
+  --font-size-xlarge: 1.5rem;
 }
 
 @font-face {
@@ -201,8 +192,7 @@ textarea {
 
 h1 {
   font-size: clamp(var(--font-size-small), 2.5vw, var(--font-size-xlarge));
-  color: var(--color-bg-b8);
-  /* text-align: left; */
+  color: var(--color-bg-b12);
   font-weight: 800;
   letter-spacing: 1px;
   font-weight: 400;
@@ -214,29 +204,47 @@ h1.dark {
 
 h2 {
   font-size: clamp(var(--font-size-small), 2.3vw, var(--font-size-large));
-  color: var(--color-bg-b5);
+  color: var(--color-bg-b11);
   text-align: left;
   font-weight: 600;
 }
 
-h3 {
-  font-size: clamp(var(--font-size-small), 1.6vw, var(--font-size-regular));
-  color: var(--color-bg-b5);
-  text-align: left;
-  font-weight: 800;
+h2.dark {
+  color: var(--color-bg-b2);
 }
 
-h4 {
-  font-size: clamp(var(--font-size-small), 1.8vw, var(--font-size-regular));
-  color: var(--color-bg-b3);
+h3 {
+  font-size: clamp(var(--font-size-small), 2.1vw, var(--font-size-regular));
+  color: var(--color-bg-b10);
   text-align: left;
-
+  font-weight: 800;
   letter-spacing: 1px;
 }
 
-h7 {
-  font-size: clamp(var(--font-size-small), 2.2vw, var(--font-size-large));
-  color: var(--color-bg-b1);
+h3.dark {
+  color: var(--color-bg-b3);
+}
+
+h4 {
+  font-size: clamp(var(--font-size-small), 1.9vw, var(--font-size-regular));
+  color: var(--color-bg-b9);
+  text-align: left;
+  letter-spacing: 1px;
+}
+
+h4.dark {
+  color: var(--color-bg-b4);
+}
+
+h5 {
+  font-size: clamp(var(--font-size-small), 1.7vw, var(--font-size-regular));
+  color: var(--color-bg-b8);
+  text-align: left;
+  letter-spacing: 1px;
+}
+
+h5.dark {
+  color: var(--color-bg-b5);
 }
 
 .fancy-1 {

@@ -14,8 +14,9 @@ import AgendaServices from "./AgendaServices.jsx";
 import AgendaEmail from "./AgendaEmail.jsx";
 import AgendaSMS from "./AgendaSMS.jsx";
 import AgendaTasks from "./AgendaTasks.jsx";
+import AgendaReservio from "./AgendaReservio.jsx";
+import AgendaWorkSchedule from "./AgendaWorkSchedule.jsx";
 import MenuToggleIcon from "../../components/icons/MenuToggleIcon";
-
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -86,6 +87,20 @@ function Agenda() {
       component: AgendaTasks,
       icon: "eye",
     },
+    {
+      id: "10",
+      label: "Reservio",
+      rights: 0,
+      component: AgendaReservio,
+      icon: "eye",
+    },
+    {
+      id: "11",
+      label: "Pracovní rozpis",
+      rights: 0,
+      component: AgendaWorkSchedule,
+      icon: "eye",
+    },
   ];
 
   //nastavuje komponentu z menu
@@ -149,7 +164,6 @@ function Agenda() {
       <div className="left-container">
         {Component ? <Component client={user} /> : null}
       </div>
-
     </div>
   );
 }
