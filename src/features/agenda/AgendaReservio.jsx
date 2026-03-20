@@ -40,6 +40,19 @@ function formatTimeLabel(value) {
   });
 }
 
+const SERVICE_CLASS_MAP = {
+  "měření zraku": "reservio-svc-mereni",
+  "měření zraku - celkové binokulární vyšetření": "reservio-svc-bino",
+  "aplikace kontaktních čoček": "reservio-svc-aplikace",
+  "kontrola kontaktních čoček": "reservio-svc-kontrola",
+  "zrakový trénink": "reservio-svc-trenink",
+};
+
+function serviceClass(serviceName) {
+  if (!serviceName) return "";
+  return SERVICE_CLASS_MAP[serviceName.toLowerCase()] || "";
+}
+
 function AgendaReservio({ client }) {
   const [selectedDate, setSelectedDate] = useState(() => toDateInputValue(new Date()));
   const [overview, setOverview] = useState(null);
@@ -158,11 +171,14 @@ function AgendaReservio({ client }) {
               ) : (
                 <ul>
                   {day.items.map((item) => (
-                    <li key={item.id}>
+                    <li key={item.id} className={serviceClass(item.serviceName)}>
                       <p>
                         <strong>{formatTimeLabel(item.start)}</strong> - {item.name}
                       </p>
+                      {item.serviceName ? <p className="reservio-service-label">{item.serviceName}</p> : null}
                       <p>Klient: {item.bookedClientName || "-"}</p>
+                      {item.phone ? <p>Tel: {item.phone}</p> : null}
+                      {item.email ? <p>Email: {item.email}</p> : null}
                       <p>Stav: {item.state || "-"}</p>
                       <p>Pocet rezervaci: {item.bookingsCount}</p>
                       {item.note ? <p>Poznamka: {item.note}</p> : null}
